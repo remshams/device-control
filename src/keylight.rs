@@ -9,6 +9,12 @@ pub struct Metadata {
     port: u16,
 }
 
+impl PartialEq for Metadata {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name && self.ip == other.ip && self.port == other.port
+    }
+}
+
 pub struct OperatingData {
     on: bool,
     brightness: i32,
@@ -22,6 +28,12 @@ pub struct Keylight {
 #[derive(Debug)]
 pub struct DiscoveredKeylight {
     metadata: Metadata,
+}
+
+impl PartialEq for DiscoveredKeylight {
+    fn eq(&self, other: &Self) -> bool {
+        self.metadata == other.metadata
+    }
 }
 
 impl DiscoveredKeylight {

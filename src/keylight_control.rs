@@ -1,6 +1,6 @@
 use crate::keylight::{DiscoveredKeylight, Keylight};
 
-pub trait DeviceFinder {
+pub trait KeylightFinder {
     fn discover(self) -> Vec<DiscoveredKeylight>;
 }
 

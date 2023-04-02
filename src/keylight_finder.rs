@@ -3,33 +3,20 @@ use zeroconf::prelude::*;
 use zeroconf::{MdnsBrowser, ServiceType};
 
 use crate::keylight::DiscoveredKeylight;
-use crate::keylight_control::DeviceFinder;
+use crate::keylight_control::KeylightFinder;
 
-pub enum DeviceType {
-    Elgato,
-}
+pub struct ZeroConfKeylightFinder {}
 
-impl DeviceType {
-    pub fn dns_name(&self) -> String {
-        match self {
-            DeviceType::Elgato => String::from("elg"),
-        }
+impl ZeroConfKeylightFinder {
+    pub fn new() -> ZeroConfKeylightFinder {
+        ZeroConfKeylightFinder {}
     }
 }
 
-pub struct ZeroConfDeviceFinder {}
-
-impl ZeroConfDeviceFinder {
-    pub fn new() -> ZeroConfDeviceFinder {
-        ZeroConfDeviceFinder {}
-    }
-}
-
-impl DeviceFinder for ZeroConfDeviceFinder {
+impl KeylightFinder for ZeroConfKeylightFinder {
     fn discover(self) -> Vec<DiscoveredKeylight> {
         let (tx, rx) = std::sync::mpsc::channel();
-        let mut browser =
-            MdnsBrowser::new(ServiceType::new(&DeviceType::Elgato.dns_name(), "tcp").unwrap());
+        let mut browser = MdnsBrowser::new(ServiceType::new("elg", "tcp").unwrap());
         let mut devices: Vec<DiscoveredKeylight> = Vec::new();
 
         // browser.set_context(discovered_services);

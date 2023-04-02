@@ -1,7 +1,7 @@
-use keylight_on::keylight_control::DeviceFinder;
-use keylight_on::keylight_discover::ZeroConfDeviceFinder;
+use keylight_on::keylight_control::KeylightFinder;
+use keylight_on::keylight_finder::ZeroConfKeylightFinder;
 
 fn main() {
-    let devices = ZeroConfDeviceFinder::new().discover();
+    let devices = ZeroConfKeylightFinder::new().discover();
     println!("{:?}", devices)
 }

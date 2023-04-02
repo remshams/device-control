@@ -39,18 +39,11 @@ impl KeylightFinder for ZeroConfKeylightFinder {
 impl ZeroConfKeylightFinder {
     fn add_new_device(&self, devices: &mut Vec<DiscoveredKeylight>, service: &ServiceDiscovery) {
         if let Ok(address) = service.address().parse() {
-            let new_device =
-                DiscoveredKeylight::new(service.name().clone(), address, service.port().clone());
-            if self.should_add_new_device(&devices, &new_device) {
-                devices.push(new_device);
-            }
+            devices.push(DiscoveredKeylight::new(
+                service.name().clone(),
+                address,
+                service.port().clone(),
+            ));
         }
-    }
-    fn should_add_new_device(
-        &self,
-        devices: &Vec<DiscoveredKeylight>,
-        new_device: &DiscoveredKeylight,
-    ) -> bool {
-        !devices.iter().any(|device| device == new_device)
     }
 }

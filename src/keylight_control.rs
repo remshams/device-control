@@ -1,15 +1,17 @@
-use crate::keylight::{DiscoveredKeylight, Keylight};
+use crate::keylight::DiscoveredKeylight;
 
 pub trait KeylightFinder {
-    fn discover(self) -> Vec<DiscoveredKeylight>;
+    fn discover(&self) -> Vec<DiscoveredKeylight>;
 }
 
 pub struct KeylightControl {
-    lights: Vec<Keylight>,
+    pub lights: Vec<DiscoveredKeylight>,
 }
 
 impl KeylightControl {
-    pub fn discover_lights() -> KeylightControl {
-        KeylightControl { lights: vec![] }
+    pub fn new(keylight_finder: &dyn KeylightFinder) -> KeylightControl {
+        let mut lights = keylight_finder.discover();
+        lights.dedup();
+        KeylightControl { lights }
     }
 }

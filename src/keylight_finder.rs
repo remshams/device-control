@@ -14,6 +14,8 @@ impl ZeroConfKeylightFinder {
 }
 
 impl KeylightFinder for ZeroConfKeylightFinder {
+    type Output = Vec<DiscoveredKeylight>;
+
     // The function uses a channel to create the list of the devices because the browser
     // callback function runs on a different thread.
     fn discover(&self) -> Vec<DiscoveredKeylight> {

@@ -27,17 +27,14 @@ impl<'a, F: KeylightFinder> KeylightControl<'a, F> {
     }
 
     fn deduplicate_lights(&mut self) {
-        // TODO Is making the DiscoveryKeylight hashable the best way to do this?
-        let seen: HashSet<DiscoveredKeylight> = self.lights.drain(..).collect();
-        self.lights.extend(seen);
-        // let mut seen = HashSet::new();
-        // // TODO implements setters for DisvoveredKeylight
-        // for light in lights.iter() {
-        //     if !seen.contains(light.metadata.ip) {
-        //         seen.insert(light);
-        //     }
-        // }
-        // lights.retain(|light| seen.contains(light.metadata.ip));
+        let mut seen: HashSet<DiscoveredKeylight> = HashSet::new();
+        let mut unique_lights: Vec<DiscoveredKeylight> = vec![];
+        for light in self.lights.drain(..) {
+            if seen.insert(light.clone()) {
+                unique_lights.push(seen.replace(light).unwrap());
+            }
+        }
+        self.lights = unique_lights
     }
 }
 
@@ -75,8 +72,10 @@ mod test {
     #[test]
     fn test_discover_lights() {
         let finder = prepare_test();
+        let deduplicated_lights = vec![finder.lights[0].clone(), finder.lights[1].clone()];
         let mut keylight_control = KeylightControl::new(&finder);
         keylight_control.discover_lights();
         assert_eq!(keylight_control.lights.len(), 2);
+        assert_eq!(keylight_control.lights, deduplicated_lights)
     }
 }

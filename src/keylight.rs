@@ -2,17 +2,11 @@ pub enum KeylightError {
     CommandError(String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct Metadata {
     name: String,
     ip: String,
     port: u16,
-}
-
-impl PartialEq for Metadata {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name && self.ip == other.ip && self.port == other.port
-    }
 }
 
 pub struct OperatingData {
@@ -25,15 +19,9 @@ pub struct Keylight {
     operating_data: OperatingData,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct DiscoveredKeylight {
     metadata: Metadata,
-}
-
-impl PartialEq for DiscoveredKeylight {
-    fn eq(&self, other: &Self) -> bool {
-        self.metadata == other.metadata
-    }
 }
 
 impl DiscoveredKeylight {

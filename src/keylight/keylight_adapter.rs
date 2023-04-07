@@ -13,9 +13,7 @@ struct LightDto {
 }
 
 #[derive(Debug, Deserialize)]
-#[allow(non_snake_case)]
 struct StatusDto {
-    pub numberOfLights: i32,
     pub lights: Vec<LightDto>,
 }
 

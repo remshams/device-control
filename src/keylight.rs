@@ -1,27 +1,34 @@
+use crate::keylight_adapter::KeylightAdapter;
+
 pub enum KeylightError {
     CommandError(String),
 }
 
-#[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct Metadata {
-    name: String,
-    ip: String,
-    port: u16,
+impl From<reqwest::Error> for KeylightError {
+    fn from(error: reqwest::Error) -> Self {
+        KeylightError::CommandError(error.to_string())
+    }
 }
 
-pub struct OperatingData {
-    on: bool,
-    brightness: i32,
-    temperature: i32,
+#[derive(Debug, Eq, Hash, PartialEq, Clone)]
+pub struct Metadata {
+    pub name: String,
+    pub ip: String,
+    pub port: u16,
+}
+
+pub struct Light {
+    pub on: bool,
+    pub brightness: i32,
+    pub temperature: i32,
 }
 pub struct Keylight {
     metadata: Metadata,
-    operating_data: OperatingData,
+    lights: Light,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct DiscoveredKeylight {
-    metadata: Metadata,
+    pub metadata: Metadata,
 }
 
 impl DiscoveredKeylight {
@@ -31,16 +38,13 @@ impl DiscoveredKeylight {
         }
     }
 
-    pub fn connect(self, operating_data: OperatingData) -> Keylight {
-        Keylight {
-            metadata: self.metadata,
-            operating_data,
-        }
+    pub fn connect(self) -> Keylight {
+        unreachable!();
     }
 }
 
 impl Keylight {
-    pub fn update(&mut self, operating_data: OperatingData) -> &Self {
+    pub fn update(&mut self, operating_data: Light) -> &Self {
         unimplemented!()
     }
 

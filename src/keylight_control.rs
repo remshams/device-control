@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::keylight::DiscoveredKeylight;
 
 pub trait KeylightFinder {
@@ -27,55 +25,78 @@ impl<'a, F: KeylightFinder> KeylightControl<'a, F> {
     }
 
     fn deduplicate_lights(&mut self) {
-        let mut seen: HashSet<DiscoveredKeylight> = HashSet::new();
-        let mut unique_lights: Vec<DiscoveredKeylight> = vec![];
-        for light in self.lights.drain(..) {
-            if seen.insert(light.clone()) {
-                unique_lights.push(seen.replace(light).unwrap());
-            }
-        }
-        self.lights = unique_lights
+        self.lights.sort_by_key(|light| light.metadata.ip.clone());
+        self.lights.dedup_by_key(|light| light.metadata.ip.clone());
     }
 }
 
 #[cfg(test)]
 mod test {
+
+    use crate::keylight::Metadata;
+
     use super::*;
 
     struct MockKeylightFinder {
-        pub lights: Vec<DiscoveredKeylight>,
+        pub metadata: Vec<Metadata>,
     }
 
     impl KeylightFinder for MockKeylightFinder {
         type Output = Vec<DiscoveredKeylight>;
 
         fn discover(&self) -> Self::Output {
-            self.lights.clone()
+            self.metadata
+                .iter()
+                .map(|metadata| {
+                    DiscoveredKeylight::new(
+                        metadata.name.clone(),
+                        metadata.ip.clone(),
+                        metadata.port,
+                    )
+                })
+                .collect()
         }
     }
 
     impl MockKeylightFinder {
-        fn new(lights: Vec<DiscoveredKeylight>) -> MockKeylightFinder {
-            MockKeylightFinder { lights }
+        fn new(metadata: Vec<Metadata>) -> MockKeylightFinder {
+            MockKeylightFinder { metadata }
         }
     }
 
     fn prepare_test() -> MockKeylightFinder {
-        let test_lights: Vec<DiscoveredKeylight> = vec![
-            DiscoveredKeylight::new(String::from("first"), String::from("192.168.1.1"), 1234),
-            DiscoveredKeylight::new(String::from("second"), String::from("192.168.1.2"), 4567),
-            DiscoveredKeylight::new(String::from("first"), String::from("192.168.1.1"), 1234),
+        let test_metadata: Vec<Metadata> = vec![
+            Metadata {
+                name: String::from("first"),
+                ip: String::from("102.168.1.1"),
+                port: 1234,
+            },
+            Metadata {
+                name: String::from("second"),
+                ip: String::from("102.168.1.2"),
+                port: 4567,
+            },
+            Metadata {
+                name: String::from("first"),
+                ip: String::from("102.168.1.1"),
+                port: 1234,
+            },
         ];
-        MockKeylightFinder::new(test_lights)
+        MockKeylightFinder::new(test_metadata)
     }
 
     #[test]
     fn test_discover_lights() {
         let finder = prepare_test();
-        let deduplicated_lights = vec![finder.lights[0].clone(), finder.lights[1].clone()];
+        let deduplicated_metadata = vec![finder.metadata[0].clone(), finder.metadata[1].clone()];
         let mut keylight_control = KeylightControl::new(&finder);
         keylight_control.discover_lights();
+        let discovered_metadata: Vec<Metadata> = keylight_control
+            .lights
+            .iter()
+            .map(|light| light.metadata.clone())
+            .collect();
         assert_eq!(keylight_control.lights.len(), 2);
-        assert_eq!(keylight_control.lights, deduplicated_lights)
+        assert_eq!(discovered_metadata, deduplicated_metadata);
     }
 }

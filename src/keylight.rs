@@ -15,24 +15,15 @@ pub struct KeylightMetadata {
     pub port: u16,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Light {
     pub on: bool,
     pub brightness: i32,
     pub temperature: i32,
 }
 pub struct Keylight {
-    metadata: KeylightMetadata,
-    lights: Light,
-}
-
-pub struct DiscoveredKeylight {
     pub metadata: KeylightMetadata,
-}
-
-impl DiscoveredKeylight {
-    pub fn connect(self) -> Keylight {
-        unreachable!();
-    }
+    pub lights: Option<Vec<Light>>,
 }
 
 impl Keylight {

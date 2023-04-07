@@ -33,12 +33,12 @@ impl<'a, F: KeylightFinder> KeylightControl<'a, F> {
 #[cfg(test)]
 mod test {
 
-    use crate::keylight::Metadata;
+    use crate::keylight::KeylightMetadata;
 
     use super::*;
 
     struct MockKeylightFinder {
-        pub metadata: Vec<Metadata>,
+        pub metadata: Vec<KeylightMetadata>,
     }
 
     impl KeylightFinder for MockKeylightFinder {
@@ -59,24 +59,24 @@ mod test {
     }
 
     impl MockKeylightFinder {
-        fn new(metadata: Vec<Metadata>) -> MockKeylightFinder {
+        fn new(metadata: Vec<KeylightMetadata>) -> MockKeylightFinder {
             MockKeylightFinder { metadata }
         }
     }
 
     fn prepare_test() -> MockKeylightFinder {
-        let test_metadata: Vec<Metadata> = vec![
-            Metadata {
+        let test_metadata: Vec<KeylightMetadata> = vec![
+            KeylightMetadata {
                 name: String::from("first"),
                 ip: String::from("102.168.1.1"),
                 port: 1234,
             },
-            Metadata {
+            KeylightMetadata {
                 name: String::from("second"),
                 ip: String::from("102.168.1.2"),
                 port: 4567,
             },
-            Metadata {
+            KeylightMetadata {
                 name: String::from("first"),
                 ip: String::from("102.168.1.1"),
                 port: 1234,
@@ -91,7 +91,7 @@ mod test {
         let deduplicated_metadata = vec![finder.metadata[0].clone(), finder.metadata[1].clone()];
         let mut keylight_control = KeylightControl::new(&finder);
         keylight_control.discover_lights();
-        let discovered_metadata: Vec<Metadata> = keylight_control
+        let discovered_metadata: Vec<KeylightMetadata> = keylight_control
             .lights
             .iter()
             .map(|light| light.metadata.clone())

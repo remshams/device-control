@@ -1,5 +1,3 @@
-use crate::keylight_adapter::KeylightAdapter;
-
 pub enum KeylightError {
     CommandError(String),
 }
@@ -11,7 +9,7 @@ impl From<reqwest::Error> for KeylightError {
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct Metadata {
+pub struct KeylightMetadata {
     pub name: String,
     pub ip: String,
     pub port: u16,
@@ -23,18 +21,18 @@ pub struct Light {
     pub temperature: i32,
 }
 pub struct Keylight {
-    metadata: Metadata,
+    metadata: KeylightMetadata,
     lights: Light,
 }
 
 pub struct DiscoveredKeylight {
-    pub metadata: Metadata,
+    pub metadata: KeylightMetadata,
 }
 
 impl DiscoveredKeylight {
     pub fn new(name: String, ip: String, port: u16) -> DiscoveredKeylight {
         DiscoveredKeylight {
-            metadata: Metadata { name, ip, port },
+            metadata: KeylightMetadata { name, ip, port },
         }
     }
 

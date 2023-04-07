@@ -1,4 +1,4 @@
-use crate::keylight::{Keylight, KeylightError, KeylightMetadata, Light};
+use crate::keylight::keylight::{Keylight, KeylightError, KeylightMetadata, Light};
 
 pub trait KeylightFinder {
     type Output: IntoIterator<Item = KeylightMetadata>;
@@ -44,7 +44,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter> KeylightControl<'a, F, A> {
 #[cfg(test)]
 mod test {
 
-    use crate::keylight::KeylightMetadata;
+    use crate::keylight::keylight::KeylightMetadata;
 
     use super::*;
 

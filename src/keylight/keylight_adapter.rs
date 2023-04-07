@@ -1,8 +1,9 @@
-use crate::{
+use serde::Deserialize;
+
+use super::{
     keylight::{KeylightError, Light},
     keylight_control::KeylightAdapter,
 };
-use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 struct LightDto {

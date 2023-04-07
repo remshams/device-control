@@ -1,7 +1,7 @@
-use crate::keylight::DiscoveredKeylight;
+use crate::keylight::{DiscoveredKeylight, KeylightMetadata};
 
 pub trait KeylightFinder {
-    type Output: IntoIterator<Item = DiscoveredKeylight>;
+    type Output: IntoIterator<Item = KeylightMetadata>;
 
     fn discover(&self) -> Self::Output;
 }
@@ -20,7 +20,12 @@ impl<'a, F: KeylightFinder> KeylightControl<'a, F> {
     }
 
     pub fn discover_lights(&mut self) {
-        self.lights = self.keylight_finder.discover().into_iter().collect();
+        self.lights = self
+            .keylight_finder
+            .discover()
+            .into_iter()
+            .map(|metadata| DiscoveredKeylight { metadata })
+            .collect();
         self.deduplicate_lights();
     }
 
@@ -42,19 +47,10 @@ mod test {
     }
 
     impl KeylightFinder for MockKeylightFinder {
-        type Output = Vec<DiscoveredKeylight>;
+        type Output = Vec<KeylightMetadata>;
 
         fn discover(&self) -> Self::Output {
-            self.metadata
-                .iter()
-                .map(|metadata| {
-                    DiscoveredKeylight::new(
-                        metadata.name.clone(),
-                        metadata.ip.clone(),
-                        metadata.port,
-                    )
-                })
-                .collect()
+            self.metadata.clone()
         }
     }
 
@@ -88,13 +84,13 @@ mod test {
     #[test]
     fn test_discover_lights() {
         let finder = prepare_test();
-        let deduplicated_metadata = vec![finder.metadata[0].clone(), finder.metadata[1].clone()];
+        let deduplicated_metadata = vec![&finder.metadata[0], &finder.metadata[1]];
         let mut keylight_control = KeylightControl::new(&finder);
         keylight_control.discover_lights();
-        let discovered_metadata: Vec<KeylightMetadata> = keylight_control
+        let discovered_metadata: Vec<&KeylightMetadata> = keylight_control
             .lights
             .iter()
-            .map(|light| light.metadata.clone())
+            .map(|light| &light.metadata)
             .collect();
         assert_eq!(keylight_control.lights.len(), 2);
         assert_eq!(discovered_metadata, deduplicated_metadata);

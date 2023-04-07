@@ -30,12 +30,6 @@ pub struct DiscoveredKeylight {
 }
 
 impl DiscoveredKeylight {
-    pub fn new(name: String, ip: String, port: u16) -> DiscoveredKeylight {
-        DiscoveredKeylight {
-            metadata: KeylightMetadata { name, ip, port },
-        }
-    }
-
     pub fn connect(self) -> Keylight {
         unreachable!();
     }

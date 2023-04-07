@@ -1,5 +1,6 @@
 use crate::keylight::keylight_control::KeylightAdapter;
 
+#[derive(Debug)]
 pub enum KeylightError {
     CommandError(String),
 }
@@ -37,5 +38,11 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
             metadata,
             lights: None,
         }
+    }
+
+    pub fn lights(&mut self) -> Result<&Vec<Light>, KeylightError> {
+        let lights = self.keylight_adapter.lights(&self.metadata.ip)?;
+        self.lights = Some(lights);
+        Ok(self.lights.as_ref().unwrap())
     }
 }

@@ -10,15 +10,17 @@ pub trait KeylightAdapter {
     fn lights(&self, ip: &String) -> Result<Vec<Light>, KeylightError>;
 }
 
-pub struct KeylightControl<'a, F: KeylightFinder> {
+pub struct KeylightControl<'a, F: KeylightFinder, A: KeylightAdapter> {
     keylight_finder: &'a F,
-    pub lights: Vec<Keylight>,
+    keylight_adapter: &'a A,
+    pub lights: Vec<Keylight<'a, A>>,
 }
 
-impl<'a, F: KeylightFinder> KeylightControl<'a, F> {
-    pub fn new(keylight_finder: &'a F) -> KeylightControl<'a, F> {
+impl<'a, F: KeylightFinder, A: KeylightAdapter> KeylightControl<'a, F, A> {
+    pub fn new(keylight_finder: &'a F, keylight_adapter: &'a A) -> KeylightControl<'a, F, A> {
         KeylightControl {
             keylight_finder,
+            keylight_adapter,
             lights: vec![],
         }
     }
@@ -28,10 +30,7 @@ impl<'a, F: KeylightFinder> KeylightControl<'a, F> {
             .keylight_finder
             .discover()
             .into_iter()
-            .map(|metadata| Keylight {
-                metadata,
-                lights: None,
-            })
+            .map(|metadata| Keylight::new(self.keylight_adapter, metadata))
             .collect();
         self.deduplicate_lights();
     }
@@ -77,7 +76,7 @@ mod test {
         }
     }
 
-    fn prepare_test() -> MockKeylightFinder {
+    fn prepare_test() -> (MockKeylightFinder, MockKeylightAdapter) {
         let test_metadata: Vec<KeylightMetadata> = vec![
             KeylightMetadata {
                 name: String::from("first"),
@@ -95,14 +94,17 @@ mod test {
                 port: 1234,
             },
         ];
-        MockKeylightFinder::new(test_metadata)
+        (
+            MockKeylightFinder::new(test_metadata),
+            MockKeylightAdapter { lights: vec![] },
+        )
     }
 
     #[test]
     fn test_discover_lights() {
-        let finder = prepare_test();
+        let (finder, adapter) = prepare_test();
         let deduplicated_metadata = vec![&finder.metadata[0], &finder.metadata[1]];
-        let mut keylight_control = KeylightControl::new(&finder);
+        let mut keylight_control = KeylightControl::new(&finder, &adapter);
         keylight_control.discover_lights();
         let discovered_metadata: Vec<&KeylightMetadata> = keylight_control
             .lights
@@ -111,7 +113,5 @@ mod test {
             .collect();
         assert_eq!(keylight_control.lights.len(), 2);
         assert_eq!(discovered_metadata, deduplicated_metadata);
-        let keylight = keylight_control.lights.get(0).unwrap();
-        assert_eq!(keylight.lights, None)
     }
 }

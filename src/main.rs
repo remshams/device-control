@@ -4,7 +4,8 @@ use keylight_on::keylight_finder::ZeroConfKeylightFinder;
 
 fn main() {
     let finder = ZeroConfKeylightFinder::new();
-    let mut keylight_control = KeylightControl::new(&finder);
+    let adapter = KeylightRestAdapter {};
+    let mut keylight_control = KeylightControl::new(&finder, &adapter);
     keylight_control.discover_lights();
     for keylight in keylight_control.lights {
         println!("{:?}", keylight.metadata);

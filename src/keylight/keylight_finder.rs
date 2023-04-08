@@ -7,12 +7,6 @@ use crate::keylight::keylight_control::KeylightFinder;
 
 pub struct ZeroConfKeylightFinder {}
 
-impl ZeroConfKeylightFinder {
-    pub fn new() -> ZeroConfKeylightFinder {
-        ZeroConfKeylightFinder {}
-    }
-}
-
 impl KeylightFinder for ZeroConfKeylightFinder {
     type Output = Vec<KeylightMetadata>;
 
@@ -32,19 +26,29 @@ impl KeylightFinder for ZeroConfKeylightFinder {
         event_loop.poll(Duration::from_secs(10)).unwrap();
 
         while let Ok(service) = rx.recv_timeout(Duration::from_secs(2)) {
-            self.add_new_device(&mut keylight_metadatas, &service);
+            self.add_new_device(&mut keylight_metadatas, service);
         }
         keylight_metadatas
     }
 }
 
+impl Default for ZeroConfKeylightFinder {
+    fn default() -> Self {
+        ZeroConfKeylightFinder::new()
+    }
+}
+
 impl ZeroConfKeylightFinder {
+    pub fn new() -> ZeroConfKeylightFinder {
+        ZeroConfKeylightFinder {}
+    }
     fn add_new_device(
         &self,
         keylight_metadatas: &mut Vec<KeylightMetadata>,
-        service: &ServiceDiscovery,
+        service: ServiceDiscovery,
     ) {
-        if let Ok(address) = service.address().parse() {
+        let address = service.address().parse();
+        if let Ok(address) = address {
             keylight_metadatas.push(KeylightMetadata {
                 name: service.name().clone(),
                 ip: address,

@@ -7,9 +7,9 @@ use super::{
 
 #[derive(Debug, Serialize, Deserialize)]
 struct LightDto {
-    pub on: i32,
-    pub brightness: i32,
-    pub temperature: i32,
+    pub on: u16,
+    pub brightness: u16,
+    pub temperature: u16,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -43,7 +43,7 @@ impl KeylightAdapter for KeylightRestAdapter {
                 lights: lights
                     .iter()
                     .map(|light| LightDto {
-                        on: if light.on { 1 } else { 0 },
+                        on: u16::from(light.on),
                         brightness: light.brightness,
                         temperature: light.temperature,
                     })

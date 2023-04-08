@@ -23,8 +23,8 @@ pub struct KeylightMetadata {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Light {
     pub on: bool,
-    pub brightness: i32,
-    pub temperature: i32,
+    pub brightness: u16,
+    pub temperature: u16,
 }
 
 pub struct Keylight<'a, A: KeylightAdapter> {

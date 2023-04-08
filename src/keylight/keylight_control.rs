@@ -8,6 +8,7 @@ pub trait KeylightFinder {
 
 pub trait KeylightAdapter {
     fn lights(&self, ip: &String) -> Result<Vec<Light>, KeylightError>;
+    fn set_lights(&self, ip: &String, lights: &Vec<Light>) -> Result<(), KeylightError>;
 }
 
 pub struct KeylightControl<'a, F: KeylightFinder, A: KeylightAdapter> {

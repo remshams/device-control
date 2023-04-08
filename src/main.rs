@@ -21,4 +21,6 @@ fn main() {
             }
         }
     }
+    let command_result = keylights[0].toggle(0);
+    println!("{:?}", command_result);
 }

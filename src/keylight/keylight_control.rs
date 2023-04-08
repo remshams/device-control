@@ -31,7 +31,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter> KeylightControl<'a, F, A> {
             .keylight_finder
             .discover()
             .into_iter()
-            .map(|metadata| Keylight::new(self.keylight_adapter, metadata))
+            .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
             .collect();
         self.deduplicate_lights();
     }
@@ -47,15 +47,15 @@ mod test {
 
     use crate::keylight::keylight::KeylightMetadata;
     use crate::keylight::keylight_mocks::{
-        create_metadata_fixture, MockKeylightAdapter, MockKeylightFinder,
+        create_metadata_list_fixture, MockKeylightAdapter, MockKeylightFinder,
     };
 
     use super::*;
 
     fn prepare_test() -> (MockKeylightFinder, MockKeylightAdapter) {
         (
-            MockKeylightFinder::new(create_metadata_fixture()),
-            MockKeylightAdapter { lights: vec![] },
+            MockKeylightFinder::new(create_metadata_list_fixture()),
+            MockKeylightAdapter::new(vec![], None),
         )
     }
 

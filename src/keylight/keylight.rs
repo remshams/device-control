@@ -46,7 +46,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         }
     }
 
-    pub fn lights(&mut self) -> Result<&Vec<Light>, KeylightError> {
+    pub fn lights(&mut self) -> Result<&[Light], KeylightError> {
         let lights = self.keylight_adapter.lights(&self.metadata.ip)?;
         self.lights = Some(lights);
         Ok(self.lights.as_ref().unwrap())

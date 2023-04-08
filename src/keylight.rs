@@ -83,7 +83,7 @@ mod keylight_mocks {
         fn lights(&self, _ip: &str) -> Result<Vec<Light>, KeylightError> {
             Ok(self.lights.clone())
         }
-        fn set_lights(&self, _ip: &str, _lights: &Vec<Light>) -> Result<(), KeylightError> {
+        fn set_lights(&self, _ip: &str, _lights: &[Light]) -> Result<(), KeylightError> {
             self.set_lights_result.clone()
         }
     }

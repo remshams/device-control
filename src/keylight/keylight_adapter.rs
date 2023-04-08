@@ -35,7 +35,7 @@ impl KeylightAdapter for KeylightRestAdapter {
         Ok(lights)
     }
 
-    fn set_lights(&self, ip: &str, lights: &Vec<Light>) -> Result<(), KeylightError> {
+    fn set_lights(&self, ip: &str, lights: &[Light]) -> Result<(), KeylightError> {
         let client = reqwest::blocking::Client::new();
         client
             .put(&format!("http://{}:9123/elgato/lights", ip))

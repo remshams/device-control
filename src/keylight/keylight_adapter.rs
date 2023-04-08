@@ -20,7 +20,7 @@ struct StatusDto {
 pub struct KeylightRestAdapter {}
 
 impl KeylightAdapter for KeylightRestAdapter {
-    fn lights(&self, ip: &String) -> Result<Vec<Light>, KeylightError> {
+    fn lights(&self, ip: &str) -> Result<Vec<Light>, KeylightError> {
         let status = reqwest::blocking::get(&format!("http://{}:9123/elgato/lights", ip))?
             .json::<StatusDto>()?;
         let lights = status
@@ -35,7 +35,7 @@ impl KeylightAdapter for KeylightRestAdapter {
         Ok(lights)
     }
 
-    fn set_lights(&self, ip: &String, lights: &Vec<Light>) -> Result<(), KeylightError> {
+    fn set_lights(&self, ip: &str, lights: &Vec<Light>) -> Result<(), KeylightError> {
         let client = reqwest::blocking::Client::new();
         client
             .put(&format!("http://{}:9123/elgato/lights", ip))

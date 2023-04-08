@@ -1,6 +1,6 @@
 use crate::keylight::keylight_control::KeylightAdapter;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum KeylightError {
     CommandError(String),
     LightDoesNotExist(usize),

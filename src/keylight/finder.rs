@@ -2,8 +2,7 @@ use std::time::Duration;
 use zeroconf::{prelude::*, ServiceDiscovery};
 use zeroconf::{MdnsBrowser, ServiceType};
 
-use crate::keylight::keylight::KeylightMetadata;
-use crate::keylight::keylight_control::KeylightFinder;
+use super::{KeylightFinder, KeylightMetadata};
 
 pub struct ZeroConfKeylightFinder {}
 

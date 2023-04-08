@@ -1,4 +1,4 @@
-use crate::keylight::keylight_control::KeylightAdapter;
+use super::KeylightAdapter;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum KeylightError {

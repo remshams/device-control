@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    keylight::{KeylightError, Light},
-    keylight_control::KeylightAdapter,
+    control::KeylightAdapter,
+    model::{KeylightError, Light},
 };
 
 #[derive(Debug, Serialize, Deserialize)]

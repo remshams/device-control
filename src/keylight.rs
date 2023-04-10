@@ -104,11 +104,6 @@ mod keylight_mocks {
         keylight_adapter: &MockKeylightAdapter,
         lights: Option<Vec<Light>>,
     ) -> Keylight<MockKeylightAdapter> {
-        let adapter = MockKeylightAdapter::new(create_lights_fixture(), None);
-        Keylight::new(
-            &keylight_adapter,
-            create_metadata_fixture(),
-            lights.or(Some(adapter.lights)),
-        )
+        Keylight::new(&keylight_adapter, create_metadata_fixture(), lights)
     }
 }

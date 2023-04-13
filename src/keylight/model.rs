@@ -110,6 +110,16 @@ mod test {
     }
 
     #[test]
+    fn lights_should_load_lights() {
+        let lights = create_lights_fixture();
+        let keylight_adapter = MockKeylightAdapter::new(lights, None);
+        let mut keylight = prepare_test(&keylight_adapter, None);
+        let result = keylight.lights();
+
+        assert_eq!(result.unwrap(), keylight_adapter.lights);
+    }
+
+    #[test]
     fn test_toggle_should_toggle() {
         let keylight_adapter = MockKeylightAdapter::new(vec![], None);
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));

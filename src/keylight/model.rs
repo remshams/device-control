@@ -4,7 +4,6 @@ use super::KeylightAdapter;
 pub enum KeylightError {
     CommandError(String),
     LightDoesNotExist(usize),
-    NoLights,
 }
 
 impl From<reqwest::Error> for KeylightError {
@@ -30,7 +29,7 @@ pub struct Light {
 pub struct Keylight<'a, A: KeylightAdapter> {
     keylight_adapter: &'a A,
     pub metadata: KeylightMetadata,
-    pub lights: Option<Vec<Light>>,
+    pub lights: Vec<Light>,
 }
 
 impl<'a, A: KeylightAdapter> Keylight<'a, A> {
@@ -42,21 +41,19 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         Keylight {
             keylight_adapter,
             metadata,
-            lights: lights.or(None),
+            lights: lights.unwrap_or(vec![]),
         }
     }
 
     pub fn lights(&mut self) -> Result<&[Light], KeylightError> {
         let lights = self.keylight_adapter.lights(&self.metadata.ip)?;
-        self.lights = Some(lights);
-        Ok(self.lights.as_ref().unwrap())
+        self.lights = lights;
+        Ok(self.lights.as_ref())
     }
 
     pub fn set_switch(&mut self, light_index: usize, on: bool) -> Result<(), KeylightError> {
         let light = self
             .lights
-            .as_ref()
-            .ok_or(KeylightError::NoLights)?
             .get(light_index)
             .ok_or(KeylightError::LightDoesNotExist(light_index))?;
         let mut new_light = light.clone();
@@ -66,7 +63,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
 
     pub fn toggle(&mut self, light_index: usize) -> Result<(), KeylightError> {
         let on = self
-            .get_lights()?
+            .lights
             .get(light_index)
             .ok_or(KeylightError::LightDoesNotExist(light_index))?
             .on;
@@ -74,20 +71,15 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
     }
 
     fn set_light(&mut self, light_index: usize, light: Light) -> Result<(), KeylightError> {
-        let lights = self.lights.as_mut().ok_or(KeylightError::NoLights)?;
-        let mut new_lights = lights.clone();
+        let mut new_lights = self.lights.clone();
         let new_light = new_lights
             .get_mut(light_index)
             .ok_or(KeylightError::LightDoesNotExist(light_index))?;
         *new_light = light;
         self.keylight_adapter
             .set_lights(&self.metadata.ip, &new_lights)?;
-        lights[light_index] = new_lights.swap_remove(light_index);
+        self.lights[light_index] = new_lights.swap_remove(light_index);
         Ok(())
-    }
-
-    fn get_lights(&mut self) -> Result<&mut Vec<Light>, KeylightError> {
-        self.lights.as_mut().ok_or(KeylightError::NoLights)
     }
 }
 
@@ -124,10 +116,10 @@ mod test {
         let keylight_adapter = MockKeylightAdapter::new(vec![], None);
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-        let old_light = keylight.lights.as_ref().unwrap()[0].clone();
+        let old_light = keylight.lights[0].clone();
         let result = keylight.toggle(0);
         assert_eq!(result, Ok(()));
-        assert_eq!(keylight.lights.unwrap()[0].on, !old_light.on);
+        assert_eq!(keylight.lights[0].on, !old_light.on);
     }
     #[test]
     fn test_toggle_should_not_toggle_if_light_cannot_be_updated() {
@@ -137,10 +129,10 @@ mod test {
         );
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-        let old_light = keylight.lights.as_ref().unwrap()[0].clone();
+        let old_light = keylight.lights[0].clone();
         let result = keylight.toggle(0);
         assert_eq!(result.is_err(), true);
-        assert_eq!(keylight.lights.unwrap()[0].on, old_light.on);
+        assert_eq!(keylight.lights[0].on, old_light.on);
     }
 
     #[test]
@@ -148,7 +140,7 @@ mod test {
         let keylight_adapter = MockKeylightAdapter::new(vec![], None);
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-        let result = keylight.toggle(keylight.lights.as_ref().unwrap().len());
+        let result = keylight.toggle(keylight.lights.len());
         assert_eq!(result.is_err(), true);
     }
 }

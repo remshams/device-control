@@ -75,13 +75,13 @@ mod keylight_mocks {
     }
 
     pub struct MockKeylightAdapter {
-        pub lights: Vec<Light>,
+        pub lights: Result<Vec<Light>, KeylightError>,
         pub set_lights_result: Result<(), KeylightError>,
     }
 
     impl KeylightAdapter for MockKeylightAdapter {
         fn lights(&self, _ip: &str) -> Result<Vec<Light>, KeylightError> {
-            Ok(self.lights.clone())
+            self.lights.clone()
         }
         fn set_lights(&self, _ip: &str, _lights: &[Light]) -> Result<(), KeylightError> {
             self.set_lights_result.clone()
@@ -90,7 +90,7 @@ mod keylight_mocks {
 
     impl MockKeylightAdapter {
         pub fn new(
-            lights: Vec<Light>,
+            lights: Result<Vec<Light>, KeylightError>,
             set_lights_result: Option<Result<(), KeylightError>>,
         ) -> MockKeylightAdapter {
             MockKeylightAdapter {

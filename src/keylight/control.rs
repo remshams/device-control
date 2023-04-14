@@ -55,7 +55,7 @@ mod test {
     fn prepare_test() -> (MockKeylightFinder, MockKeylightAdapter) {
         (
             MockKeylightFinder::new(create_metadata_list_fixture()),
-            MockKeylightAdapter::new(vec![], None),
+            MockKeylightAdapter::new(Ok(vec![]), None),
         )
     }
 

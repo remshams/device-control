@@ -104,16 +104,28 @@ mod test {
     #[test]
     fn lights_should_load_lights() {
         let lights = create_lights_fixture();
-        let keylight_adapter = MockKeylightAdapter::new(lights, None);
+        let keylight_adapter = MockKeylightAdapter::new(Ok(lights), None);
         let mut keylight = prepare_test(&keylight_adapter, None);
         let result = keylight.lights();
 
-        assert_eq!(result.unwrap(), keylight_adapter.lights);
+        assert_eq!(result.unwrap(), keylight_adapter.lights.as_ref().unwrap());
+    }
+
+    #[test]
+    fn lights_should_return_error_result_if_lights_cannot_be_loaded() {
+        let keylight_adapter = MockKeylightAdapter::new(
+            Err(KeylightError::CommandError(String::from("error"))),
+            None,
+        );
+        let mut keylight = prepare_test(&keylight_adapter, None);
+        let result = keylight.lights();
+
+        assert_eq!(result.is_err(), true);
     }
 
     #[test]
     fn test_toggle_should_toggle() {
-        let keylight_adapter = MockKeylightAdapter::new(vec![], None);
+        let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
         let old_light = keylight.lights[0].clone();
@@ -124,7 +136,7 @@ mod test {
     #[test]
     fn test_toggle_should_not_toggle_if_light_cannot_be_updated() {
         let keylight_adapter = MockKeylightAdapter::new(
-            vec![],
+            Ok(vec![]),
             Some(Err(KeylightError::CommandError(String::from("error")))),
         );
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
@@ -137,7 +149,7 @@ mod test {
 
     #[test]
     fn test_toggle_should_not_toggle_if_light_does_not_exist() {
-        let keylight_adapter = MockKeylightAdapter::new(vec![], None);
+        let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
         let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
         let result = keylight.toggle(keylight.lights.len());

@@ -101,58 +101,72 @@ mod test {
         keylight
     }
 
-    #[test]
-    fn lights_should_load_lights() {
-        let lights = create_lights_fixture();
-        let keylight_adapter = MockKeylightAdapter::new(Ok(lights), None);
-        let mut keylight = prepare_test(&keylight_adapter, None);
-        let result = keylight.lights();
+    mod lights {
+        use super::*;
+        #[test]
+        fn should_load_lights() {
+            let lights = create_lights_fixture();
+            let keylight_adapter = MockKeylightAdapter::new(Ok(lights), None);
+            let mut keylight = prepare_test(&keylight_adapter, None);
+            let result = keylight.lights();
 
-        assert_eq!(result.unwrap(), keylight_adapter.lights.as_ref().unwrap());
+            assert_eq!(result.unwrap(), keylight_adapter.lights.as_ref().unwrap());
+        }
+
+        #[test]
+        fn should_return_error_result_if_lights_cannot_be_loaded() {
+            let keylight_adapter = MockKeylightAdapter::new(
+                Err(KeylightError::CommandError(String::from("error"))),
+                None,
+            );
+            let mut keylight = prepare_test(&keylight_adapter, None);
+            let result = keylight.lights();
+
+            assert_eq!(result.is_err(), true);
+        }
     }
 
-    #[test]
-    fn lights_should_return_error_result_if_lights_cannot_be_loaded() {
-        let keylight_adapter = MockKeylightAdapter::new(
-            Err(KeylightError::CommandError(String::from("error"))),
-            None,
-        );
-        let mut keylight = prepare_test(&keylight_adapter, None);
-        let result = keylight.lights();
+    mod set_light {
+        use super::*;
 
-        assert_eq!(result.is_err(), true);
-    }
+        #[test]
+        fn should_set_light() {
+            let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
+            let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-    #[test]
-    fn test_toggle_should_toggle() {
-        let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
-        let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
+            let old_light = keylight.lights[0].clone();
+            let mut new_light = old_light.clone();
+            new_light.on = !old_light.on;
+            let result = keylight.set_light(0, new_light);
+            assert_eq!(result, Ok(()));
+            assert_eq!(keylight.lights[0].on, !old_light.on);
+        }
+        #[test]
+        fn should_not_update_if_light_cannot_be_updated() {
+            let keylight_adapter = MockKeylightAdapter::new(
+                Ok(vec![]),
+                Some(Err(KeylightError::CommandError(String::from("error")))),
+            );
+            let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-        let old_light = keylight.lights[0].clone();
-        let result = keylight.toggle(0);
-        assert_eq!(result, Ok(()));
-        assert_eq!(keylight.lights[0].on, !old_light.on);
-    }
-    #[test]
-    fn test_toggle_should_not_toggle_if_light_cannot_be_updated() {
-        let keylight_adapter = MockKeylightAdapter::new(
-            Ok(vec![]),
-            Some(Err(KeylightError::CommandError(String::from("error")))),
-        );
-        let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
+            let old_light = keylight.lights[0].clone();
+            let mut new_light = old_light.clone();
+            new_light.on = !old_light.on;
+            let result = keylight.set_light(0, new_light);
+            assert_eq!(result.is_err(), true);
+            assert_eq!(keylight.lights[0].on, old_light.on);
+        }
 
-        let old_light = keylight.lights[0].clone();
-        let result = keylight.toggle(0);
-        assert_eq!(result.is_err(), true);
-        assert_eq!(keylight.lights[0].on, old_light.on);
-    }
+        #[test]
+        fn should_do_nothing_if_light_does_not_exist() {
+            let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
+            let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
+            let old_lights = keylight.lights.clone();
+            let mut new_light = old_lights[0].clone();
+            new_light.on = !old_lights[0].on;
 
-    #[test]
-    fn test_toggle_should_not_toggle_if_light_does_not_exist() {
-        let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
-        let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
-
-        let result = keylight.toggle(keylight.lights.len());
-        assert_eq!(result.is_err(), true);
+            let result = keylight.set_light(keylight.lights.len(), new_light);
+            assert_eq!(result.is_err(), true);
+        }
     }
 }

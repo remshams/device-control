@@ -12,6 +12,10 @@ pub trait KeylightAdapter {
 }
 
 pub struct KeylightControl<'a, F: KeylightFinder, A: KeylightAdapter> {
+pub trait KeylightDb {
+    fn store(&self, metadatas: &[&KeylightMetadata]) -> Result<(), KeylightError>;
+    fn load(&self) -> Result<Vec<KeylightMetadata>, KeylightError>;
+}
     keylight_finder: &'a F,
     keylight_adapter: &'a A,
     pub lights: Vec<Keylight<'a, A>>,

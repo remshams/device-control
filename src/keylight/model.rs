@@ -1,9 +1,12 @@
+use serde::{Deserialize, Serialize};
+
 use super::KeylightAdapter;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum KeylightError {
     CommandError(String),
     LightDoesNotExist(usize),
+    DbError(String),
 }
 
 impl From<reqwest::Error> for KeylightError {
@@ -12,7 +15,19 @@ impl From<reqwest::Error> for KeylightError {
     }
 }
 
-#[derive(Debug, Eq, Hash, PartialEq, Clone)]
+impl From<serde_json::Error> for KeylightError {
+    fn from(error: serde_json::Error) -> Self {
+        KeylightError::DbError(error.to_string())
+    }
+}
+
+impl From<std::io::Error> for KeylightError {
+    fn from(error: std::io::Error) -> Self {
+        KeylightError::DbError(error.to_string())
+    }
+}
+
+#[derive(Debug, Eq, Hash, PartialEq, Clone, Serialize, Deserialize)]
 pub struct KeylightMetadata {
     pub name: String,
     pub ip: String,

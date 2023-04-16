@@ -1,17 +1,19 @@
 mod adapter;
 mod control;
+mod db;
 mod finder;
 mod model;
 
 pub use adapter::KeylightRestAdapter;
-pub use control::{KeylightAdapter, KeylightControl, KeylightFinder};
+pub use control::{KeylightAdapter, KeylightControl, KeylightDb, KeylightFinder};
+pub use db::KeylightJsonDb;
 pub use finder::ZeroConfKeylightFinder;
 pub use model::{CommandLight, Keylight, KeylightError, KeylightMetadata, Light};
 
 #[cfg(test)]
 mod keylight_mocks {
 
-    use super::{model::KeylightError, *};
+    use super::{control::KeylightDb, model::KeylightError, *};
 
     pub fn create_metadata_fixture() -> KeylightMetadata {
         KeylightMetadata {
@@ -97,6 +99,18 @@ mod keylight_mocks {
                 lights,
                 set_lights_result: set_lights_result.unwrap_or(Ok(())),
             }
+        }
+    }
+
+    pub struct MockKeylightDb {}
+
+    impl KeylightDb for MockKeylightDb {
+        fn store(&self, metadatas: &[&KeylightMetadata]) -> Result<(), KeylightError> {
+            Ok(())
+        }
+
+        fn load(&self) -> Result<Vec<KeylightMetadata>, KeylightError> {
+            Ok(vec![])
         }
     }
 

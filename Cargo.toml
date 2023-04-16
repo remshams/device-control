@@ -11,4 +11,5 @@ zeroconf = "0.10.5"
 serde = "1.0.159"
 serde_json = "1.0"
 indicatif = "0.17.3"
+clap = { version = "4.2.2", features = ["derive"] }
 

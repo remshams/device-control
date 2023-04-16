@@ -6,7 +6,7 @@ mod model;
 pub use adapter::KeylightRestAdapter;
 pub use control::{KeylightAdapter, KeylightControl, KeylightFinder};
 pub use finder::ZeroConfKeylightFinder;
-pub use model::{Keylight, KeylightMetadata, Light};
+pub use model::{CommandLight, Keylight, KeylightError, KeylightMetadata, Light};
 
 #[cfg(test)]
 mod keylight_mocks {

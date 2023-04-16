@@ -25,6 +25,24 @@ pub struct Light {
     pub brightness: u16,
     pub temperature: u16,
 }
+#[derive(Debug)]
+pub struct CommandLight {
+    pub index: usize,
+    pub on: Option<bool>,
+    pub brightness: Option<u16>,
+    pub temperature: Option<u16>,
+}
+
+impl CommandLight {
+    pub fn from_light(index: usize, light: &Light) -> CommandLight {
+        CommandLight {
+            index,
+            on: Some(light.on),
+            brightness: Some(light.brightness),
+            temperature: Some(light.temperature),
+        }
+    }
+}
 
 pub struct Keylight<'a, A: KeylightAdapter> {
     keylight_adapter: &'a A,
@@ -58,7 +76,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
             .ok_or(KeylightError::LightDoesNotExist(light_index))?;
         let mut new_light = light.clone();
         new_light.on = on;
-        self.set_light(light_index, new_light)
+        self.update_light(light_index, new_light)
     }
 
     pub fn toggle(&mut self, light_index: usize) -> Result<(), KeylightError> {
@@ -70,7 +88,19 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         self.set_switch(light_index, !on)
     }
 
-    fn set_light(&mut self, light_index: usize, light: Light) -> Result<(), KeylightError> {
+    pub fn set_light(&mut self, command_light: CommandLight) -> Result<(), KeylightError> {
+        let light = self
+            .lights
+            .get(command_light.index)
+            .ok_or(KeylightError::LightDoesNotExist(command_light.index))?;
+        let mut new_light = light.clone();
+        new_light.on = command_light.on.unwrap_or(light.on);
+        new_light.brightness = command_light.brightness.unwrap_or(light.brightness);
+        new_light.temperature = command_light.temperature.unwrap_or(light.temperature);
+        self.update_light(command_light.index, new_light)
+    }
+
+    fn update_light(&mut self, light_index: usize, light: Light) -> Result<(), KeylightError> {
         let mut new_lights = self.lights.clone();
         let new_light = new_lights
             .get_mut(light_index)
@@ -129,17 +159,28 @@ mod test {
     mod set_light {
         use super::*;
 
+        fn prepare_test_lights<'a>(
+            keylight: &'a Keylight<MockKeylightAdapter>,
+        ) -> (&'a Light, bool, CommandLight) {
+            let old_light = &keylight.lights[0];
+            let old_light_on = old_light.on;
+            (
+                old_light,
+                old_light_on,
+                CommandLight::from_light(0, old_light),
+            )
+        }
+
         #[test]
         fn should_set_light() {
             let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
             let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-            let old_light = keylight.lights[0].clone();
-            let mut new_light = old_light.clone();
-            new_light.on = !old_light.on;
-            let result = keylight.set_light(0, new_light);
+            let (_old_light, old_light_on, mut new_light) = prepare_test_lights(&keylight);
+            new_light.on = Some(!old_light_on);
+            let result = keylight.set_light(new_light);
             assert_eq!(result, Ok(()));
-            assert_eq!(keylight.lights[0].on, !old_light.on);
+            assert_eq!(keylight.lights[0].on, !old_light_on);
         }
         #[test]
         fn should_not_update_if_light_cannot_be_updated() {
@@ -149,12 +190,11 @@ mod test {
             );
             let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
 
-            let old_light = keylight.lights[0].clone();
-            let mut new_light = old_light.clone();
-            new_light.on = !old_light.on;
-            let result = keylight.set_light(0, new_light);
+            let (_old_light, old_light_on, mut new_light) = prepare_test_lights(&keylight);
+            new_light.on = Some(!old_light_on);
+            let result = keylight.set_light(new_light);
             assert_eq!(result.is_err(), true);
-            assert_eq!(keylight.lights[0].on, old_light.on);
+            assert_eq!(keylight.lights[0].on, old_light_on);
         }
 
         #[test]
@@ -162,10 +202,11 @@ mod test {
             let keylight_adapter = MockKeylightAdapter::new(Ok(vec![]), None);
             let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
             let old_lights = keylight.lights.clone();
-            let mut new_light = old_lights[0].clone();
-            new_light.on = !old_lights[0].on;
+            let old_light = &old_lights[0];
+            let mut new_light = CommandLight::from_light(keylight.lights.len(), old_light);
+            new_light.on = Some(!old_light.on);
 
-            let result = keylight.set_light(keylight.lights.len(), new_light);
+            let result = keylight.set_light(new_light);
             assert_eq!(result.is_err(), true);
         }
     }

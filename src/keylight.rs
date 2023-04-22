@@ -14,6 +14,7 @@ pub use model::{CommandLight, Keylight, KeylightError, KeylightMetadata, Light};
 mod keylight_mocks {
 
     use super::{control::KeylightDb, model::KeylightError, *};
+    use std::cell::RefCell;
 
     pub fn create_metadata_fixture() -> KeylightMetadata {
         KeylightMetadata {
@@ -102,15 +103,20 @@ mod keylight_mocks {
         }
     }
 
-    pub struct MockKeylightDb {}
+    pub struct MockKeylightDb {
+        pub stored_metadata_passed: RefCell<Vec<KeylightMetadata>>,
+        pub load_response: Result<Vec<KeylightMetadata>, KeylightError>,
+    }
 
     impl KeylightDb for MockKeylightDb {
         fn store(&self, metadatas: &[&KeylightMetadata]) -> Result<(), KeylightError> {
+            self.stored_metadata_passed
+                .replace(metadatas.to_vec().into_iter().map(|m| m.clone()).collect());
             Ok(())
         }
 
         fn load(&self) -> Result<Vec<KeylightMetadata>, KeylightError> {
-            Ok(vec![])
+            self.load_response.clone()
         }
     }
 

@@ -2,7 +2,11 @@ use std::time::Duration;
 
 use indicatif::{ProgressBar, ProgressStyle};
 
-pub fn run<F: FnMut() -> ()>(mut action: F, pending_message: String, finished_message: String) {
+pub fn run<R, F: FnMut() -> R>(
+    mut action: F,
+    pending_message: String,
+    finished_message: String,
+) -> R {
     let spinner = ProgressBar::new_spinner();
     spinner.enable_steady_tick(Duration::from_millis(100));
     spinner.set_style(
@@ -12,6 +16,7 @@ pub fn run<F: FnMut() -> ()>(mut action: F, pending_message: String, finished_me
             .unwrap(),
     );
     spinner.set_message(pending_message);
-    action();
+    let result = action();
     spinner.finish_with_message(finished_message);
+    result
 }

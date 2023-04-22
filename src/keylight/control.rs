@@ -7,7 +7,7 @@ pub trait KeylightFinder {
 }
 
 pub trait KeylightAdapter {
-    fn lights(&self, ip: &str) -> Result<Vec<Light>, KeylightError>;
+    fn lights(&self, ip: &str, port: &u16) -> Result<Vec<Light>, KeylightError>;
     fn set_lights(&self, ip: &str, lights: &[Light]) -> Result<(), KeylightError>;
 }
 

@@ -83,7 +83,7 @@ mod keylight_mocks {
     }
 
     impl KeylightAdapter for MockKeylightAdapter {
-        fn lights(&self, _ip: &str) -> Result<Vec<Light>, KeylightError> {
+        fn lights(&self, _ip: &str, _port: &u16) -> Result<Vec<Light>, KeylightError> {
             self.lights.clone()
         }
         fn set_lights(&self, _ip: &str, _lights: &[Light]) -> Result<(), KeylightError> {

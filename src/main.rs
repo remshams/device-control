@@ -1,6 +1,7 @@
 use keylight_on::display;
 use keylight_on::keylight::{
     KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter, ZeroConfKeylightFinder,
+    KEYLIGHT_DB_PATH,
 };
 mod cli;
 
@@ -8,7 +9,7 @@ fn main() -> Result<(), KeylightError> {
     let command_light = cli::parse();
     let finder = ZeroConfKeylightFinder::new();
     let adapter = KeylightRestAdapter {};
-    let db = KeylightJsonDb::new(String::from("./testing.json"));
+    let db = KeylightJsonDb::new(KEYLIGHT_DB_PATH);
     let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
     let action = || keylight_control.load_lights();
     display::progress::run(

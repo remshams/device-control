@@ -6,7 +6,7 @@ mod model;
 
 pub use adapter::KeylightRestAdapter;
 pub use control::{KeylightAdapter, KeylightControl, KeylightDb, KeylightFinder};
-pub use db::KeylightJsonDb;
+pub use db::{KeylightJsonDb, KEYLIGHT_DB_PATH};
 pub use finder::ZeroConfKeylightFinder;
 pub use model::{CommandLight, Keylight, KeylightError, KeylightMetadata, Light};
 

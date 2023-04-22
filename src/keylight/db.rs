@@ -1,16 +1,18 @@
 use super::{control::KeylightDb, KeylightError, KeylightMetadata};
 
-pub struct KeylightJsonDb {
-    pub path: String,
+pub static KEYLIGHT_DB_PATH: &str = "./keylight.json";
+
+pub struct KeylightJsonDb<'a> {
+    pub path: &'a str,
 }
 
-impl KeylightJsonDb {
-    pub fn new(path: String) -> KeylightJsonDb {
+impl<'a> KeylightJsonDb<'a> {
+    pub fn new(path: &str) -> KeylightJsonDb {
         KeylightJsonDb { path }
     }
 }
 
-impl KeylightDb for KeylightJsonDb {
+impl<'a> KeylightDb for KeylightJsonDb<'a> {
     fn store(&self, metadatas: &[&KeylightMetadata]) -> Result<(), KeylightError> {
         let metadatas_string = serde_json::to_string(metadatas)?;
         std::fs::write(&self.path, metadatas_string)?;

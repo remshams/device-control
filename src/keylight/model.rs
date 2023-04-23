@@ -6,6 +6,7 @@ use super::KeylightAdapter;
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum KeylightError {
     CommandError(String),
+    KeylightDoesNotExist(String),
     LightDoesNotExist(usize),
     DbError(String),
 }
@@ -30,6 +31,7 @@ impl From<std::io::Error> for KeylightError {
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone, Serialize, Deserialize)]
 pub struct KeylightMetadata {
+    pub id: String,
     pub name: String,
     pub ip: String,
     pub port: u16,
@@ -43,6 +45,7 @@ pub struct Light {
 }
 #[derive(Debug)]
 pub struct CommandLight {
+    pub id: String,
     pub index: usize,
     pub on: Option<bool>,
     pub brightness: Option<u16>,
@@ -50,8 +53,9 @@ pub struct CommandLight {
 }
 
 impl CommandLight {
-    pub fn from_light(index: usize, light: &Light) -> CommandLight {
+    pub fn from_light(id: String, index: usize, light: &Light) -> CommandLight {
         CommandLight {
+            id,
             index,
             on: Some(light.on),
             brightness: Some(light.brightness),
@@ -193,7 +197,7 @@ mod test {
             (
                 old_light,
                 old_light_on,
-                CommandLight::from_light(0, old_light),
+                CommandLight::from_light(keylight.metadata.id.clone(), 0, old_light),
             )
         }
 
@@ -229,7 +233,11 @@ mod test {
             let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
             let old_lights = keylight.lights.clone();
             let old_light = &old_lights[0];
-            let mut new_light = CommandLight::from_light(keylight.lights.len(), old_light);
+            let mut new_light = CommandLight::from_light(
+                keylight.metadata.id.clone(),
+                keylight.lights.len(),
+                old_light,
+            );
             new_light.on = Some(!old_light.on);
 
             let result = keylight.set_light(new_light);

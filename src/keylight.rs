@@ -18,6 +18,7 @@ mod keylight_mocks {
 
     pub fn create_metadata_fixture() -> KeylightMetadata {
         KeylightMetadata {
+            id: String::from("first"),
             name: String::from("first"),
             ip: String::from("102.168.1.1"),
             port: 1234,
@@ -27,17 +28,20 @@ mod keylight_mocks {
     pub fn create_metadata_list_fixture() -> Vec<KeylightMetadata> {
         vec![
             KeylightMetadata {
+                id: String::from("first"),
                 name: String::from("first"),
                 ip: String::from("102.168.1.1"),
                 port: 1234,
             },
             KeylightMetadata {
+                id: String::from("second"),
                 name: String::from("second"),
                 ip: String::from("102.168.1.2"),
                 port: 4567,
             },
             KeylightMetadata {
-                name: String::from("first"),
+                id: String::from("third"),
+                name: String::from("third"),
                 ip: String::from("102.168.1.1"),
                 port: 1234,
             },

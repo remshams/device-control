@@ -51,6 +51,7 @@ impl ZeroConfKeylightFinder {
         let address = service.address().parse();
         if let Ok(address) = address {
             keylight_metadatas.push(KeylightMetadata {
+                id: keylight_metadatas.len().to_string(),
                 name: service.name().clone(),
                 ip: address,
                 port: service.port().clone(),

@@ -24,8 +24,10 @@ fn main() -> Result<(), KeylightError> {
         String::from("Discovering lights"),
         String::from("Lights discovered"),
     )?;
-    let mut keylights = keylight_control.lights;
-    let light = keylights.get_mut(0).unwrap();
+    let light = keylight_control.find_light_mut(&command_light.id).ok_or(
+        KeylightError::KeylightDoesNotExist(command_light.id.clone()),
+    )?;
+
     light.lights()?;
     light.set_light(command_light)
 }

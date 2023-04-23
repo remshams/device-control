@@ -1,3 +1,4 @@
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use super::KeylightAdapter;
@@ -83,6 +84,11 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
             .keylight_adapter
             .lights(&self.metadata.ip, &self.metadata.port)?;
         self.lights = lights;
+        debug!(
+            "Found {} lights for keylight {:#?}",
+            self.lights.len(),
+            self.metadata
+        );
         Ok(self.lights.as_ref())
     }
 
@@ -93,6 +99,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
             .ok_or(KeylightError::LightDoesNotExist(light_index))?;
         let mut new_light = light.clone();
         new_light.on = on;
+        debug!("Switch light {} to {}", light_index, on);
         self.update_light(light_index, new_light)
     }
 
@@ -102,6 +109,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
             .get(light_index)
             .ok_or(KeylightError::LightDoesNotExist(light_index))?
             .on;
+        debug!("Toggle light {} from {}", light_index, on);
         self.set_switch(light_index, !on)
     }
 
@@ -114,6 +122,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         new_light.on = command_light.on.unwrap_or(light.on);
         new_light.brightness = command_light.brightness.unwrap_or(light.brightness);
         new_light.temperature = command_light.temperature.unwrap_or(light.temperature);
+        debug!("Set Light: {:#?}", new_light);
         self.update_light(command_light.index, new_light)
     }
 

@@ -1,4 +1,5 @@
 use super::{model::KeylightError, Keylight, KeylightMetadata, Light};
+use log::debug;
 
 pub trait KeylightFinder {
     type Output: IntoIterator<Item = KeylightMetadata>;
@@ -45,6 +46,8 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
                     .into_iter()
                     .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
                     .collect();
+                debug!("Loaded {} lights", self.lights.len());
+
                 Ok(())
             }
             Err(_) => {
@@ -62,6 +65,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
             .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
             .collect();
         self.deduplicate_lights();
+        debug!("Discovered {} lights", self.lights.len());
     }
 
     pub fn store_lights(&self) -> Result<(), KeylightError> {
@@ -70,6 +74,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
             .iter()
             .map(|light| &light.metadata)
             .collect::<Vec<&KeylightMetadata>>();
+        debug!("Storing {} lights", keylight_metadatas.len());
         self.keylight_db.store(keylight_metadatas.as_slice())
     }
 

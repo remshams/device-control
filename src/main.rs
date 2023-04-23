@@ -1,3 +1,4 @@
+use env_logger::{Builder, Env};
 use keylight_on::display;
 use keylight_on::keylight::{
     KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter, ZeroConfKeylightFinder,
@@ -5,7 +6,13 @@ use keylight_on::keylight::{
 };
 mod cli;
 
+fn setup_logger() {
+    Builder::from_env(Env::default().default_filter_or("info")).init();
+}
+
 fn main() -> Result<(), KeylightError> {
+    setup_logger();
+
     let command_light = cli::parse();
     let finder = ZeroConfKeylightFinder::new();
     let adapter = KeylightRestAdapter {};

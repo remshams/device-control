@@ -1,3 +1,4 @@
+use log::debug;
 use std::time::Duration;
 use zeroconf::{prelude::*, ServiceDiscovery};
 use zeroconf::{MdnsBrowser, ServiceType};
@@ -27,6 +28,7 @@ impl KeylightFinder for ZeroConfKeylightFinder {
         while let Ok(service) = rx.recv_timeout(Duration::from_secs(2)) {
             self.add_new_device(&mut keylight_metadatas, service);
         }
+        debug!("Discovered {} keylights", keylight_metadatas.len());
         keylight_metadatas
     }
 }

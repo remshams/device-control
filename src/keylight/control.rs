@@ -38,6 +38,14 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
         }
     }
 
+    pub fn find_light_mut(&mut self, id: &str) -> Option<&mut Keylight<'a, A>> {
+        self.lights.iter_mut().find(|light| light.metadata.id == id)
+    }
+
+    pub fn find_light(&self, id: &str) -> Option<&Keylight<'a, A>> {
+        self.lights.iter().find(|light| light.metadata.id == id)
+    }
+
     pub fn load_lights(&mut self) -> Result<(), KeylightError> {
         let result = self.keylight_db.load();
         match result {

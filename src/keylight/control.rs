@@ -38,15 +38,15 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
         }
     }
 
-    pub fn find_light_mut(&mut self, id: &str) -> Option<&mut Keylight<'a, A>> {
+    pub fn find_keylight_mut(&mut self, id: &str) -> Option<&mut Keylight<'a, A>> {
         self.lights.iter_mut().find(|light| light.metadata.id == id)
     }
 
-    pub fn find_light(&self, id: &str) -> Option<&Keylight<'a, A>> {
+    pub fn find_keylight(&self, id: &str) -> Option<&Keylight<'a, A>> {
         self.lights.iter().find(|light| light.metadata.id == id)
     }
 
-    pub fn load_lights(&mut self) -> Result<(), KeylightError> {
+    pub fn load_keylights(&mut self) -> Result<(), KeylightError> {
         let result = self.keylight_db.load();
         match result {
             Ok(metadata) => {
@@ -54,39 +54,39 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
                     .into_iter()
                     .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
                     .collect();
-                debug!("Loaded {} lights", self.lights.len());
+                debug!("Loaded {} keylights", self.lights.len());
 
                 Ok(())
             }
             Err(_) => {
-                self.discover_lights();
-                self.store_lights()
+                self.discover_keylights();
+                self.store_keylights()
             }
         }
     }
 
-    pub fn discover_lights(&mut self) {
+    pub fn discover_keylights(&mut self) {
         self.lights = self
             .keylight_finder
             .discover()
             .into_iter()
             .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
             .collect();
-        self.deduplicate_lights();
-        debug!("Discovered {} lights", self.lights.len());
+        self.deduplicate_keylights();
+        debug!("Discovered {} keylights", self.lights.len());
     }
 
-    pub fn store_lights(&self) -> Result<(), KeylightError> {
+    pub fn store_keylights(&self) -> Result<(), KeylightError> {
         let keylight_metadatas = self
             .lights
             .iter()
             .map(|light| &light.metadata)
             .collect::<Vec<&KeylightMetadata>>();
-        debug!("Storing {} lights", keylight_metadatas.len());
+        debug!("Storing {} keylights", keylight_metadatas.len());
         self.keylight_db.store(keylight_metadatas.as_slice())
     }
 
-    fn deduplicate_lights(&mut self) {
+    fn deduplicate_keylights(&mut self) {
         self.lights.sort_by_key(|light| light.metadata.ip.clone());
         self.lights.dedup_by_key(|light| light.metadata.ip.clone());
     }
@@ -119,11 +119,11 @@ mod test {
         use super::*;
 
         #[test]
-        fn test_discover_lights() {
+        fn test_discover_keylights() {
             let (finder, adapter, db) = prepare_test();
             let deduplicated_metadata = vec![&finder.metadata[0], &finder.metadata[1]];
             let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
-            keylight_control.discover_lights();
+            keylight_control.discover_keylights();
             let discovered_metadata: Vec<&KeylightMetadata> = keylight_control
                 .lights
                 .iter()
@@ -142,7 +142,7 @@ mod test {
             let (finder, adapter, db) = prepare_test();
             let keylight_metadatas = db.load_response.clone().unwrap();
             let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
-            let result = keylight_control.load_lights();
+            let result = keylight_control.load_keylights();
 
             assert_eq!(result.is_ok(), true);
             for (index, keylight) in keylight_control.lights.iter().enumerate() {
@@ -155,7 +155,7 @@ mod test {
             let (finder, adapter, mut db) = prepare_test();
             db.load_response = Err(KeylightError::DbError(String::from("Test")));
             let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
-            let result = keylight_control.load_lights();
+            let result = keylight_control.load_keylights();
 
             assert_eq!(result.is_ok(), true);
             assert_eq!(keylight_control.lights.is_empty(), false);

@@ -18,16 +18,16 @@ fn main() -> Result<(), KeylightError> {
     let adapter = KeylightRestAdapter {};
     let db = KeylightJsonDb::new(KEYLIGHT_DB_PATH);
     let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
-    let action = || keylight_control.load_lights();
     display::progress::run(
-        action,
+        || keylight_control.load_keylights(),
         String::from("Discovering lights"),
         String::from("Lights discovered"),
     )?;
-    let light = keylight_control.find_light_mut(&command_light.id).ok_or(
-        KeylightError::KeylightDoesNotExist(command_light.id.clone()),
-    )?;
+    let light = keylight_control
+        .find_keylight_mut(&command_light.id)
+        .ok_or(KeylightError::KeylightDoesNotExist(
+            command_light.id.clone(),
+        ))?;
 
-    light.lights()?;
     light.set_light(command_light)
 }

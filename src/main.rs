@@ -28,6 +28,7 @@ fn main() -> Result<(), KeylightError> {
         .ok_or(KeylightError::KeylightDoesNotExist(
             command_light.id.clone(),
         ))?;
+    light.lights()?;
 
     light.set_light(command_light)
 }

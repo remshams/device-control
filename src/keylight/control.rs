@@ -21,7 +21,7 @@ pub struct KeylightControl<'a, F: KeylightFinder, A: KeylightAdapter, Db: Keylig
     keylight_finder: &'a F,
     keylight_adapter: &'a A,
     keylight_db: &'a Db,
-    pub lights: Vec<Keylight<'a, A>>,
+    lights: Vec<Keylight<'a, A>>,
 }
 
 impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<'a, F, A, Db> {
@@ -89,6 +89,10 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
     fn deduplicate_keylights(&mut self) {
         self.lights.sort_by_key(|light| light.metadata.ip.clone());
         self.lights.dedup_by_key(|light| light.metadata.ip.clone());
+    }
+
+    pub fn list(&self) -> &Vec<Keylight<'a, A>> {
+        &self.lights
     }
 }
 

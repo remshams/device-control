@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use keylight_on::keylight::{CommandLight, KeylightCommand};
+use keylight_on::keylight::{KeylightCommand, LightCommand};
 
 #[derive(Parser, Debug)]
 #[command(name = "keylight-on", about = "Turn on your keylight")]
@@ -48,7 +48,7 @@ struct CommandLightArgs {
 pub fn parse() -> KeylightCommand {
     let args: Args = Args::parse();
     match args.keylight_command {
-        Command::SendCommand(command_light_args) => KeylightCommand::SendCommand(CommandLight {
+        Command::SendCommand(command_light_args) => KeylightCommand::SendCommand(LightCommand {
             id: command_light_args.id,
             index: command_light_args.light_index.unwrap_or(0),
             on: command_light_args.on,

@@ -44,12 +44,13 @@ pub struct Light {
     pub temperature: u16,
 }
 
+#[derive(Debug)]
 pub enum KeylightCommand {
-    SendCommand(CommandLight),
+    SendCommand(LightCommand),
 }
 
 #[derive(Debug)]
-pub struct CommandLight {
+pub struct LightCommand {
     pub id: String,
     pub index: usize,
     pub on: Option<bool>,
@@ -57,9 +58,9 @@ pub struct CommandLight {
     pub temperature: Option<u16>,
 }
 
-impl CommandLight {
-    pub fn from_light(id: String, index: usize, light: &Light) -> CommandLight {
-        CommandLight {
+impl LightCommand {
+    pub fn from_light(id: String, index: usize, light: &Light) -> LightCommand {
+        LightCommand {
             id,
             index,
             on: Some(light.on),
@@ -122,7 +123,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         self.set_switch(light_index, !on)
     }
 
-    pub fn set_light(&mut self, command_light: CommandLight) -> Result<(), KeylightError> {
+    pub fn set_light(&mut self, command_light: LightCommand) -> Result<(), KeylightError> {
         let light = self
             .lights
             .get(command_light.index)
@@ -196,13 +197,13 @@ mod test {
 
         fn prepare_test_lights<'a>(
             keylight: &'a Keylight<MockKeylightAdapter>,
-        ) -> (&'a Light, bool, CommandLight) {
+        ) -> (&'a Light, bool, LightCommand) {
             let old_light = &keylight.lights[0];
             let old_light_on = old_light.on;
             (
                 old_light,
                 old_light_on,
-                CommandLight::from_light(keylight.metadata.id.clone(), 0, old_light),
+                LightCommand::from_light(keylight.metadata.id.clone(), 0, old_light),
             )
         }
 
@@ -238,7 +239,7 @@ mod test {
             let mut keylight = prepare_test(&keylight_adapter, Some(create_lights_fixture()));
             let old_lights = keylight.lights.clone();
             let old_light = &old_lights[0];
-            let mut new_light = CommandLight::from_light(
+            let mut new_light = LightCommand::from_light(
                 keylight.metadata.id.clone(),
                 keylight.lights.len(),
                 old_light,

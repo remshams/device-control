@@ -43,6 +43,11 @@ pub struct Light {
     pub brightness: u16,
     pub temperature: u16,
 }
+
+pub enum KeylightCommand {
+    SendCommand(CommandLight),
+}
+
 #[derive(Debug)]
 pub struct CommandLight {
     pub id: String,

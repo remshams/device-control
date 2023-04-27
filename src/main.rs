@@ -1,8 +1,8 @@
 use env_logger::{Builder, Env};
 use keylight_on::display;
 use keylight_on::keylight::{
-    KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter, ZeroConfKeylightFinder,
-    KEYLIGHT_DB_PATH,
+    KeylightCommand, KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter,
+    ZeroConfKeylightFinder, KEYLIGHT_DB_PATH,
 };
 mod cli;
 
@@ -13,7 +13,7 @@ fn setup_logger() {
 fn main() -> Result<(), KeylightError> {
     setup_logger();
 
-    let command_light = cli::parse();
+    let keylight_command = cli::parse();
     let finder = ZeroConfKeylightFinder::new();
     let adapter = KeylightRestAdapter {};
     let db = KeylightJsonDb::new(KEYLIGHT_DB_PATH);
@@ -23,12 +23,16 @@ fn main() -> Result<(), KeylightError> {
         String::from("Discovering lights"),
         String::from("Lights discovered"),
     )?;
-    let light = keylight_control
-        .find_keylight_mut(&command_light.id)
-        .ok_or(KeylightError::KeylightDoesNotExist(
-            command_light.id.clone(),
-        ))?;
-    light.lights()?;
+    match keylight_command {
+        KeylightCommand::SendCommand(light_command) => {
+            let light = keylight_control
+                .find_keylight_mut(&light_command.id)
+                .ok_or(KeylightError::KeylightDoesNotExist(
+                    light_command.id.clone(),
+                ))?;
+            light.lights()?;
 
-    light.set_light(command_light)
+            light.set_light(light_command)
+        }
+    }
 }

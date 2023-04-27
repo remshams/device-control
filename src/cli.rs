@@ -1,9 +1,21 @@
-use clap::Parser;
-use keylight_on::keylight::CommandLight;
+use clap::{Parser, Subcommand};
+use keylight_on::keylight::{CommandLight, KeylightCommand};
 
 #[derive(Parser, Debug)]
 #[command(name = "keylight-on", about = "Turn on your keylight")]
 struct Args {
+    #[clap(subcommand)]
+    keylight_command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+enum Command {
+    SendCommand(CommandLightArgs),
+}
+
+#[derive(Parser, Debug)]
+#[command(name = "KeylightCommand", about = "Set keylight parameters")]
+struct CommandLightArgs {
     #[clap(short, long, value_name = "id", help = "Id of controlled keylight")]
     id: String,
     #[clap(
@@ -33,13 +45,15 @@ struct Args {
     temperature: Option<u16>,
 }
 
-pub fn parse() -> CommandLight {
+pub fn parse() -> KeylightCommand {
     let args: Args = Args::parse();
-    CommandLight {
-        id: args.id,
-        index: args.light_index.unwrap_or(0),
-        on: args.on,
-        brightness: args.brightness,
-        temperature: args.temperature,
+    match args.keylight_command {
+        Command::SendCommand(command_light_args) => KeylightCommand::SendCommand(CommandLight {
+            id: command_light_args.id,
+            index: command_light_args.light_index.unwrap_or(0),
+            on: command_light_args.on,
+            brightness: command_light_args.brightness,
+            temperature: command_light_args.temperature,
+        }),
     }
 }

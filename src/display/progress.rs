@@ -12,7 +12,7 @@ pub fn run<R, F: FnMut() -> R>(
     spinner.set_style(
         ProgressStyle::default_spinner()
             .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-            .template("{spinner:.white} {msg}")
+            .template("{spinner:.green} {msg:.green}")
             .unwrap(),
     );
     spinner.set_message(pending_message);

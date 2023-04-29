@@ -47,6 +47,7 @@ pub struct Light {
 #[derive(Debug)]
 pub enum KeylightCommand {
     SendCommand(LightCommand),
+    List,
 }
 
 #[derive(Debug)]

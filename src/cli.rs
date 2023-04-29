@@ -11,6 +11,7 @@ struct Args {
 #[derive(Subcommand, Debug)]
 enum Command {
     SendCommand(CommandLightArgs),
+    List,
 }
 
 #[derive(Parser, Debug)]
@@ -55,5 +56,6 @@ pub fn parse() -> KeylightCommand {
             brightness: command_light_args.brightness,
             temperature: command_light_args.temperature,
         }),
+        Command::List => KeylightCommand::List,
     }
 }

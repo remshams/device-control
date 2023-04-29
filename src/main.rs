@@ -34,5 +34,9 @@ fn main() -> Result<(), KeylightError> {
 
             light.set_light(light_command)
         }
+        KeylightCommand::List => {
+            display::keylight::print_keylights(&keylight_control.list_metadata());
+            Ok(())
+        }
     }
 }

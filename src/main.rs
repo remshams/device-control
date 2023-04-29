@@ -28,9 +28,7 @@ fn main() -> Result<(), KeylightError> {
         KeylightCommand::SendCommand(light_command) => {
             let light = keylight_control
                 .find_keylight_mut(&light_command.id)
-                .ok_or(KeylightError::KeylightDoesNotExist(
-                    light_command.id.clone(),
-                ))?;
+                .ok_or_else(|| KeylightError::KeylightDoesNotExist(light_command.id.clone()))?;
             light.lights()?;
 
             light.set_light(light_command)

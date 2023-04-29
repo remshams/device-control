@@ -54,7 +54,7 @@ impl ZeroConfKeylightFinder {
                 id: keylight_metadatas.len().to_string(),
                 name: service.name().clone(),
                 ip: address,
-                port: service.port().clone(),
+                port: *service.port(),
             });
         }
     }

@@ -87,7 +87,7 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         Keylight {
             keylight_adapter,
             metadata,
-            lights: lights.unwrap_or(vec![]),
+            lights: lights.unwrap_or_default(),
         }
     }
 

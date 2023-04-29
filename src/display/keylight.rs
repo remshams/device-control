@@ -2,7 +2,7 @@ use crate::keylight::KeylightMetadata;
 use console::{style, StyledObject};
 
 fn pad_text(padding: usize) -> StyledObject<String> {
-    style(format!("{}", " ".repeat(padding)))
+    style(" ".repeat(padding))
 }
 
 fn print_key_value(padding: usize, key: &str, value: &str) {
@@ -23,7 +23,7 @@ pub fn print_keylights(headline: Option<&str>, keylights: &Vec<&KeylightMetadata
     for (index, metadata) in keylights.iter().enumerate() {
         print_keylight_metadata(metadata);
         if index < keylights.len() - 1 {
-            println!("");
+            println!();
         }
     }
 }

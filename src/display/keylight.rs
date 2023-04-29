@@ -16,8 +16,10 @@ pub fn print_keylight_metadata(metadata: &KeylightMetadata) {
     print_key_value(4, "Port: ", &metadata.port.to_string());
 }
 
-pub fn print_keylights(keylights: &Vec<&KeylightMetadata>) {
-    println!("{}:", style("Keylights").bold().green());
+pub fn print_keylights(headline: Option<&str>, keylights: &Vec<&KeylightMetadata>) {
+    if let Some(headline) = headline {
+        println!("{}", style(headline).bold().green());
+    }
     for (index, metadata) in keylights.iter().enumerate() {
         print_keylight_metadata(metadata);
         if index < keylights.len() - 1 {

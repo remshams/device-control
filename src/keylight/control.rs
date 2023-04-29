@@ -94,6 +94,13 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
     pub fn list(&self) -> &Vec<Keylight<'a, A>> {
         &self.lights
     }
+
+    pub fn list_metadata(&self) -> Vec<&KeylightMetadata> {
+        self.lights
+            .iter()
+            .map(|keylight| &keylight.metadata)
+            .collect()
+    }
 }
 
 #[cfg(test)]

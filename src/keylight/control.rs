@@ -58,10 +58,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
 
                 Ok(())
             }
-            Err(_) => {
-                self.discover_keylights();
-                self.store_keylights()
-            }
+            Err(_) => self.discover_and_store_keylights(),
         }
     }
 
@@ -84,6 +81,11 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
             .collect::<Vec<&KeylightMetadata>>();
         debug!("Storing {} keylights", keylight_metadatas.len());
         self.keylight_db.store(keylight_metadatas.as_slice())
+    }
+
+    pub fn discover_and_store_keylights(&mut self) -> Result<(), KeylightError> {
+        self.discover_keylights();
+        self.store_keylights()
     }
 
     fn deduplicate_keylights(&mut self) {

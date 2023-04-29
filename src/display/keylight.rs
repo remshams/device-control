@@ -17,8 +17,11 @@ pub fn print_keylight_metadata(metadata: &KeylightMetadata) {
 }
 
 pub fn print_keylights(keylights: &Vec<&KeylightMetadata>) {
-    println!("{}:", style("Keylights").bold());
-    for metadata in keylights {
+    println!("{}:", style("Keylights").bold().green());
+    for (index, metadata) in keylights.iter().enumerate() {
         print_keylight_metadata(metadata);
+        if index < keylights.len() - 1 {
+            println!("");
+        }
     }
 }

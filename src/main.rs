@@ -1,3 +1,4 @@
+use console::style;
 use env_logger::{Builder, Env};
 use keylight_on::display;
 use keylight_on::keylight::{
@@ -35,7 +36,16 @@ fn main() -> Result<(), KeylightError> {
             light.set_light(light_command)
         }
         KeylightCommand::List => {
-            display::keylight::print_keylights(&keylight_control.list_metadata());
+            display::keylight::print_keylights(Some("Lights: "), &keylight_control.list_metadata());
+            Ok(())
+        }
+        KeylightCommand::Discover => {
+            keylight_control.discover_and_store_keylights()?;
+            println!(
+                "Discovered and stored {} keylights\n",
+                style(keylight_control.list_metadata().len()).green().bold()
+            );
+            display::keylight::print_keylights(None, &keylight_control.list_metadata());
             Ok(())
         }
     }

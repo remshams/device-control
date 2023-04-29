@@ -14,6 +14,11 @@ enum Command {
     List,
     #[command(name = "send-command", about = "Set keylight parameters")]
     SendCommand(CommandLightArgs),
+    #[command(
+        name = "discover-keylights",
+        about = "Discover keylights in network and store them in json file (overwrites existing file)"
+    )]
+    Discover,
 }
 
 #[derive(Parser, Debug)]
@@ -58,5 +63,6 @@ pub fn parse() -> KeylightCommand {
             temperature: command_light_args.temperature,
         }),
         Command::List => KeylightCommand::List,
+        Command::Discover => KeylightCommand::Discover,
     }
 }

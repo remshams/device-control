@@ -10,12 +10,13 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    SendCommand(CommandLightArgs),
+    #[command(name = "list", about = "List available keylights")]
     List,
+    #[command(name = "send-command", about = "Set keylight parameters")]
+    SendCommand(CommandLightArgs),
 }
 
 #[derive(Parser, Debug)]
-#[command(name = "KeylightCommand", about = "Set keylight parameters")]
 struct CommandLightArgs {
     #[clap(short, long, value_name = "id", help = "Id of controlled keylight")]
     id: String,

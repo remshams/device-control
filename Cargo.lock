@@ -758,6 +758,7 @@ name = "keylight-on"
 version = "0.1.0"
 dependencies = [
  "clap 4.2.2",
+ "console",
  "env_logger 0.10.0",
  "indicatif",
  "log",

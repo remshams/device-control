@@ -1,5 +1,6 @@
 [workspace]
 members = [
 "keylight-control",
-"keylight-cli"
+"keylight-cli",
+"keylight-ui"
 ]

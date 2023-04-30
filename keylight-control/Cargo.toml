@@ -1,5 +1,5 @@
 [package]
-name = "keylight-on"
+name = "keylight-control"
 version = "0.1.0"
 edition = "2021"
 

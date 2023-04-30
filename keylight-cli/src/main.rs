@@ -1,6 +1,6 @@
 use console::style;
 use env_logger::{Builder, Env};
-use keylight_on::keylight::{
+use keylight_control::keylight::{
     KeylightCommand, KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter,
     ZeroConfKeylightFinder, KEYLIGHT_DB_PATH,
 };

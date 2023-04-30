@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use keylight_on::keylight::{KeylightCommand, LightCommand};
+use keylight_control::keylight::{KeylightCommand, LightCommand};
 
 #[derive(Parser, Debug)]
 #[command(name = "keylight-on", about = "Turn on your keylight")]

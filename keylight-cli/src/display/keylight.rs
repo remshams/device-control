@@ -1,5 +1,5 @@
 use console::{style, StyledObject};
-use keylight_on::keylight::KeylightMetadata;
+use keylight_control::keylight::KeylightMetadata;
 
 fn pad_text(padding: usize) -> StyledObject<String> {
     style(" ".repeat(padding))

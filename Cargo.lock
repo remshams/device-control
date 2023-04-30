@@ -760,6 +760,7 @@ dependencies = [
  "clap 4.2.2",
  "console",
  "env_logger 0.10.0",
+ "indicatif",
  "keylight-on",
 ]
 

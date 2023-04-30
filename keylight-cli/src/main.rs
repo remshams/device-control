@@ -1,11 +1,11 @@
 use console::style;
 use env_logger::{Builder, Env};
-use keylight_on::display;
 use keylight_on::keylight::{
     KeylightCommand, KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter,
     ZeroConfKeylightFinder, KEYLIGHT_DB_PATH,
 };
 mod cli;
+mod display;
 
 fn setup_logger() {
     Builder::from_env(Env::default().default_filter_or("info")).init();

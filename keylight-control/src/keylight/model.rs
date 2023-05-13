@@ -104,27 +104,6 @@ impl<'a, A: KeylightAdapter> Keylight<'a, A> {
         Ok(self.lights.as_ref())
     }
 
-    pub fn set_switch(&mut self, light_index: usize, on: bool) -> Result<(), KeylightError> {
-        let light = self
-            .lights
-            .get(light_index)
-            .ok_or(KeylightError::LightDoesNotExist(light_index))?;
-        let mut new_light = light.clone();
-        new_light.on = on;
-        debug!("Switch light {} to {}", light_index, on);
-        self.update_light(light_index, new_light)
-    }
-
-    pub fn toggle(&mut self, light_index: usize) -> Result<(), KeylightError> {
-        let on = self
-            .lights
-            .get(light_index)
-            .ok_or(KeylightError::LightDoesNotExist(light_index))?
-            .on;
-        debug!("Toggle light {} from {}", light_index, on);
-        self.set_switch(light_index, !on)
-    }
-
     pub fn set_light(&mut self, command_light: LightCommand) -> Result<(), KeylightError> {
         let light = self
             .lights

@@ -124,14 +124,7 @@ mod keylight_mocks {
         }
     }
 
-    pub fn create_keylight_fixture(
-        keylight_adapter: &MockKeylightAdapter,
-        lights: Option<Vec<Light>>,
-    ) -> Keylight<MockKeylightAdapter> {
-        Keylight::new(
-            &keylight_adapter,
-            create_metadata_fixture(),
-            lights.or(None),
-        )
+    pub fn create_keylight_fixture(lights: Option<Vec<Light>>) -> Keylight {
+        Keylight::new(create_metadata_fixture(), lights.or(None))
     }
 }

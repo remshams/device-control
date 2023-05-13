@@ -18,7 +18,7 @@ fn main() -> Result<(), KeylightError> {
     let finder = ZeroConfKeylightFinder::new();
     let adapter = KeylightRestAdapter {};
     let db = KeylightJsonDb::new(KEYLIGHT_DB_PATH);
-    let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
+    let mut keylight_control = KeylightControl::new(finder, db);
     display::progress::run(
         || keylight_control.load_keylights(),
         String::from("Discovering lights"),
@@ -29,9 +29,9 @@ fn main() -> Result<(), KeylightError> {
             let light = keylight_control
                 .find_keylight_mut(&light_command.id)
                 .ok_or_else(|| KeylightError::KeylightDoesNotExist(light_command.id.clone()))?;
-            light.lights()?;
+            light.lights(&adapter)?;
 
-            light.set_light(light_command)
+            light.set_light(light_command, &adapter)
         }
         KeylightCommand::List => {
             display::keylight::print_keylights(Some("Lights: "), &keylight_control.list_metadata());

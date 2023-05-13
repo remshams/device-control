@@ -17,32 +17,26 @@ pub trait KeylightDb {
     fn load(&self) -> Result<Vec<KeylightMetadata>, KeylightError>;
 }
 
-pub struct KeylightControl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> {
-    keylight_finder: &'a F,
-    keylight_adapter: &'a A,
-    keylight_db: &'a Db,
-    lights: Vec<Keylight<'a, A>>,
+pub struct KeylightControl<F: KeylightFinder, Db: KeylightDb> {
+    keylight_finder: F,
+    keylight_db: Db,
+    lights: Vec<Keylight>,
 }
 
-impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<'a, F, A, Db> {
-    pub fn new(
-        keylight_finder: &'a F,
-        keylight_adapter: &'a A,
-        keylight_db: &'a Db,
-    ) -> KeylightControl<'a, F, A, Db> {
+impl<F: KeylightFinder, Db: KeylightDb> KeylightControl<F, Db> {
+    pub fn new(keylight_finder: F, keylight_db: Db) -> KeylightControl<F, Db> {
         KeylightControl {
             keylight_finder,
-            keylight_adapter,
             keylight_db,
             lights: vec![],
         }
     }
 
-    pub fn find_keylight_mut(&mut self, id: &str) -> Option<&mut Keylight<'a, A>> {
+    pub fn find_keylight_mut(&mut self, id: &str) -> Option<&mut Keylight> {
         self.lights.iter_mut().find(|light| light.metadata.id == id)
     }
 
-    pub fn find_keylight(&self, id: &str) -> Option<&Keylight<'a, A>> {
+    pub fn find_keylight(&self, id: &str) -> Option<&Keylight> {
         self.lights.iter().find(|light| light.metadata.id == id)
     }
 
@@ -52,7 +46,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
             Ok(metadata) => {
                 self.lights = metadata
                     .into_iter()
-                    .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
+                    .map(|metadata| Keylight::new(metadata, None))
                     .collect();
                 debug!("Loaded {} keylights", self.lights.len());
 
@@ -67,7 +61,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
             .keylight_finder
             .discover()
             .into_iter()
-            .map(|metadata| Keylight::new(self.keylight_adapter, metadata, None))
+            .map(|metadata| Keylight::new(metadata, None))
             .collect();
         self.deduplicate_keylights();
         debug!("Discovered {} keylights", self.lights.len());
@@ -93,7 +87,7 @@ impl<'a, F: KeylightFinder, A: KeylightAdapter, Db: KeylightDb> KeylightControl<
         self.lights.dedup_by_key(|light| light.metadata.ip.clone());
     }
 
-    pub fn list(&self) -> &Vec<Keylight<'a, A>> {
+    pub fn list(&self) -> &Vec<Keylight> {
         &self.lights
     }
 
@@ -111,16 +105,15 @@ mod test {
     use std::cell::RefCell;
 
     use crate::keylight::keylight_mocks::{
-        create_metadata_list_fixture, MockKeylightAdapter, MockKeylightDb, MockKeylightFinder,
+        create_metadata_list_fixture, MockKeylightDb, MockKeylightFinder,
     };
     use crate::keylight::model::KeylightMetadata;
 
     use super::*;
 
-    fn prepare_test() -> (MockKeylightFinder, MockKeylightAdapter, MockKeylightDb) {
+    fn prepare_test() -> (MockKeylightFinder, MockKeylightDb) {
         (
             MockKeylightFinder::new(create_metadata_list_fixture()),
-            MockKeylightAdapter::new(Ok(vec![]), None),
             MockKeylightDb {
                 stored_metadata_passed: RefCell::new(vec![]),
                 load_response: Ok(create_metadata_list_fixture()),
@@ -133,16 +126,16 @@ mod test {
 
         #[test]
         fn test_discover_keylights() {
-            let (finder, adapter, db) = prepare_test();
-            let deduplicated_metadata = vec![&finder.metadata[0], &finder.metadata[1]];
-            let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
+            let (finder, db) = prepare_test();
+            let deduplicated_metadata = &finder.metadata.clone()[0..2];
+            let mut keylight_control = KeylightControl::new(finder, db);
             keylight_control.discover_keylights();
-            let discovered_metadata: Vec<&KeylightMetadata> = keylight_control
+            let discovered_metadata: Vec<KeylightMetadata> = keylight_control
                 .lights
-                .iter()
-                .map(|light| &light.metadata)
+                .into_iter()
+                .map(|light| light.metadata)
                 .collect();
-            assert_eq!(keylight_control.lights.len(), 2);
+            assert_eq!(discovered_metadata.len(), 2);
             assert_eq!(discovered_metadata, deduplicated_metadata);
         }
     }
@@ -152,9 +145,9 @@ mod test {
 
         #[test]
         fn should_load_metadata_from_db() {
-            let (finder, adapter, db) = prepare_test();
+            let (finder, db) = prepare_test();
             let keylight_metadatas = db.load_response.clone().unwrap();
-            let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
+            let mut keylight_control = KeylightControl::new(finder, db);
             let result = keylight_control.load_keylights();
 
             assert_eq!(result.is_ok(), true);
@@ -165,15 +158,16 @@ mod test {
 
         #[test]
         fn should_discover_keylights_when_loading_from_db_fails() {
-            let (finder, adapter, mut db) = prepare_test();
+            let (finder, mut db) = prepare_test();
+            let metadata = finder.metadata.clone();
             db.load_response = Err(KeylightError::DbError(String::from("Test")));
-            let mut keylight_control = KeylightControl::new(&finder, &adapter, &db);
+            let mut keylight_control = KeylightControl::new(finder, db);
             let result = keylight_control.load_keylights();
 
             assert_eq!(result.is_ok(), true);
             assert_eq!(keylight_control.lights.is_empty(), false);
             for (index, keylight) in keylight_control.lights.iter().enumerate() {
-                assert_eq!(keylight.metadata, finder.metadata[index]);
+                assert_eq!(keylight.metadata, metadata[index]);
             }
         }
     }

@@ -2,5 +2,5 @@
 members = [
 "keylight-control",
 "keylight-cli",
-"keylight-ui"
+"keylight-ui/src-tauri",
 ]

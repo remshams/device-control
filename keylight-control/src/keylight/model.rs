@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::KeylightAdapter;
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum KeylightError {
     CommandError(String),
     KeylightDoesNotExist(String),

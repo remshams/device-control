@@ -20,7 +20,7 @@ pub trait KeylightDb {
 pub struct KeylightControl<F: KeylightFinder, Db: KeylightDb> {
     keylight_finder: F,
     keylight_db: Db,
-    lights: Vec<Keylight>,
+    pub lights: Vec<Keylight>,
 }
 
 impl<F: KeylightFinder, Db: KeylightDb> KeylightControl<F, Db> {
@@ -85,10 +85,6 @@ impl<F: KeylightFinder, Db: KeylightDb> KeylightControl<F, Db> {
     fn deduplicate_keylights(&mut self) {
         self.lights.sort_by_key(|light| light.metadata.ip.clone());
         self.lights.dedup_by_key(|light| light.metadata.ip.clone());
-    }
-
-    pub fn list(&self) -> &Vec<Keylight> {
-        &self.lights
     }
 
     pub fn list_metadata(&self) -> Vec<&KeylightMetadata> {

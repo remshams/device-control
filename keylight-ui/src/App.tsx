@@ -10,6 +10,8 @@ function App() {
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     setGreetMsg(await invoke("greet", { name: name() }));
+    await invoke("discover_keylights");
+    await invoke("load_lights");
     await invoke("turn_keylight_on");
   }
 

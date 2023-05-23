@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::KeylightAdapter;
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
 pub enum KeylightError {
     CommandError(String),
     KeylightDoesNotExist(String),
@@ -37,21 +37,21 @@ pub struct KeylightMetadata {
     pub port: u16,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Light {
     pub on: bool,
     pub brightness: u16,
     pub temperature: u16,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, Hash, PartialEq, Clone, Serialize, Deserialize)]
 pub enum KeylightCommand {
     SendCommand(LightCommand),
     List,
     Discover,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, Hash, PartialEq, Clone, Serialize, Deserialize)]
 pub struct LightCommand {
     pub id: String,
     pub index: usize,
@@ -72,6 +72,7 @@ impl LightCommand {
     }
 }
 
+#[derive(Debug, Eq, Hash, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Keylight {
     pub metadata: KeylightMetadata,
     pub lights: Vec<Light>,

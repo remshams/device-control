@@ -1,7 +1,6 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.solid:hover {
-  filter: drop-shadow(0 0 2em #2f5d90);
+main {
+  height: 100vh;
+  display: grid;
+  justify-items: center;
+  align-items: center;
 }

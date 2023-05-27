@@ -1,10 +1,10 @@
-use keylight_control::keylight::KeylightError;
+use keylight_control::keylight::{Keylight, KeylightError};
 use tauri::State;
 
 use crate::model::AppState;
 
 #[tauri::command]
-pub fn discover_keylights(state: State<AppState>) -> Result<(), KeylightError> {
+pub fn discover_keylights(state: State<AppState>) -> Result<Vec<Keylight>, KeylightError> {
     let mut keylight_control = state
         .keylight_control
         .lock()
@@ -14,5 +14,5 @@ pub fn discover_keylights(state: State<AppState>) -> Result<(), KeylightError> {
     for light in lights.iter_mut() {
         light.lights(&state.adapter)?;
     }
-    Ok(())
+    Ok(keylight_control.lights.clone())
 }

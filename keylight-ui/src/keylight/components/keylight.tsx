@@ -1,4 +1,4 @@
-import { Keylight as KeylightModel } from './adapter';
+import { Keylight as KeylightModel } from '../adapter';
 import styles from './Keylight.module.css';
 
 export const Keylight = ({ light }: { light: KeylightModel }) => {

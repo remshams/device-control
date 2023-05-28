@@ -5,10 +5,12 @@ export type KeylightListProps = {
   lights: Array<Keylight>;
 };
 
-export const KeylightList = ({ lights }: KeylightListProps) => (
-  <>
-    {lights.map(light => (
-      <KeylightComponent light={light} />
-    ))}
-  </>
-);
+export const KeylightList = (props: KeylightListProps) => {
+  return (
+    <>
+      {props.lights.map(light => (
+        <KeylightComponent light={light} />
+      ))}
+    </>
+  );
+};

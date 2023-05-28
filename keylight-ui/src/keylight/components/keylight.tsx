@@ -17,14 +17,16 @@ const KeyValue = ({ label, value }: KeyValueProps) => (
   </div>
 );
 
-export const Keylight = ({ light }: KeylightProps) => (
-  <div class={styles.keylight}>
-    <div class={styles.lightSwitch}>
-      <button>{light.lights[0].on ? 'On' : 'Off'}</button>
+export const Keylight = (props: KeylightProps) => {
+  return (
+    <div class={styles.keylight}>
+      <div class={styles.lightSwitch}>
+        <button>{props.light.lights[0].on ? 'On' : 'Off'}</button>
+      </div>
+      <div class={styles.metadata}>
+        <KeyValue label="Temperature" value={props.light.lights[0].temperature.toString()} />
+        <KeyValue label="Brightness" value={props.light.lights[0].brightness.toString()} />
+      </div>
     </div>
-    <div class={styles.metadata}>
-      <KeyValue label="Temperature" value={light.lights[0].temperature.toString()} />
-      <KeyValue label="Brightness" value={light.lights[0].brightness.toString()} />
-    </div>
-  </div>
-);
+  );
+};

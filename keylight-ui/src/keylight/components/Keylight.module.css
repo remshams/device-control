@@ -18,3 +18,8 @@
   justify-content: center;
   align-items: center;
 }
+
+.keyValue {
+  display: flex;
+  column-gap: 0.5rem;
+}

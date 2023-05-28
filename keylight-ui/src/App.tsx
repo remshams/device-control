@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js';
 import './App.css';
 import { Keylight, loadKeylights } from './keylight/adapter';
-import { Keylight as KeylightComponent } from './keylight/components/keylight';
+import { KeylightList } from './keylight/components/KeylightList';
 
 const AppState = {
   init: 'init',
@@ -21,7 +21,7 @@ function App() {
     setAppState(AppState.loaded);
   });
 
-  return <main>{appState() === AppState.loading ? <Loading /> : <KeylightComponent light={lights()[0]} />}</main>;
+  return <main>{appState() === AppState.loading ? <Loading /> : <KeylightList lights={lights()} />}</main>;
 }
 
 export default App;

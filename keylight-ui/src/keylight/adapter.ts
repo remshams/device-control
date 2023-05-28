@@ -28,3 +28,10 @@ export const loadKeylights = async (): Promise<Array<Keylight>> => {
   });
   return result;
 };
+
+export const refresh_lights = async (): Promise<Array<Keylight>> => {
+  const result = await invoke<Array<Keylight>>('refresh_lights').catch(_e => {
+    throw KeylightError.keylightLoadError;
+  });
+  return result;
+};

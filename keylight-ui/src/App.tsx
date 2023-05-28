@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js';
 import './App.css';
-import { Keylight, loadKeylights } from './keylight/adapter';
+import { Keylight, loadKeylights, refresh_lights } from './keylight/adapter';
 import { KeylightList } from './keylight/components/KeylightList';
 
 const AppState = {
@@ -19,6 +19,11 @@ function App() {
   loadKeylights().then(lights => {
     setLights(lights);
     setAppState(AppState.loaded);
+    window.setInterval(() => {
+      refresh_lights().then(lights => {
+        setLights(lights);
+      });
+    }, 2000);
   });
 
   return <main>{appState() === AppState.loading ? <Loading /> : <KeylightList lights={lights()} />}</main>;

@@ -48,7 +48,7 @@ export const refresh_lights = async (): Promise<Array<Keylight>> => {
   return result.map(convertKeylightDto);
 };
 
-export const setLight = async (lightCommand: LightCommand): Promise<void> => {
+export const setKeylight = async (lightCommand: LightCommand): Promise<void> => {
   const result = await invoke<void>('set_light', { command: lightCommand }).catch(_e => {
     throw KeylightError.commandError;
   });

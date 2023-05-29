@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from 'solid-js';
-import { Keylight as KeylightModel, setLight as setLightSystem } from '../adapter';
+import { Keylight as KeylightModel, setKeylight } from '../adapter';
 import styles from './Keylight.module.css';
 
 type KeyValueProps = {
@@ -24,7 +24,7 @@ export const Keylight = (props: KeylightProps) => {
     setLight({ ...light(), on: !light().on });
   };
   createEffect(() => {
-    setLightSystem({ id: props.light.metadata.id, index: 0, ...light() });
+    setKeylight({ id: props.light.metadata.id, index: 0, ...light() });
   });
 
   return (

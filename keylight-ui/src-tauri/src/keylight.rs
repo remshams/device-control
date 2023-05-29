@@ -1,4 +1,4 @@
-use keylight_control::keylight::{Keylight, KeylightError, KeylightRestAdapter};
+use keylight_control::keylight::{Keylight, KeylightError, KeylightRestAdapter, LightCommand};
 use tauri::State;
 
 use crate::model::AppState;
@@ -30,4 +30,17 @@ fn load_lights(
         light.lights(adapter)?;
     }
     Ok(lights.clone())
+}
+
+#[tauri::command]
+pub fn set_light(state: State<AppState>, command: LightCommand) -> Result<(), KeylightError> {
+    let mut keylight_control = state
+        .keylight_control
+        .lock()
+        .map_err(|_err| KeylightError::CommandError(String::from("test")))?;
+    let light = keylight_control.find_keylight_mut(&command.id);
+    match light {
+        Some(light) => light.set_light(command, &state.adapter),
+        None => Err(KeylightError::KeylightDoesNotExist(command.id)),
+    }
 }

@@ -8,7 +8,7 @@ use keylight_control::keylight::{
 };
 use model::AppState;
 
-use crate::keylight::{discover_keylights, refresh_lights};
+use crate::keylight::{discover_keylights, refresh_lights, set_light};
 
 mod keylight;
 mod model;
@@ -33,7 +33,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             greet,
             discover_keylights,
-            refresh_lights
+            refresh_lights,
+            set_light
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

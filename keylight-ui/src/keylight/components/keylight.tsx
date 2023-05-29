@@ -1,3 +1,4 @@
+import { createEffect, createSignal } from 'solid-js';
 import { Keylight as KeylightModel, setLight as setLightSystem } from '../adapter';
 import styles from './Keylight.module.css';
 
@@ -18,17 +19,22 @@ const KeyValue = ({ label, value }: KeyValueProps) => (
 );
 
 export const Keylight = (props: KeylightProps) => {
+  const [light, setLight] = createSignal(props.light.light);
   const toggleOn = () => {
-    setLightSystem({ id: props.light.metadata.id, index: 0, on: !props.light.lights[0].on });
+    setLight({ ...light(), on: !light().on });
   };
+  createEffect(() => {
+    setLightSystem({ id: props.light.metadata.id, index: 0, ...light() });
+  });
+
   return (
     <div class={styles.keylight}>
       <div class={styles.lightSwitch}>
-        <button onClick={toggleOn}>{props.light.light.on ? 'On' : 'Off'}</button>
+        <button onClick={toggleOn}>{light().on ? 'On' : 'Off'}</button>
       </div>
       <div class={styles.metadata}>
-        <KeyValue label="Temperature" value={props.light.light.temperature.toString()} />
-        <KeyValue label="Brightness" value={props.light.light.brightness.toString()} />
+        <KeyValue label="Temperature" value={light().temperature.toString()} />
+        <KeyValue label="Brightness" value={light().brightness.toString()} />
       </div>
     </div>
   );

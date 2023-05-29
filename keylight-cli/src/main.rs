@@ -2,7 +2,7 @@ use console::style;
 use env_logger::{Builder, Env};
 use keylight_control::keylight::{
     KeylightCommand, KeylightControl, KeylightError, KeylightJsonDb, KeylightRestAdapter,
-    ZeroConfKeylightFinder, KEYLIGHT_DB_PATH,
+    ZeroConfKeylightFinder,
 };
 mod cli;
 mod display;
@@ -17,7 +17,7 @@ fn main() -> Result<(), KeylightError> {
     let keylight_command = cli::parse();
     let finder = ZeroConfKeylightFinder::new();
     let adapter = KeylightRestAdapter {};
-    let db = KeylightJsonDb::new(KEYLIGHT_DB_PATH);
+    let db = KeylightJsonDb::new(None);
     let mut keylight_control = KeylightControl::new(finder, db);
     display::progress::run(
         || keylight_control.load_keylights(),

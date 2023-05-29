@@ -1,10 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use home::home_dir;
 use std::sync::Mutex;
 
 use keylight_control::keylight::{
-    KeylightControl, KeylightJsonDb, KeylightRestAdapter, ZeroConfKeylightFinder, KEYLIGHT_DB_PATH,
+    KeylightControl, KeylightJsonDb, KeylightRestAdapter, ZeroConfKeylightFinder,
 };
 use model::AppState;
 
@@ -20,8 +21,12 @@ fn greet(name: &str) -> String {
 }
 
 fn main() {
+    let db_dir = home_dir().map(|mut home_dir| {
+        home_dir.push("keylight.json");
+        home_dir
+    });
     let finder = ZeroConfKeylightFinder::new();
-    let db = KeylightJsonDb::new(KEYLIGHT_DB_PATH);
+    let db = KeylightJsonDb::new(db_dir);
     let adapter = KeylightRestAdapter {};
     let control = KeylightControl::new(finder, db);
     let app_state = AppState {

@@ -6,5 +6,5 @@ use keylight_control::keylight::{
 
 pub struct AppState {
     pub adapter: KeylightRestAdapter,
-    pub keylight_control: Mutex<KeylightControl<ZeroConfKeylightFinder, KeylightJsonDb<'static>>>,
+    pub keylight_control: Mutex<KeylightControl<ZeroConfKeylightFinder, KeylightJsonDb>>,
 }

@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api';
+import { convertKeylightDto, KeylightDto } from './converter';
 
 export type KeylightMetadata = {
   id: string;
@@ -10,6 +11,7 @@ export type KeylightMetadata = {
 export type Keylight = {
   metadata: KeylightMetadata;
   lights: Array<Light>;
+  light: Light;
 };
 
 export type Light = {
@@ -33,17 +35,17 @@ export const KeylightError = {
 export type KeylightError = keyof typeof KeylightError;
 
 export const loadKeylights = async (): Promise<Array<Keylight>> => {
-  const result = await invoke<Array<Keylight>>('discover_keylights').catch(_e => {
+  const result = await invoke<Array<KeylightDto>>('discover_keylights').catch(_e => {
     throw KeylightError.keylightLoadError;
   });
-  return result;
+  return result.map(convertKeylightDto);
 };
 
 export const refresh_lights = async (): Promise<Array<Keylight>> => {
-  const result = await invoke<Array<Keylight>>('refresh_lights').catch(_e => {
+  const result = await invoke<Array<KeylightDto>>('refresh_lights').catch(_e => {
     throw KeylightError.keylightLoadError;
   });
-  return result;
+  return result.map(convertKeylightDto);
 };
 
 export const setLight = async (lightCommand: LightCommand): Promise<void> => {

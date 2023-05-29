@@ -22,7 +22,7 @@ fn greet(name: &str) -> String {
 
 fn main() {
     let db_dir = home_dir().map(|mut home_dir| {
-        home_dir.push("keylight.json");
+        home_dir.push(".keylightOn/keylight.json");
         home_dir
     });
     let finder = ZeroConfKeylightFinder::new();

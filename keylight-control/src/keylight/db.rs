@@ -20,6 +20,7 @@ impl KeylightJsonDb {
 impl KeylightDb for KeylightJsonDb {
     fn store(&self, metadatas: &[&KeylightMetadata]) -> Result<(), KeylightError> {
         let metadatas_string = serde_json::to_string(metadatas)?;
+        std::fs::create_dir_all(&self.path.parent().unwrap())?;
         std::fs::write(&self.path, metadatas_string)?;
         debug!("Stored {} keylight metadatas", metadatas.len());
         Ok(())

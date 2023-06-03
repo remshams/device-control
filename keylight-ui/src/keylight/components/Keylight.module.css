@@ -19,6 +19,13 @@
   align-items: center;
 }
 
+.lightSlider {
+  display: grid;
+  grid-template-columns: min-content auto;
+  align-items: center;
+  column-gap: 1rem;
+}
+
 .keyValue {
   display: flex;
   column-gap: 0.5rem;

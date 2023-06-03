@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js';
 import './App.css';
 import { Keylight, loadKeylights, refresh_lights } from './keylight/adapter';
 import { KeylightList } from './keylight/components/KeylightList';
-import { isAppLockedSignal } from './keylight/stores';
+import { areLightsEditedSignal } from './keylight/stores';
 
 const AppState = {
   init: 'init',
@@ -15,7 +15,7 @@ type AppState = keyof typeof AppState;
 export const Loading = () => <span>Loading</span>;
 
 function App() {
-  const [isAppLocked] = isAppLockedSignal;
+  const [areLightsEdited] = areLightsEditedSignal;
   const [appState, setAppState] = createSignal<AppState>(AppState.loading);
   const [lights, setLights] = createSignal<Array<Keylight>>([]);
   loadKeylights().then(lights => {
@@ -23,7 +23,7 @@ function App() {
     setAppState(AppState.loaded);
     window.setInterval(() => {
       refresh_lights().then(lights => {
-        if (!isAppLocked()) {
+        if (!areLightsEdited()) {
           setLights(lights);
         }
       });

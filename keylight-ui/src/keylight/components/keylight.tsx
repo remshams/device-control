@@ -2,8 +2,9 @@ import { createEffect, createSignal } from 'solid-js';
 import { Keylight as KeylightModel, setKeylight } from '../adapter';
 import { areLightsEditedSignal } from '../stores';
 import styles from './Keylight.module.css';
+import { Slider } from './slider/Slider';
 
-const [_areLightsEdited, setAreLightsEdited] = areLightsEditedSignal;
+const [_areLightsEdited] = areLightsEditedSignal;
 
 type KeyValueProps = {
   label: string;
@@ -21,30 +22,6 @@ const KeyValue = (props: KeyValueProps) => (
   </div>
 );
 
-type LightSliderProps = {
-  label: string;
-  value: number;
-  min?: number;
-  max?: number;
-  onChange: (value: number) => void;
-};
-
-const LightSlider = (props: LightSliderProps) => (
-  <div class={styles.lightSlider}>
-    <label for="slider">{props.label}</label>
-    <input
-      id="slider"
-      type="range"
-      min={props.min ?? 0}
-      max={props.max ?? 100}
-      value={props.value}
-      onChange={event => props.onChange(Number(event.currentTarget.value))}
-      onMouseDown={_event => setAreLightsEdited(true)}
-      onMouseUp={_event => setAreLightsEdited(false)}
-    />
-  </div>
-);
-
 export const Keylight = (props: KeylightProps) => {
   const [light, setLight] = createSignal(props.light.light);
   createEffect(() => {
@@ -58,7 +35,7 @@ export const Keylight = (props: KeylightProps) => {
       </div>
       <div class={styles.metadata}>
         <div>
-          <LightSlider
+          <Slider
             label="Temperature"
             value={light().temperature}
             min={143}
@@ -68,7 +45,7 @@ export const Keylight = (props: KeylightProps) => {
           <KeyValue label="Temperature" value={light().temperature.toString()} />
         </div>
         <div>
-          <LightSlider
+          <Slider
             label="Brightness"
             value={light().brightness}
             onChange={value => setLight({ ...light(), brightness: value })}

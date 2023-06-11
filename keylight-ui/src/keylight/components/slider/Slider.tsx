@@ -13,8 +13,10 @@ export type SliderProps = {
 export const Slider = (props: SliderProps) => {
   const onchangeStart = props.onChangeStart ?? (() => {});
   const onChangeEnd = props.onChangeEnd ?? (() => {});
+  const endColorPercentage = () => ((props.value - (props.min ?? 0)) / ((props.max ?? 100) - (props.min ?? 0))) * 100;
+
   return (
-    <div class={styles.container}>
+    <div style={{ '--end-color-percentage': `${endColorPercentage()}%` }} class={styles.container}>
       <label for="slider">{props.label}:</label>
       <input
         id="slider"

@@ -1,5 +1,5 @@
 import { Keylight } from '../adapter';
-import { Keylight as KeylightComponent } from './Keylight';
+import { Keylight as KeylightComponent } from './keylight';
 
 export type KeylightListProps = {
   lights: Array<Keylight>;

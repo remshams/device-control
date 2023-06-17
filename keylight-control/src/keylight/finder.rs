@@ -23,7 +23,14 @@ impl KeylightFinder for ZeroConfKeylightFinder {
         }));
 
         let event_loop = browser.browse_services().unwrap();
-        event_loop.poll(Duration::from_secs(10)).unwrap();
+        let poll_duration = Duration::from_secs(2);
+        let start_time = std::time::Instant::now();
+        loop {
+            if start_time.elapsed() > poll_duration {
+                break;
+            }
+            event_loop.poll(Duration::from_secs(0)).unwrap();
+        }
 
         while let Ok(service) = rx.recv_timeout(Duration::from_secs(2)) {
             self.add_new_device(&mut keylight_metadatas, service);

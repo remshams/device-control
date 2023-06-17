@@ -1,0 +1,3 @@
+[submodule "avahi-sys"]
+	path = avahi-sys
+	url = git@github.com:remshams/avahi-sys.git

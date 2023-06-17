@@ -1,6 +1,10 @@
 [workspace]
 members = [
+"avahi-sys",
 "keylight-control",
 "keylight-cli",
 "keylight-ui/src-tauri",
 ]
+
+[patch.crates-io]
+avahi-sys = { path = "avahi-sys/" }

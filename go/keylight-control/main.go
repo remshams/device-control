@@ -2,13 +2,13 @@ package main
 
 import (
 	"keylight-control/control"
+	"log"
 )
 
 func main() {
-	test := control.ZeroConfKeylightFinder{}
-	control := control.KeylightControl{
-		Finder: &test,
+	keylightControl := control.KeylightControl{
+		Finder: &control.ZeroConfKeylightFinder{},
 	}
-
-	keylights := test.Discover()
+	keylights := keylightControl.LoadKeylights()
+	log.Println(keylights)
 }

@@ -7,8 +7,12 @@ import (
 
 func main() {
 	keylightControl := control.KeylightControl{
-		Finder: &control.ZeroConfKeylightFinder{},
+		Finder:  &control.ZeroConfKeylightFinder{},
+		Adapter: &control.KeylightRestAdapter{},
 	}
-	keylights := keylightControl.LoadKeylights()
+	keylights, err := keylightControl.LoadKeylights()
+	if err != nil {
+		log.Println(err)
+	}
 	log.Println(keylights)
 }

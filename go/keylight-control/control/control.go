@@ -11,21 +11,13 @@ type KeylightControl struct {
 }
 
 func (control *KeylightControl) LoadKeylights() ([]Keylight, error) {
-	keylights := control.Finder.Discover()
+	keylights := control.Finder.Discover(control.Adapter)
 	control.keylights = keylights
-	control.setAdapterForLights()
 	isSuccess := control.loadLights()
 	if isSuccess {
 		return keylights, nil
 	} else {
 		return keylights, errors.New("Failed to load some lights")
-	}
-}
-
-func (control *KeylightControl) setAdapterForLights() {
-	for i := range control.keylights {
-		keylight := &control.keylights[i]
-		keylight.Adapter = control.Adapter
 	}
 }
 

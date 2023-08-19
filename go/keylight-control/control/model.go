@@ -3,7 +3,7 @@ package control
 import "net"
 
 type KeylightFinder interface {
-	Discover() []Keylight
+	Discover(adapter KeylightAdapter) []Keylight
 }
 
 type KeylightAdapter interface {

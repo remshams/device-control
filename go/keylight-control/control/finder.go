@@ -10,7 +10,7 @@ import (
 
 type ZeroConfKeylightFinder struct{}
 
-func (finder *ZeroConfKeylightFinder) Discover() []Keylight {
+func (finder *ZeroConfKeylightFinder) Discover(adapter KeylightAdapter) []Keylight {
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
 		log.Fatalln("Failed to initialize resolver:", err.Error())
@@ -18,7 +18,7 @@ func (finder *ZeroConfKeylightFinder) Discover() []Keylight {
 
 	serviceEntryCh := make(chan *zeroconf.ServiceEntry)
 	keylightCh := make(chan Keylight)
-	go finder.searchKeylights(serviceEntryCh, keylightCh)
+	go finder.searchKeylights(serviceEntryCh, keylightCh, adapter)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 
@@ -37,13 +37,14 @@ func (finder *ZeroConfKeylightFinder) Discover() []Keylight {
 
 }
 
-func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroconf.ServiceEntry, keylightCh chan Keylight) {
+func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroconf.ServiceEntry, keylightCh chan Keylight, adapter KeylightAdapter) {
 	for entry := range serviceEntryCh {
 		keylightCh <- Keylight{
-			Name:  entry.ServiceRecord.Instance,
-			Ip:    entry.AddrIPv4,
-			Port:  entry.Port,
-			Light: nil,
+			Name:    entry.ServiceRecord.Instance,
+			Ip:      entry.AddrIPv4,
+			Port:    entry.Port,
+			Adapter: adapter,
+			Light:   nil,
 		}
 	}
 	close(keylightCh)

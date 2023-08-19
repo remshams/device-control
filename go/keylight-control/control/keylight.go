@@ -22,6 +22,7 @@ type Keylight struct {
 	Port    int
 	Light   *Light
 	Adapter KeylightAdapter
+	Store   KeylightStore
 }
 
 func (keylight *Keylight) LoadLights() error {
@@ -57,5 +58,10 @@ func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
 	if err == nil {
 		keylight.Light = &light
 	}
+	return err
+}
+
+func (keylight *Keylight) Save() error {
+	err := keylight.Store.Save(keylight)
 	return err
 }

@@ -7,11 +7,12 @@ import (
 type KeylightControl struct {
 	Finder    KeylightFinder
 	Adapter   KeylightAdapter
+	Store     KeylightStore
 	keylights []Keylight
 }
 
 func (control *KeylightControl) LoadKeylights() ([]Keylight, error) {
-	keylights := control.Finder.Discover(control.Adapter)
+	keylights := control.Finder.Discover(control.Adapter, control.Store)
 	control.keylights = keylights
 	isSuccess := control.loadLights()
 	if isSuccess {
@@ -32,4 +33,15 @@ func (control *KeylightControl) loadLights() bool {
 	}
 	return isSuccess
 
+}
+
+func (control *KeylightControl) SaveLights() bool {
+	isSuccess := true
+	for _, keylight := range control.keylights {
+		err := keylight.Save()
+		if err != nil {
+			isSuccess = false
+		}
+	}
+	return isSuccess
 }

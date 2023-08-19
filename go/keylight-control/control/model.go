@@ -8,4 +8,5 @@ type KeylightFinder interface {
 
 type KeylightAdapter interface {
 	Lights(ip []net.IP, port int) ([]Light, error)
+	SetLight(ip []net.IP, port int, lights []Light) error
 }

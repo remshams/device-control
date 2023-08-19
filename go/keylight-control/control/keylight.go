@@ -34,3 +34,28 @@ func (keylight *Keylight) LoadLights() error {
 	}
 	return nil
 }
+
+func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
+	on := lightCommand.On
+	if on == nil {
+		on = &keylight.Light.On
+	}
+	brightness := lightCommand.Brightness
+	if brightness == nil {
+		brightness = &keylight.Light.Brightness
+	}
+	temperature := lightCommand.Temperature
+	if temperature == nil {
+		temperature = &keylight.Light.Temperature
+	}
+	light := Light{
+		On:          *on,
+		Temperature: *temperature,
+		Brightness:  *brightness,
+	}
+	err := keylight.Adapter.SetLight(keylight.Ip, keylight.Port, []Light{light})
+	if err == nil {
+		keylight.Light = &light
+	}
+	return err
+}

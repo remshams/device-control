@@ -14,5 +14,10 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(keylights)
+	if len(keylights) > 0 {
+		keylight := &keylights[0]
+		isOn := false
+		keylight.SetLight(control.LightCommand{On: &isOn})
+
+	}
 }

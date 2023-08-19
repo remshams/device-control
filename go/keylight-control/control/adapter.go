@@ -1,6 +1,7 @@
 package control
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -49,4 +50,38 @@ func (adapter KeylightRestAdapter) Lights(ip []net.IP, port int) ([]Light, error
 	}
 
 	return loadedLights, nil
+}
+
+func (adapter KeylightRestAdapter) SetLight(ip []net.IP, port int, lights []Light) error {
+	requestDto := adapter.createRequestDto(lights)
+	requestString, err := json.Marshal(requestDto)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf(path, ip, port), bytes.NewBuffer(requestString))
+	if err != nil {
+		return errors.New("Could not update lights")
+	}
+	req.Header.Add("Content-Type", "application/json")
+	client := http.DefaultClient
+	res, err := client.Do(req)
+	if err != nil {
+		return errors.New("Could not update lights")
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func (adapter KeylightRestAdapter) createRequestDto(lights []Light) LightResponseDto {
+	lightDtos := []LightDto{}
+	for _, light := range lights {
+		var on int
+		if light.On {
+			on = 1
+		} else {
+			on = 0
+		}
+		lightDtos = append(lightDtos, LightDto{On: on, Brightness: light.Brightness, Temperature: light.Temperature})
+	}
+	requestDto := LightResponseDto{NumberOfLights: len(lights), Lights: lightDtos}
+	return requestDto
+
 }

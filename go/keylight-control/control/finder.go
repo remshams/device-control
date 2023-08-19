@@ -19,7 +19,7 @@ func (finder *ZeroConfKeylightFinder) Discover(adapter KeylightAdapter) []Keylig
 	serviceEntryCh := make(chan *zeroconf.ServiceEntry)
 	keylightCh := make(chan Keylight)
 	go finder.searchKeylights(serviceEntryCh, keylightCh, adapter)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	err = resolver.Browse(ctx, "_elg._tcp", "local", serviceEntryCh)

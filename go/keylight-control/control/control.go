@@ -35,6 +35,11 @@ func (control *KeylightControl) loadLights() bool {
 
 }
 
+func (control *KeylightControl) SaveAllLights() error {
+	err := control.Store.SaveAll(control.Keylights)
+	return err
+}
+
 func (control *KeylightControl) SaveLights() bool {
 	isSuccess := true
 	for _, keylight := range control.Keylights {

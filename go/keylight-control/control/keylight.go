@@ -25,7 +25,7 @@ type Keylight struct {
 }
 
 func (keylight *Keylight) LoadLights() error {
-	lights, err := keylight.Adapter.Lights(keylight.Ip, keylight.Port)
+	lights, err := keylight.Adapter.Load(keylight.Ip, keylight.Port)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
 		Temperature: *temperature,
 		Brightness:  *brightness,
 	}
-	err := keylight.Adapter.SetLight(keylight.Ip, keylight.Port, []Light{light})
+	err := keylight.Adapter.Set(keylight.Ip, keylight.Port, []Light{light})
 	if err == nil {
 		keylight.Light = &light
 	}

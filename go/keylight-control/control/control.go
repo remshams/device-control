@@ -11,10 +11,10 @@ type KeylightControl struct {
 	Keylights []Keylight
 }
 
-func (control *KeylightControl) LoadKeylights() ([]Keylight, error) {
+func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
 	keylights := control.Finder.Discover(control.Adapter, control.Store)
 	control.Keylights = keylights
-	isSuccess := control.loadLights()
+	isSuccess := control.discoverKeylights()
 	if isSuccess {
 		return keylights, nil
 	} else {
@@ -22,7 +22,7 @@ func (control *KeylightControl) LoadKeylights() ([]Keylight, error) {
 	}
 }
 
-func (control *KeylightControl) loadLights() bool {
+func (control *KeylightControl) discoverKeylights() bool {
 	isSuccess := true
 	for i := range control.Keylights {
 		keylight := &control.Keylights[i]
@@ -35,12 +35,12 @@ func (control *KeylightControl) loadLights() bool {
 
 }
 
-func (control *KeylightControl) SaveAllLights() error {
+func (control *KeylightControl) SaveKeylights() error {
 	err := control.Store.Save(control.Keylights)
 	return err
 }
 
-func (control *KeylightControl) LoadAllLights() bool {
+func (control *KeylightControl) LoadKeylights() bool {
 	isSuccess := true
 	keylights, err := control.Store.Load(control.Adapter)
 	if err != nil {

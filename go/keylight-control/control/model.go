@@ -13,4 +13,5 @@ type KeylightAdapter interface {
 
 type KeylightStore interface {
 	Save(keylight *Keylight) error
+	Load(adapter KeylightAdapter) (*Keylight, error)
 }

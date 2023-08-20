@@ -16,10 +16,10 @@ func main() {
 		Adapter: &control.KeylightRestAdapter{},
 		Store:   &control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")},
 	}
-	keylights, err := keylightControl.LoadKeylights()
-	keylightControl.SaveLights()
-	if len(keylights) > 0 {
-		keylight := &keylights[0]
+	keylightControl.LoadLights()
+	// keylightControl.SaveLights()
+	if len(keylightControl.Keylights) > 0 {
+		keylight := &keylightControl.Keylights[0]
 		isOn := false
 		keylight.SetLight(control.LightCommand{On: &isOn})
 	}

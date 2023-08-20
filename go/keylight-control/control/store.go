@@ -36,3 +36,21 @@ func (store *JsonKeylightStore) Save(keylight *Keylight) error {
 	_, err = file.Write(keylightJson)
 	return err
 }
+
+func (store *JsonKeylightStore) Load(adapter KeylightAdapter) (*Keylight, error) {
+	data, err := os.ReadFile(store.FilePath)
+	if err != nil {
+		return nil, err
+	}
+	var keylightDto KeylightDto
+	err = json.Unmarshal(data, &keylightDto)
+	if err != nil {
+		return nil, err
+	}
+	keylight := Keylight{Name: keylightDto.Name, Ip: keylightDto.Ip, Port: keylightDto.Port, Adapter: adapter, Store: store}
+	err = keylight.LoadLights()
+	if err != nil {
+		return nil, err
+	}
+	return &keylight, nil
+}

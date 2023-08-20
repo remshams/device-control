@@ -78,3 +78,23 @@ func (store *JsonKeylightStore) Load(adapter KeylightAdapter) (*Keylight, error)
 	}
 	return &keylight, nil
 }
+
+func (store *JsonKeylightStore) LoadAll(adapter KeylightAdapter) ([]Keylight, error) {
+	data, err := os.ReadFile(store.FilePath)
+	if err != nil {
+		return nil, err
+	}
+	var keylightDtos []KeylightDto
+	err = json.Unmarshal(data, &keylightDtos)
+	if err != nil {
+		return nil, err
+	}
+	keylights := []Keylight{}
+	for _, keylightDto := range keylightDtos {
+		keylights = append(keylights, Keylight{Name: keylightDto.Name, Ip: keylightDto.Ip, Port: keylightDto.Port, Adapter: adapter, Store: store})
+	}
+	if err != nil {
+		return nil, err
+	}
+	return keylights, nil
+}

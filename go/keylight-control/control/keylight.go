@@ -60,8 +60,3 @@ func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
 	}
 	return err
 }
-
-func (keylight *Keylight) Save() error {
-	err := keylight.Store.Save(keylight)
-	return err
-}

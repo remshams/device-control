@@ -16,9 +16,7 @@ func main() {
 		Adapter: &control.KeylightRestAdapter{},
 		Store:   &control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")},
 	}
-	// keylightControl.LoadLights()
-	keylightControl.DiscoverKeylights()
-	keylightControl.LoadKeylights()
+	keylightControl.LoadOrDiscoverKeylights()
 	if len(keylightControl.Keylights) > 0 {
 		keylightControl.SaveKeylights()
 		keylight := &keylightControl.Keylights[0]

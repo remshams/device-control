@@ -11,6 +11,17 @@ type KeylightControl struct {
 	Keylights []Keylight
 }
 
+func (control *KeylightControl) LoadOrDiscoverKeylights() []Keylight {
+	control.LoadKeylights()
+	if len(control.Keylights) == 0 {
+		_, err := control.DiscoverKeylights()
+		if err == nil {
+			control.SaveKeylights()
+		}
+	}
+	return control.Keylights
+}
+
 func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
 	keylights := control.Finder.Discover(control.Adapter, control.Store)
 	control.Keylights = keylights

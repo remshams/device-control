@@ -22,7 +22,6 @@ type Keylight struct {
 	Port    int
 	Light   *Light
 	Adapter KeylightAdapter
-	Store   KeylightStore
 }
 
 func (keylight *Keylight) LoadLights() error {

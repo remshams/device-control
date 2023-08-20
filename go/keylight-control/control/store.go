@@ -53,7 +53,7 @@ func (store *JsonKeylightStore) Load(adapter KeylightAdapter) ([]Keylight, error
 	}
 	keylights := []Keylight{}
 	for _, keylightDto := range keylightDtos {
-		keylights = append(keylights, Keylight{Name: keylightDto.Name, Ip: keylightDto.Ip, Port: keylightDto.Port, Adapter: adapter, Store: store})
+		keylights = append(keylights, Keylight{Name: keylightDto.Name, Ip: keylightDto.Ip, Port: keylightDto.Port, Adapter: adapter})
 	}
 	if err != nil {
 		return nil, err

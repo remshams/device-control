@@ -12,6 +12,6 @@ type KeylightAdapter interface {
 }
 
 type KeylightStore interface {
-	SaveAll(keylights []Keylight) error
-	LoadAll(adapter KeylightAdapter) ([]Keylight, error)
+	Save(keylights []Keylight) error
+	Load(adapter KeylightAdapter) ([]Keylight, error)
 }

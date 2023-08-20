@@ -36,13 +36,13 @@ func (control *KeylightControl) loadLights() bool {
 }
 
 func (control *KeylightControl) SaveAllLights() error {
-	err := control.Store.SaveAll(control.Keylights)
+	err := control.Store.Save(control.Keylights)
 	return err
 }
 
 func (control *KeylightControl) LoadAllLights() bool {
 	isSuccess := true
-	keylights, err := control.Store.LoadAll(control.Adapter)
+	keylights, err := control.Store.Load(control.Adapter)
 	if err != nil {
 		return false
 	}

@@ -17,7 +17,7 @@ type JsonKeylightStore struct {
 	FilePath string
 }
 
-func (store *JsonKeylightStore) SaveAll(keylights []Keylight) error {
+func (store *JsonKeylightStore) Save(keylights []Keylight) error {
 	keylightDtos := []KeylightDto{}
 	for _, keylight := range keylights {
 		keylightDtos = append(keylightDtos, KeylightDto{Name: keylight.Name, Ip: keylight.Ip, Port: keylight.Port})
@@ -41,7 +41,7 @@ func (store *JsonKeylightStore) SaveAll(keylights []Keylight) error {
 
 }
 
-func (store *JsonKeylightStore) LoadAll(adapter KeylightAdapter) ([]Keylight, error) {
+func (store *JsonKeylightStore) Load(adapter KeylightAdapter) ([]Keylight, error) {
 	data, err := os.ReadFile(store.FilePath)
 	if err != nil {
 		return nil, err

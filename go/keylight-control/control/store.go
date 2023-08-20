@@ -17,6 +17,30 @@ type JsonKeylightStore struct {
 	FilePath string
 }
 
+func (store *JsonKeylightStore) SaveAll(keylights []Keylight) error {
+	keylightDtos := []KeylightDto{}
+	for _, keylight := range keylights {
+		keylightDtos = append(keylightDtos, KeylightDto{Name: keylight.Name, Ip: keylight.Ip, Port: keylight.Port})
+	}
+	keylightsJson, err := json.Marshal(keylightDtos)
+	if err != nil {
+		return err
+	}
+	dir := filepath.Dir(store.FilePath)
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	file, err := os.Create(store.FilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.Write(keylightsJson)
+	return err
+
+}
+
 func (store *JsonKeylightStore) Save(keylight *Keylight) error {
 	keylightDto := KeylightDto{Name: keylight.Name, Ip: keylight.Ip, Port: keylight.Port}
 	keylightJson, err := json.Marshal(keylightDto)

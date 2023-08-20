@@ -59,3 +59,20 @@ func (control *KeylightControl) LoadLights() bool {
 	control.Keylights = []Keylight{*keylight}
 	return true
 }
+
+func (control *KeylightControl) LoadAllLights() bool {
+	isSuccess := true
+	keylights, err := control.Store.LoadAll(control.Adapter)
+	if err != nil {
+		return false
+	}
+	for i := range keylights {
+		keylight := &keylights[i]
+		err = keylight.LoadLights()
+		if err != nil {
+			isSuccess = false
+		}
+	}
+	control.Keylights = keylights
+	return isSuccess
+}

@@ -19,10 +19,7 @@ type KeylightControl struct {
 func (control *KeylightControl) LoadOrDiscoverKeylights() []Keylight {
 	control.LoadKeylights()
 	if len(control.Keylights) == 0 {
-		_, err := control.DiscoverKeylights()
-		if err == nil {
-			control.SaveKeylights()
-		}
+		control.DiscoverKeylights()
 	}
 	return control.Keylights
 }
@@ -32,6 +29,7 @@ func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
 	control.Keylights = keylights
 	isSuccess := control.discoverKeylights()
 	if isSuccess {
+		control.SaveKeylights()
 		return keylights, nil
 	} else {
 		return keylights, errors.New("Failed to load some lights")

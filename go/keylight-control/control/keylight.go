@@ -17,6 +17,7 @@ type Light struct {
 }
 
 type Keylight struct {
+	Id      int
 	Name    string
 	Ip      []net.IP
 	Port    int

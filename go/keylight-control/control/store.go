@@ -8,6 +8,7 @@ import (
 )
 
 type KeylightDto struct {
+	Id   int
 	Name string
 	Ip   []net.IP
 	Port int
@@ -53,7 +54,7 @@ func (store *JsonKeylightStore) Load(adapter KeylightAdapter) ([]Keylight, error
 	}
 	keylights := []Keylight{}
 	for _, keylightDto := range keylightDtos {
-		keylights = append(keylights, Keylight{Name: keylightDto.Name, Ip: keylightDto.Ip, Port: keylightDto.Port, Adapter: adapter})
+		keylights = append(keylights, Keylight{Id: keylightDto.Id, Name: keylightDto.Name, Ip: keylightDto.Ip, Port: keylightDto.Port, Adapter: adapter})
 	}
 	if err != nil {
 		return nil, err

@@ -38,14 +38,17 @@ func (finder *ZeroConfKeylightFinder) Discover(adapter KeylightAdapter, store Ke
 }
 
 func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroconf.ServiceEntry, keylightCh chan Keylight, adapter KeylightAdapter, store KeylightStore) {
+	index := 0
 	for entry := range serviceEntryCh {
 		keylightCh <- Keylight{
+			Id:      index,
 			Name:    entry.ServiceRecord.Instance,
 			Ip:      entry.AddrIPv4,
 			Port:    entry.Port,
 			Adapter: adapter,
 			Light:   nil,
 		}
+		index += 1
 	}
 	close(keylightCh)
 }

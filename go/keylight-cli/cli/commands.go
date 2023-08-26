@@ -37,6 +37,7 @@ func AddSendCommand(keylightControl *control.KeylightControl) {
 			}
 		},
 	}
+	command.Flags().IntP("id", "i", 0, "Id of light the command should be send to")
 	command.Flags().BoolP("on", "o", false, "Is light on")
 	command.Flags().IntP("brightness", "b", 0, "Brightness of light in percent")
 	command.Flags().IntP("temperature", "t", 0, "Temperature of the light")

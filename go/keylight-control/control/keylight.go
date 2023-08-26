@@ -22,11 +22,11 @@ type Keylight struct {
 	Ip      []net.IP
 	Port    int
 	Light   *Light
-	Adapter KeylightAdapter
+	adapter KeylightAdapter
 }
 
-func (keylight *Keylight) LoadLights() error {
-	lights, err := keylight.Adapter.Load(keylight.Ip, keylight.Port)
+func (keylight *Keylight) loadLights() error {
+	lights, err := keylight.adapter.Load(keylight.Ip, keylight.Port)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (keylight *Keylight) LoadLights() error {
 	return nil
 }
 
-func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
+func (keylight *Keylight) setLight(lightCommand LightCommand) error {
 	on := lightCommand.On
 	if on == nil {
 		on = &keylight.Light.On
@@ -54,7 +54,7 @@ func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
 		Temperature: *temperature,
 		Brightness:  *brightness,
 	}
-	err := keylight.Adapter.Set(keylight.Ip, keylight.Port, []Light{light})
+	err := keylight.adapter.Set(keylight.Ip, keylight.Port, []Light{light})
 	if err == nil {
 		keylight.Light = &light
 	}

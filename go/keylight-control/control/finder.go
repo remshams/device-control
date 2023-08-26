@@ -45,7 +45,7 @@ func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroc
 			Name:    entry.ServiceRecord.Instance,
 			Ip:      entry.AddrIPv4,
 			Port:    entry.Port,
-			Adapter: adapter,
+			adapter: adapter,
 			Light:   nil,
 		}
 		index += 1

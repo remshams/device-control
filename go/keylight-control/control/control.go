@@ -85,11 +85,11 @@ func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) err
 }
 
 func (control *KeylightControl) findKeylight(id int) *Keylight {
-	var keylight *Keylight
+	var selectedKeylight *Keylight
 	for _, light := range control.keylights {
 		if light.Id == id {
-			keylight = &light
-			return keylight
+			selectedKeylight = &light
+			return selectedKeylight
 		}
 	}
 	return nil

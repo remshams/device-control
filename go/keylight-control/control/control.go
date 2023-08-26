@@ -4,6 +4,11 @@ import (
 	"errors"
 )
 
+type KeylightCommand struct {
+	Id      int
+	Command LightCommand
+}
+
 type KeylightControl struct {
 	Finder    KeylightFinder
 	Adapter   KeylightAdapter
@@ -66,4 +71,25 @@ func (control *KeylightControl) LoadKeylights() bool {
 	}
 	control.Keylights = keylights
 	return isSuccess
+}
+
+func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) error {
+	keylight := control.findKeylight(command.Id)
+	if keylight == nil {
+		return errors.New("Keylight not found")
+	}
+	keylight.SetLight(command.Command)
+	return nil
+}
+
+func (control *KeylightControl) findKeylight(id int) *Keylight {
+	var keylight *Keylight
+	for _, light := range control.Keylights {
+		if light.Id == id {
+			keylight = &light
+			return keylight
+		}
+	}
+	return nil
+
 }

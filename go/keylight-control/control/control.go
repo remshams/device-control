@@ -10,10 +10,14 @@ type KeylightCommand struct {
 }
 
 type KeylightControl struct {
-	Finder    KeylightFinder
-	Adapter   KeylightAdapter
-	Store     KeylightStore
+	finder    KeylightFinder
+	adapter   KeylightAdapter
+	store     KeylightStore
 	keylights []Keylight
+}
+
+func New(finder KeylightFinder, adapter KeylightAdapter, store KeylightStore) KeylightControl {
+	return KeylightControl{finder, adapter, store, []Keylight{}}
 }
 
 func (control *KeylightControl) LoadOrDiscoverKeylights() []Keylight {
@@ -25,7 +29,7 @@ func (control *KeylightControl) LoadOrDiscoverKeylights() []Keylight {
 }
 
 func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
-	keylights := control.Finder.Discover(control.Adapter, control.Store)
+	keylights := control.finder.Discover(control.adapter, control.store)
 	control.keylights = keylights
 	isSuccess := control.discoverKeylights()
 	if isSuccess {
@@ -50,13 +54,13 @@ func (control *KeylightControl) discoverKeylights() bool {
 }
 
 func (control *KeylightControl) saveKeylights() error {
-	err := control.Store.Save(control.keylights)
+	err := control.store.Save(control.keylights)
 	return err
 }
 
 func (control *KeylightControl) loadKeylights() bool {
 	isSuccess := true
-	keylights, err := control.Store.Load(control.Adapter)
+	keylights, err := control.store.Load(control.adapter)
 	if err != nil {
 		return false
 	}

@@ -26,7 +26,7 @@ type LightResponseDto struct {
 type KeylightRestAdapter struct {
 }
 
-func (adapter KeylightRestAdapter) Load(ip []net.IP, port int) ([]Light, error) {
+func (adapter *KeylightRestAdapter) Load(ip []net.IP, port int) ([]Light, error) {
 	response, err := http.Get(fmt.Sprintf(path, ip, port))
 	if err != nil || response.StatusCode >= 300 {
 		return nil, errors.New("Could not load lights")
@@ -52,7 +52,7 @@ func (adapter KeylightRestAdapter) Load(ip []net.IP, port int) ([]Light, error) 
 	return loadedLights, nil
 }
 
-func (adapter KeylightRestAdapter) Set(ip []net.IP, port int, lights []Light) error {
+func (adapter *KeylightRestAdapter) Set(ip []net.IP, port int, lights []Light) error {
 	requestDto := adapter.createRequestDto(lights)
 	requestString, err := json.Marshal(requestDto)
 	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf(path, ip, port), bytes.NewBuffer(requestString))
@@ -70,7 +70,7 @@ func (adapter KeylightRestAdapter) Set(ip []net.IP, port int, lights []Light) er
 	return nil
 }
 
-func (adapter KeylightRestAdapter) createRequestDto(lights []Light) LightResponseDto {
+func (adapter *KeylightRestAdapter) createRequestDto(lights []Light) LightResponseDto {
 	lightDtos := []LightDto{}
 	for _, light := range lights {
 		var on int

@@ -13,23 +13,23 @@ type KeylightControl struct {
 	Finder    KeylightFinder
 	Adapter   KeylightAdapter
 	Store     KeylightStore
-	Keylights []Keylight
+	keylights []Keylight
 }
 
 func (control *KeylightControl) LoadOrDiscoverKeylights() []Keylight {
-	control.LoadKeylights()
-	if len(control.Keylights) == 0 {
+	control.loadKeylights()
+	if len(control.keylights) == 0 {
 		control.DiscoverKeylights()
 	}
-	return control.Keylights
+	return control.keylights
 }
 
 func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
 	keylights := control.Finder.Discover(control.Adapter, control.Store)
-	control.Keylights = keylights
+	control.keylights = keylights
 	isSuccess := control.discoverKeylights()
 	if isSuccess {
-		control.SaveKeylights()
+		control.saveKeylights()
 		return keylights, nil
 	} else {
 		return keylights, errors.New("Failed to load some lights")
@@ -38,8 +38,8 @@ func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
 
 func (control *KeylightControl) discoverKeylights() bool {
 	isSuccess := true
-	for i := range control.Keylights {
-		keylight := &control.Keylights[i]
+	for i := range control.keylights {
+		keylight := &control.keylights[i]
 		err := keylight.loadLights()
 		if err != nil {
 			isSuccess = false
@@ -49,12 +49,12 @@ func (control *KeylightControl) discoverKeylights() bool {
 
 }
 
-func (control *KeylightControl) SaveKeylights() error {
-	err := control.Store.Save(control.Keylights)
+func (control *KeylightControl) saveKeylights() error {
+	err := control.Store.Save(control.keylights)
 	return err
 }
 
-func (control *KeylightControl) LoadKeylights() bool {
+func (control *KeylightControl) loadKeylights() bool {
 	isSuccess := true
 	keylights, err := control.Store.Load(control.Adapter)
 	if err != nil {
@@ -67,7 +67,7 @@ func (control *KeylightControl) LoadKeylights() bool {
 			isSuccess = false
 		}
 	}
-	control.Keylights = keylights
+	control.keylights = keylights
 	return isSuccess
 }
 
@@ -82,7 +82,7 @@ func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) err
 
 func (control *KeylightControl) findKeylight(id int) *Keylight {
 	var keylight *Keylight
-	for _, light := range control.Keylights {
+	for _, light := range control.keylights {
 		if light.Id == id {
 			keylight = &light
 			return keylight

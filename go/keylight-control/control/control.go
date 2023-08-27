@@ -2,6 +2,8 @@ package control
 
 import (
 	"errors"
+
+	"github.com/rs/zerolog/log"
 )
 
 type KeylightCommand struct {
@@ -33,9 +35,11 @@ func (control *KeylightControl) DiscoverKeylights() ([]Keylight, error) {
 	control.keylights = keylights
 	isSuccess := control.discoverKeylights()
 	if isSuccess {
+		log.Debug().Msgf("Discovered %d keylights", len((keylights)))
 		control.saveKeylights()
 		return keylights, nil
 	} else {
+		log.Debug().Msg("Failed to discover keylights")
 		return keylights, errors.New("Failed to load some lights")
 	}
 }
@@ -55,6 +59,11 @@ func (control *KeylightControl) discoverKeylights() bool {
 
 func (control *KeylightControl) saveKeylights() error {
 	err := control.store.Save(control.keylights)
+	if err != nil {
+		log.Debug().Msg("Failed to save keylights")
+	} else {
+		log.Debug().Msg("Saved keylights")
+	}
 	return err
 }
 
@@ -72,15 +81,18 @@ func (control *KeylightControl) loadKeylights() bool {
 		}
 	}
 	control.keylights = keylights
+	log.Debug().Msgf("Loaded %d keylights: %+v", len(control.keylights), control.keylights)
 	return isSuccess
 }
 
 func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) error {
+	log.Debug().Msgf("Send command: %+v", command)
 	keylight := control.findKeylight(command.Id)
 	if keylight == nil {
 		return errors.New("Keylight not found")
 	}
 	keylight.setLight(command.Command)
+	log.Debug().Msg("Send command success")
 	return nil
 }
 

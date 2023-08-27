@@ -2,8 +2,8 @@ package cli
 
 import (
 	"keylight-control/control"
-	"log"
 
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func AddSendCommand(keylightControl *control.KeylightControl) {
 			temperature := getInt("temperature", cmd)
 			err := keylightControl.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: brightness, Temperature: temperature}})
 			if err != nil {
-				log.Println(err)
+				log.Error().Msgf("Error executing command: ", err)
 			}
 		},
 	}

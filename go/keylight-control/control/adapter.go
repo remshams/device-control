@@ -8,6 +8,8 @@ import (
 	"io"
 	"net"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 )
 
 const path = "http://%s:%d/elgato/lights"
@@ -29,10 +31,12 @@ type KeylightRestAdapter struct {
 func (adapter *KeylightRestAdapter) Load(ip []net.IP, port int) ([]Light, error) {
 	response, err := http.Get(fmt.Sprintf(path, ip, port))
 	if err != nil || response.StatusCode >= 300 {
+		log.Error().Msg("Could not load lights")
 		return nil, errors.New("Could not load lights")
 	}
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
+		log.Error().Msg("Could not load lights")
 		return nil, errors.New("Could not load lights")
 	}
 	defer response.Body.Close()
@@ -40,6 +44,7 @@ func (adapter *KeylightRestAdapter) Load(ip []net.IP, port int) ([]Light, error)
 	var lightResponseDto LightResponseDto
 	err = json.Unmarshal(body, &lightResponseDto)
 	if err != nil {
+		log.Error().Msg("Could not parse lights")
 		return nil, errors.New("Could not parse lights")
 	}
 	loadedLights := []Light{}
@@ -48,7 +53,6 @@ func (adapter *KeylightRestAdapter) Load(ip []net.IP, port int) ([]Light, error)
 			loadedLights = append(loadedLights, Light{On: light.On == 1, Brightness: light.Brightness, Temperature: light.Temperature})
 		}
 	}
-
 	return loadedLights, nil
 }
 
@@ -57,12 +61,14 @@ func (adapter *KeylightRestAdapter) Set(ip []net.IP, port int, lights []Light) e
 	requestString, err := json.Marshal(requestDto)
 	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf(path, ip, port), bytes.NewBuffer(requestString))
 	if err != nil {
+		log.Error().Msg("Could not update lights")
 		return errors.New("Could not update lights")
 	}
 	req.Header.Add("Content-Type", "application/json")
 	client := http.DefaultClient
 	res, err := client.Do(req)
 	if err != nil {
+		log.Error().Msg("Could not update lights")
 		return errors.New("Could not update lights")
 	}
 	defer res.Body.Close()

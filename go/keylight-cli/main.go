@@ -5,9 +5,13 @@ import (
 	"keylight-control/control"
 	"os"
 	"path/filepath"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	home, err := os.UserHomeDir()
 	if err != nil {
 		home = "keylight.json"

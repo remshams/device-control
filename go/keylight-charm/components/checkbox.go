@@ -2,7 +2,6 @@ package checkbox
 
 import (
 	"fmt"
-	"keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -26,9 +25,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		switch mgs := msg.(type) {
 		case tea.KeyMsg:
 			switch mgs.String() {
-			case " ", "enter":
+			case " ":
 				m.Checked = !m.Checked
-				return m, createKeylighCommandMsg(&m.Checked)
 			}
 		}
 	}
@@ -42,13 +40,4 @@ func (m Model) View() string {
 	}
 
 	return fmt.Sprintf("%s [%s]", m.Label, checked)
-}
-
-func createKeylighCommandMsg(isOn *bool) tea.Cmd {
-	return func() tea.Msg {
-		return control.KeylightCommand{
-			Id:      0,
-			Command: control.LightCommand{On: isOn},
-		}
-	}
 }

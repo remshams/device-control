@@ -85,6 +85,10 @@ func (control *KeylightControl) loadKeylights() bool {
 	return isSuccess
 }
 
+func (control *KeylightControl) KeylightWithId(id int) *Keylight {
+	return control.findKeylight(id)
+}
+
 func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) error {
 	log.Debug().Msgf("Send command: %+v", command)
 	keylight := control.findKeylight(command.Id)

@@ -69,21 +69,13 @@ func (m *model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "i":
-		if !m.isInsertMode {
-			m.isInsertMode = true
-		}
+		m.isInsertMode = true
 	case "j", "down":
-		if !m.isInsertMode {
-			m.cursor++
-			m.normalizeCursor()
-			m.selectedElement()
-		}
+		m.increaseCursor()
+		m.selectedElement()
 	case "k", "up":
-		if !m.isInsertMode {
-			m.cursor--
-			m.normalizeCursor()
-			m.selectedElement()
-		}
+		m.decreaseCursor()
+		m.selectedElement()
 	case "ctrl+c", "q":
 		cmd = tea.Quit
 	case "enter":
@@ -118,12 +110,17 @@ func (m *model) selectedElement() {
 	}
 }
 
-func (m *model) normalizeCursor() {
-	if m.cursor < 0 {
-		m.cursor = 1
-	}
+func (m *model) increaseCursor() {
+	m.cursor++
 	if m.cursor > 1 {
 		m.cursor = 0
+	}
+}
+
+func (m *model) decreaseCursor() {
+	m.cursor--
+	if m.cursor < 0 {
+		m.cursor = 1
 	}
 }
 

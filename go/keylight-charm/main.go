@@ -129,19 +129,25 @@ func (m *model) normalizeCursor() {
 
 func (m model) View() string {
 	title := "Update keylight"
-	onCursor := " "
-	if m.on.Focus {
-		onCursor = ">"
-	}
-	brightnessCursor := " "
-	if m.brightness.Focused() {
-		brightnessCursor = ">"
-	}
-	on := fmt.Sprintf("%s %s", onCursor, m.on.View())
-	brightness := fmt.Sprintf("%s Brightness %s%%", brightnessCursor, m.brightness.View())
+	on := fmt.Sprintf("%s", m.on.View())
+	brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
+	lines := m.renderCursor([]string{on, brightness})
 
-	return fmt.Sprintf("%s \n\n %s \n\n %s", title, on, brightness)
+	return fmt.Sprintf("%s \n\n %s \n\n %s", title, lines[0], lines[1])
+}
 
+func (m *model) renderCursor(lines []string) []string {
+	var linesWithSelector []string
+	for i, line := range lines {
+		var newLine string
+		if i == m.cursor {
+			newLine = fmt.Sprintf("> %s", line)
+		} else {
+			newLine = fmt.Sprintf("  %s", line)
+		}
+		linesWithSelector = append(linesWithSelector, newLine)
+	}
+	return linesWithSelector
 }
 
 func (m *model) sendCommand() {

@@ -135,10 +135,16 @@ func (m model) View() string {
 
 func (m *model) renderCursor(lines []string) []string {
 	var linesWithSelector []string
+	var editMarker string
+	if m.isInsertMode {
+		editMarker = "(edit)"
+	} else {
+		editMarker = ""
+	}
 	for i, line := range lines {
 		var newLine string
 		if i == m.cursor {
-			newLine = fmt.Sprintf("> %s", line)
+			newLine = fmt.Sprintf("> %s %s", line, editMarker)
 		} else {
 			newLine = fmt.Sprintf("  %s", line)
 		}

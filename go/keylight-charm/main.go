@@ -16,10 +16,11 @@ import (
 )
 
 type model struct {
-	on         checkbox.Model
-	brightness textinput.Model
-	cursor     int
-	control    *control.KeylightControl
+	on          checkbox.Model
+	brightness  textinput.Model
+	cursor      int
+	canNavigate bool
+	control     *control.KeylightControl
 }
 
 func initModel(control control.KeylightControl) model {
@@ -30,7 +31,7 @@ func initModel(control control.KeylightControl) model {
 	}
 	brightness := textinput.New()
 	brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
-	model := model{on: checkbox.New("On: ", keylight.Light.On), brightness: brightness, cursor: 0, control: &control}
+	model := model{on: checkbox.New("On: ", keylight.Light.On), brightness: brightness, cursor: 0, canNavigate: true, control: &control}
 	model.selectedElement()
 	return model
 }
@@ -47,15 +48,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = m.updateChild(msg)
 		switch msg.String() {
 		case "j", "down":
-			m.cursor++
-			m.selectedElement()
+			if m.canNavigate {
+				m.cursor++
+				m.normalizeCursor()
+				m.selectedElement()
+			}
 		case "k", "up":
-			m.cursor--
-			m.selectedElement()
+			if m.canNavigate {
+				m.cursor--
+				m.normalizeCursor()
+				m.selectedElement()
+			}
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		case "enter":
 			m.sendCommand()
+		case "esc":
+			m.cursor = 0
+			m.selectedElement()
 		}
 	}
 	return m, cmd
@@ -77,16 +87,24 @@ func (m *model) updateChild(msg tea.Msg) tea.Cmd {
 }
 
 func (m *model) selectedElement() {
+	m.canNavigate = true
+	m.on.Focus = false
+	m.brightness.Blur()
 	switch m.cursor {
 	case 0:
 		m.on.Focus = true
-		m.brightness.Blur()
 	case 1:
 		m.brightness.Focus()
-		m.on.Focus = false
-	default:
-		m.on.Focus = false
-		m.brightness.Blur()
+		m.canNavigate = false
+	}
+}
+
+func (m *model) normalizeCursor() {
+	if m.cursor < 0 {
+		m.cursor = 1
+	}
+	if m.cursor > 1 {
+		m.cursor = 0
 	}
 }
 
@@ -115,6 +133,7 @@ func (m *model) sendCommand() {
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	control := keylight.InitKeylightControl()
 	p := tea.NewProgram(initModel(control))
 	if _, err := p.Run(); err != nil {

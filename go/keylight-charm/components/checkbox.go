@@ -12,8 +12,8 @@ type Model struct {
 	Checked bool
 }
 
-func New(label string) Model {
-	return Model{Focus: false, Label: label, Checked: false}
+func New(label string, checked bool) Model {
+	return Model{Focus: false, Label: label, Checked: checked}
 }
 
 func (m Model) Init() tea.Cmd {

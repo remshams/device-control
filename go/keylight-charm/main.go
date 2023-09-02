@@ -16,11 +16,11 @@ import (
 )
 
 type model struct {
-	on          checkbox.Model
-	brightness  textinput.Model
-	cursor      int
-	canNavigate bool
-	control     *control.KeylightControl
+	on           checkbox.Model
+	brightness   textinput.Model
+	cursor       int
+	isInsertMode bool
+	control      *control.KeylightControl
 }
 
 func initModel(control control.KeylightControl) model {
@@ -31,7 +31,7 @@ func initModel(control control.KeylightControl) model {
 	}
 	brightness := textinput.New()
 	brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
-	model := model{on: checkbox.New("On: ", keylight.Light.On), brightness: brightness, cursor: 0, canNavigate: true, control: &control}
+	model := model{on: checkbox.New("On: ", keylight.Light.On), brightness: brightness, cursor: 0, isInsertMode: false, control: &control}
 	model.selectedElement()
 	return model
 }
@@ -45,30 +45,51 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 
-		cmd = m.updateChild(msg)
-		switch msg.String() {
-		case "j", "down":
-			if m.canNavigate {
-				m.cursor++
-				m.normalizeCursor()
-				m.selectedElement()
-			}
-		case "k", "up":
-			if m.canNavigate {
-				m.cursor--
-				m.normalizeCursor()
-				m.selectedElement()
-			}
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "enter":
-			m.sendCommand()
-		case "esc":
-			m.cursor = 0
-			m.selectedElement()
+		if m.isInsertMode {
+			cmd = m.processInInsertMode(msg)
+		} else {
+			cmd = m.processInNavigateMode(msg)
 		}
 	}
 	return m, cmd
+}
+
+func (m *model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg.String() {
+	case "esc":
+		m.isInsertMode = false
+	default:
+		cmd = m.updateChild(msg)
+	}
+	return cmd
+}
+
+func (m *model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg.String() {
+	case "i":
+		if !m.isInsertMode {
+			m.isInsertMode = true
+		}
+	case "j", "down":
+		if !m.isInsertMode {
+			m.cursor++
+			m.normalizeCursor()
+			m.selectedElement()
+		}
+	case "k", "up":
+		if !m.isInsertMode {
+			m.cursor--
+			m.normalizeCursor()
+			m.selectedElement()
+		}
+	case "ctrl+c", "q":
+		cmd = tea.Quit
+	case "enter":
+		m.sendCommand()
+	}
+	return cmd
 }
 
 func (m *model) updateChild(msg tea.Msg) tea.Cmd {
@@ -87,7 +108,6 @@ func (m *model) updateChild(msg tea.Msg) tea.Cmd {
 }
 
 func (m *model) selectedElement() {
-	m.canNavigate = true
 	m.on.Focus = false
 	m.brightness.Blur()
 	switch m.cursor {
@@ -95,7 +115,6 @@ func (m *model) selectedElement() {
 		m.on.Focus = true
 	case 1:
 		m.brightness.Focus()
-		m.canNavigate = false
 	}
 }
 

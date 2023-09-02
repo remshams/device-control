@@ -46,7 +46,7 @@ func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroc
 			Ip:      entry.AddrIPv4,
 			Port:    entry.Port,
 			adapter: adapter,
-			light:   nil,
+			Light:   nil,
 		}
 		log.Debug().Msgf("Found keylight: %+v", keylight)
 		keylightCh <- keylight

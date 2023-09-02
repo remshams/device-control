@@ -3,10 +3,14 @@ package main
 import (
 	"fmt"
 	checkbox "keylight-charm/components"
+	"keylight-charm/keylight"
+	"keylight-control/control"
 
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 type model struct {
@@ -14,8 +18,13 @@ type model struct {
 	cursor int
 }
 
-func initModel() model {
-	model := model{on: checkbox.New("On: "), cursor: 0}
+func initModel(control control.KeylightControl) model {
+	keylight := control.KeylightWithId(0)
+	if keylight == nil {
+		log.Error().Msg("No keylight found")
+		os.Exit(1)
+	}
+	model := model{on: checkbox.New("On: ", keylight.Light.On), cursor: 0}
 	model.selectedElement()
 	return model
 }
@@ -78,7 +87,9 @@ func (m model) View() string {
 }
 
 func main() {
-	p := tea.NewProgram(initModel())
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	control := keylight.InitKeylightControl()
+	p := tea.NewProgram(initModel(control))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

@@ -14,8 +14,9 @@ import (
 )
 
 type model struct {
-	on     checkbox.Model
-	cursor int
+	on      checkbox.Model
+	cursor  int
+	control *control.KeylightControl
 }
 
 func initModel(control control.KeylightControl) model {
@@ -24,7 +25,7 @@ func initModel(control control.KeylightControl) model {
 		log.Error().Msg("No keylight found")
 		os.Exit(1)
 	}
-	model := model{on: checkbox.New("On: ", keylight.Light.On), cursor: 0}
+	model := model{on: checkbox.New("On: ", keylight.Light.On), cursor: 0, control: &control}
 	model.selectedElement()
 	return model
 }
@@ -50,6 +51,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 			cmd = m.updateChild(msg)
 		}
+	case control.KeylightCommand:
+		m.control.SendKeylightCommand(msg)
 	}
 	return m, cmd
 }

@@ -27,15 +27,16 @@ const (
 type initMsg struct{}
 
 type model struct {
-	state      viewState
-	on         checkbox.Model
-	brightness textinput.Model
-	cursor     int
-	control    *control.KeylightControl
+	state       viewState
+	on          checkbox.Model
+	brightness  textinput.Model
+	temperature textinput.Model
+	cursor      int
+	control     *control.KeylightControl
 }
 
 func initModel(control control.KeylightControl) model {
-	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), cursor: 0, control: &control}
+	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), temperature: textinput.New(), cursor: 0, control: &control}
 	return model
 }
 
@@ -64,10 +65,9 @@ func (m *model) processInit() {
 		log.Error().Msg("No keylight found")
 		os.Exit(1)
 	}
-	brightness := textinput.New()
-	brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
-	m.brightness = brightness
 	m.on = checkbox.New("On: ", keylight.Light.On)
+	m.brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
+	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
 	m.state = navigate
 	m.selectedElement()
 }
@@ -115,6 +115,10 @@ func (m *model) updateChild(msg tea.Msg) tea.Cmd {
 		brightness, cmd := m.brightness.Update(msg)
 		m.brightness = brightness
 		return cmd
+	case 2:
+		temperature, cmd := m.temperature.Update(msg)
+		m.temperature = temperature
+		return cmd
 	default:
 		return nil
 	}
@@ -123,17 +127,20 @@ func (m *model) updateChild(msg tea.Msg) tea.Cmd {
 func (m *model) selectedElement() {
 	m.on.Focus = false
 	m.brightness.Blur()
+	m.temperature.Blur()
 	switch m.cursor {
 	case 0:
 		m.on.Focus = true
 	case 1:
 		m.brightness.Focus()
+	case 2:
+		m.temperature.Focus()
 	}
 }
 
 func (m *model) increaseCursor() {
 	m.cursor++
-	if m.cursor > 1 {
+	if m.cursor > 2 {
 		m.cursor = 0
 	}
 }
@@ -141,7 +148,7 @@ func (m *model) increaseCursor() {
 func (m *model) decreaseCursor() {
 	m.cursor--
 	if m.cursor < 0 {
-		m.cursor = 1
+		m.cursor = 2
 	}
 }
 
@@ -150,9 +157,10 @@ func (m model) View() string {
 	if m.state != initial {
 		on := fmt.Sprintf("%s", m.on.View())
 		brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
-		lines := m.renderCursor([]string{on, brightness})
+		temperature := fmt.Sprintf("Temperature %s", m.temperature.View())
+		lines := m.renderCursor([]string{on, brightness, temperature})
 
-		return fmt.Sprintf("%s \n\n %s \n\n %s", title, lines[0], lines[1])
+		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s", title, lines[0], lines[1], lines[2])
 	} else {
 		return fmt.Sprintf("%s \n\n %s", title, "Loading...")
 	}
@@ -181,7 +189,8 @@ func (m *model) renderCursor(lines []string) []string {
 func (m *model) sendCommand() {
 	on := m.on.Checked
 	brightness, _ := strconv.Atoi(m.brightness.Value())
-	m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness}})
+	temperature, _ := strconv.Atoi(m.temperature.Value())
+	m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness, Temperature: &temperature}})
 }
 
 func (m *model) discoverKeylights() tea.Cmd {

@@ -48,7 +48,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
-		m.processInit()
+		m.updateKeylight()
 	case tea.KeyMsg:
 		if m.state == insert {
 			cmd = m.processInInsertMode(msg)
@@ -59,24 +59,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *model) processInit() {
-	keylight := m.control.KeylightWithId(0)
-	if keylight == nil {
-		log.Error().Msg("No keylight found")
-		os.Exit(1)
-	}
-	m.on = checkbox.New("On: ", keylight.Light.On)
-	m.brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
-	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
-	m.state = navigate
-	m.selectedElement()
-}
-
 func (m *model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "esc":
 		m.state = navigate
+		m.updateKeylight()
 	case "enter":
 		m.state = navigate
 		m.sendCommand()
@@ -191,6 +179,7 @@ func (m *model) sendCommand() {
 	brightness, _ := strconv.Atoi(m.brightness.Value())
 	temperature, _ := strconv.Atoi(m.temperature.Value())
 	m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness, Temperature: &temperature}})
+	m.updateKeylight()
 }
 
 func (m *model) discoverKeylights() tea.Cmd {
@@ -198,6 +187,19 @@ func (m *model) discoverKeylights() tea.Cmd {
 		m.control.LoadOrDiscoverKeylights()
 		return initMsg{}
 	}
+}
+
+func (m *model) updateKeylight() {
+	keylight := m.control.KeylightWithId(0)
+	if keylight == nil {
+		log.Error().Msg("No keylight found")
+		os.Exit(1)
+	}
+	m.on = checkbox.New("On: ", keylight.Light.On)
+	m.brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
+	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
+	m.state = navigate
+	m.selectedElement()
 }
 
 func main() {

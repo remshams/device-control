@@ -15,13 +15,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type viewState int
+type viewState string
 
 const (
-	initial viewState = iota
-	insert
-	navigate
-	inError
+	initial  viewState = "initial"
+	edit               = "edit"
+	navigate           = "navigate"
+	inError            = "error"
 )
 
 type initMsg struct{}
@@ -33,10 +33,11 @@ type model struct {
 	temperature textinput.Model
 	cursor      int
 	control     *control.KeylightControl
+	message     string
 }
 
 func initModel(control control.KeylightControl) model {
-	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), temperature: textinput.New(), cursor: 0, control: &control}
+	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), temperature: textinput.New(), cursor: 0, control: &control, message: ""}
 	return model
 }
 
@@ -50,7 +51,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case initMsg:
 		m.updateKeylight()
 	case tea.KeyMsg:
-		if m.state == insert {
+		if m.state == edit {
 			cmd = m.processInInsertMode(msg)
 		} else {
 			cmd = m.processInNavigateMode(msg)
@@ -78,7 +79,7 @@ func (m *model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "i":
-		m.state = insert
+		m.state = edit
 	case "j", "down":
 		m.increaseCursor()
 		m.selectedElement()
@@ -148,7 +149,7 @@ func (m model) View() string {
 		temperature := fmt.Sprintf("Temperature %s", m.temperature.View())
 		lines := m.renderCursor([]string{on, brightness, temperature})
 
-		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s", title, lines[0], lines[1], lines[2])
+		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", title, lines[0], lines[1], lines[2], m.state, m.message)
 	} else {
 		return fmt.Sprintf("%s \n\n %s", title, "Loading...")
 	}
@@ -157,7 +158,7 @@ func (m model) View() string {
 func (m *model) renderCursor(lines []string) []string {
 	var linesWithSelector []string
 	var editMarker string
-	if m.state == insert {
+	if m.state == edit {
 		editMarker = "(edit)"
 	} else {
 		editMarker = ""
@@ -176,10 +177,15 @@ func (m *model) renderCursor(lines []string) []string {
 
 func (m *model) sendCommand() {
 	on := m.on.Checked
-	brightness, _ := strconv.Atoi(m.brightness.Value())
-	temperature, _ := strconv.Atoi(m.temperature.Value())
+	brightness, err := strconv.Atoi(m.brightness.Value())
+	temperature, err := strconv.Atoi(m.temperature.Value())
 	temperature = normalizeTemperature(temperature)
-	m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness, Temperature: &temperature}})
+	err = m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness, Temperature: &temperature}})
+	if err != nil {
+		m.message = "Could not set light values"
+	} else {
+		m.message = "Light values set"
+	}
 	m.updateKeylight()
 }
 

@@ -13,6 +13,5 @@ func InitKeylightControl() control.KeylightControl {
 	}
 
 	keylightControl := control.New(&control.ZeroConfKeylightFinder{}, &control.KeylightRestAdapter{}, &control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")})
-	keylightControl.LoadOrDiscoverKeylights()
 	return keylightControl
 }

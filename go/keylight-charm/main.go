@@ -15,7 +15,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type initMsg struct{}
+
 type model struct {
+	isInit       bool
 	on           checkbox.Model
 	brightness   textinput.Model
 	cursor       int
@@ -24,27 +27,20 @@ type model struct {
 }
 
 func initModel(control control.KeylightControl) model {
-	keylight := control.KeylightWithId(0)
-	if keylight == nil {
-		log.Error().Msg("No keylight found")
-		os.Exit(1)
-	}
-	brightness := textinput.New()
-	brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
-	model := model{on: checkbox.New("On: ", keylight.Light.On), brightness: brightness, cursor: 0, isInsertMode: false, control: &control}
-	model.selectedElement()
+	model := model{isInit: false, on: checkbox.New("On: ", false), brightness: textinput.New(), cursor: 0, isInsertMode: false, control: &control}
 	return model
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+	return m.discoverKeylights()
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case initMsg:
+		m.processInit()
 	case tea.KeyMsg:
-
 		if m.isInsertMode {
 			cmd = m.processInInsertMode(msg)
 		} else {
@@ -52,6 +48,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 	return m, cmd
+}
+
+func (m *model) processInit() {
+	keylight := m.control.KeylightWithId(0)
+	if keylight == nil {
+		log.Error().Msg("No keylight found")
+		os.Exit(1)
+	}
+	brightness := textinput.New()
+	brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
+	m.brightness = brightness
+	m.on = checkbox.New("On: ", keylight.Light.On)
+	m.isInit = true
+	m.selectedElement()
 }
 
 func (m *model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
@@ -126,11 +136,15 @@ func (m *model) decreaseCursor() {
 
 func (m model) View() string {
 	title := "Update keylight"
-	on := fmt.Sprintf("%s", m.on.View())
-	brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
-	lines := m.renderCursor([]string{on, brightness})
+	if m.isInit {
+		on := fmt.Sprintf("%s", m.on.View())
+		brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
+		lines := m.renderCursor([]string{on, brightness})
 
-	return fmt.Sprintf("%s \n\n %s \n\n %s", title, lines[0], lines[1])
+		return fmt.Sprintf("%s \n\n %s \n\n %s", title, lines[0], lines[1])
+	} else {
+		return fmt.Sprintf("%s \n\n %s", title, "Loading...")
+	}
 }
 
 func (m *model) renderCursor(lines []string) []string {
@@ -157,6 +171,13 @@ func (m *model) sendCommand() {
 	on := m.on.Checked
 	brightness, _ := strconv.Atoi(m.brightness.Value())
 	m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness}})
+}
+
+func (m *model) discoverKeylights() tea.Cmd {
+	return func() tea.Msg {
+		m.control.LoadOrDiscoverKeylights()
+		return initMsg{}
+	}
 }
 
 func main() {

@@ -178,8 +178,20 @@ func (m *model) sendCommand() {
 	on := m.on.Checked
 	brightness, _ := strconv.Atoi(m.brightness.Value())
 	temperature, _ := strconv.Atoi(m.temperature.Value())
+	temperature = normalizeTemperature(temperature)
 	m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness, Temperature: &temperature}})
 	m.updateKeylight()
+}
+
+func normalizeTemperature(temperature int) int {
+	if temperature < 144 {
+		return 144
+	} else if temperature > 344 {
+		return 344
+	} else {
+		return temperature
+	}
+
 }
 
 func (m *model) discoverKeylights() tea.Cmd {

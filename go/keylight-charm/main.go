@@ -15,19 +15,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type viewState int
+
+const (
+	initial viewState = iota
+	insert
+	navigate
+	inError
+)
+
 type initMsg struct{}
 
 type model struct {
-	isInit       bool
-	on           checkbox.Model
-	brightness   textinput.Model
-	cursor       int
-	isInsertMode bool
-	control      *control.KeylightControl
+	state      viewState
+	on         checkbox.Model
+	brightness textinput.Model
+	cursor     int
+	control    *control.KeylightControl
 }
 
 func initModel(control control.KeylightControl) model {
-	model := model{isInit: false, on: checkbox.New("On: ", false), brightness: textinput.New(), cursor: 0, isInsertMode: false, control: &control}
+	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), cursor: 0, control: &control}
 	return model
 }
 
@@ -41,7 +49,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case initMsg:
 		m.processInit()
 	case tea.KeyMsg:
-		if m.isInsertMode {
+		if m.state == insert {
 			cmd = m.processInInsertMode(msg)
 		} else {
 			cmd = m.processInNavigateMode(msg)
@@ -60,7 +68,7 @@ func (m *model) processInit() {
 	brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
 	m.brightness = brightness
 	m.on = checkbox.New("On: ", keylight.Light.On)
-	m.isInit = true
+	m.state = navigate
 	m.selectedElement()
 }
 
@@ -68,7 +76,7 @@ func (m *model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "esc":
-		m.isInsertMode = false
+		m.state = navigate
 	default:
 		cmd = m.updateChild(msg)
 	}
@@ -79,7 +87,7 @@ func (m *model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "i":
-		m.isInsertMode = true
+		m.state = insert
 	case "j", "down":
 		m.increaseCursor()
 		m.selectedElement()
@@ -136,7 +144,7 @@ func (m *model) decreaseCursor() {
 
 func (m model) View() string {
 	title := "Update keylight"
-	if m.isInit {
+	if m.state != initial {
 		on := fmt.Sprintf("%s", m.on.View())
 		brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
 		lines := m.renderCursor([]string{on, brightness})
@@ -150,7 +158,7 @@ func (m model) View() string {
 func (m *model) renderCursor(lines []string) []string {
 	var linesWithSelector []string
 	var editMarker string
-	if m.isInsertMode {
+	if m.state == insert {
 		editMarker = "(edit)"
 	} else {
 		editMarker = ""

@@ -96,15 +96,18 @@ func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) err
 		return errors.New("Keylight not found")
 	}
 	keylight.setLight(command.Command)
+	log.Print(keylight.Light.Brightness)
+	log.Print(control.findKeylight(0).Light.Brightness)
 	log.Debug().Msg("Send command success")
 	return nil
 }
 
 func (control *KeylightControl) findKeylight(id int) *Keylight {
 	var selectedKeylight *Keylight
-	for _, light := range control.keylights {
+	for i := range control.keylights {
+		light := &control.keylights[i]
 		if light.Id == id {
-			selectedKeylight = &light
+			selectedKeylight = light
 			return selectedKeylight
 		}
 	}

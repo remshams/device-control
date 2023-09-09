@@ -2,17 +2,13 @@ package main
 
 import (
 	"fmt"
-	checkbox "keylight-charm/components"
-	"keylight-charm/keylight"
-	"keylight-control/control"
-	"strconv"
-
-	"os"
-
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	checkbox "keylight-charm/components"
+	"keylight-charm/keylight"
+	"os"
 )
 
 type viewState string
@@ -27,17 +23,17 @@ const (
 type initMsg struct{}
 
 type model struct {
-	state       viewState
-	on          checkbox.Model
-	brightness  textinput.Model
-	temperature textinput.Model
-	cursor      int
-	control     *control.KeylightControl
-	message     string
+	state           viewState
+	on              checkbox.Model
+	brightness      textinput.Model
+	temperature     textinput.Model
+	cursor          int
+	keylightAdapter *keylight.KeylightAdapter
+	message         string
 }
 
-func initModel(control control.KeylightControl) model {
-	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), temperature: textinput.New(), cursor: 0, control: &control, message: ""}
+func initModel(keylightAdapter keylight.KeylightAdapter) model {
+	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), temperature: textinput.New(), cursor: 0, keylightAdapter: &keylightAdapter, message: ""}
 	return model
 }
 
@@ -176,11 +172,7 @@ func (m *model) renderCursor(lines []string) []string {
 }
 
 func (m *model) sendCommand() {
-	on := m.on.Checked
-	brightness, err := strconv.Atoi(m.brightness.Value())
-	temperature, err := strconv.Atoi(m.temperature.Value())
-	temperature = normalizeTemperature(temperature)
-	err = m.control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &brightness, Temperature: &temperature}})
+	err := m.keylightAdapter.SendCommand(m.on.Checked, m.brightness.Value(), m.temperature.Value())
 	if err != nil {
 		m.message = "Could not set light values"
 	} else {
@@ -189,26 +181,15 @@ func (m *model) sendCommand() {
 	m.updateKeylight()
 }
 
-func normalizeTemperature(temperature int) int {
-	if temperature < 144 {
-		return 144
-	} else if temperature > 344 {
-		return 344
-	} else {
-		return temperature
-	}
-
-}
-
 func (m *model) discoverKeylights() tea.Cmd {
 	return func() tea.Msg {
-		m.control.LoadOrDiscoverKeylights()
+		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		return initMsg{}
 	}
 }
 
 func (m *model) updateKeylight() {
-	keylight := m.control.KeylightWithId(0)
+	keylight := m.keylightAdapter.Control.KeylightWithId(0)
 	if keylight == nil {
 		log.Error().Msg("No keylight found")
 		os.Exit(1)
@@ -223,8 +204,8 @@ func (m *model) updateKeylight() {
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	control := keylight.InitKeylightControl()
-	p := tea.NewProgram(initModel(control))
+	keylightAdapter := keylight.NewKeylightAdapter()
+	p := tea.NewProgram(initModel(keylightAdapter))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

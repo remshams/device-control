@@ -143,32 +143,26 @@ func (m model) View() string {
 		on := fmt.Sprintf("%s", m.on.View())
 		brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
 		temperature := fmt.Sprintf("Temperature %s", m.temperature.View())
-		lines := m.renderLines([]string{on, brightness, temperature})
+		on = m.renderLine(on, m.cursor == 0, m.state == edit)
+		brightness = m.renderLine(brightness, m.cursor == 1, m.state == edit)
+		temperature = m.renderLine(temperature, m.cursor == 2, m.state == edit)
 
-		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", title, lines[0], lines[1], lines[2], m.state, m.message)
+		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", title, on, brightness, temperature, m.state, m.message)
 	} else {
 		return fmt.Sprintf("%s \n\n %s", title, "Loading...")
 	}
 }
 
-func (m *model) renderLines(lines []string) []string {
-	var linesWithSelector []string
-	var editMarker string
-	if m.state == edit {
-		editMarker = "(edit)"
-	} else {
-		editMarker = ""
+func (m *model) renderLine(line string, isActive bool, isEdit bool) string {
+	cursor := " "
+	if isActive {
+		cursor = ">"
 	}
-	for i, line := range lines {
-		var newLine string
-		if i == m.cursor {
-			newLine = fmt.Sprintf("> %s %s", line, editMarker)
-		} else {
-			newLine = fmt.Sprintf("  %s", line)
-		}
-		linesWithSelector = append(linesWithSelector, newLine)
+	edit := ""
+	if isActive && isEdit {
+		edit = "(edit)"
 	}
-	return linesWithSelector
+	return fmt.Sprintf("%s %s %s", cursor, line, edit)
 }
 
 func (m *model) sendCommand() {

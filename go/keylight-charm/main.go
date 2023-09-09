@@ -143,7 +143,7 @@ func (m model) View() string {
 		on := fmt.Sprintf("%s", m.on.View())
 		brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
 		temperature := fmt.Sprintf("Temperature %s", m.temperature.View())
-		lines := m.renderCursor([]string{on, brightness, temperature})
+		lines := m.renderLines([]string{on, brightness, temperature})
 
 		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", title, lines[0], lines[1], lines[2], m.state, m.message)
 	} else {
@@ -151,7 +151,7 @@ func (m model) View() string {
 	}
 }
 
-func (m *model) renderCursor(lines []string) []string {
+func (m *model) renderLines(lines []string) []string {
 	var linesWithSelector []string
 	var editMarker string
 	if m.state == edit {

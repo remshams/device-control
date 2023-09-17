@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"keylight-charm/components/checkbox"
 	"keylight-charm/keylight"
+	"keylight-charm/styles"
 	"os"
+
+	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 type viewState string
@@ -154,15 +157,17 @@ func (m model) View() string {
 }
 
 func (m *model) renderLine(line string, isActive bool, isEdit bool) string {
-	cursor := " "
+	style := lipgloss.NewStyle().PaddingLeft(styles.Padding)
+	cursor := ""
 	if isActive {
-		cursor = ">"
+		style = style.UnsetPaddingLeft()
+		cursor = styles.TextAccentColor.Render(">")
 	}
 	edit := ""
 	if isActive && isEdit {
 		edit = "(edit)"
 	}
-	return fmt.Sprintf("%s %s %s", cursor, line, edit)
+	return style.Render(fmt.Sprintf("%s %s %s", cursor, line, edit))
 }
 
 func (m *model) sendCommand() {

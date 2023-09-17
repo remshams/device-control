@@ -6,7 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	checkbox "keylight-charm/components"
+	"keylight-charm/components/checkbox"
 	"keylight-charm/keylight"
 	"os"
 )

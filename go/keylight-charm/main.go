@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"keylight-charm/components/checkbox"
+	"keylight-charm/components/textinput"
 	"keylight-charm/keylight"
 	"keylight-charm/styles"
 	"os"
@@ -36,7 +37,7 @@ type model struct {
 }
 
 func initModel(keylightAdapter keylight.KeylightAdapter) model {
-	model := model{state: initial, on: checkbox.New("On: ", false), brightness: textinput.New(), temperature: textinput.New(), cursor: 0, keylightAdapter: &keylightAdapter, message: ""}
+	model := model{state: initial, on: checkbox.New("On: ", false), brightness: kl_textinput.CreateTextInputModel(), temperature: kl_textinput.CreateTextInputModel(), cursor: 0, keylightAdapter: &keylightAdapter, message: ""}
 	return model
 }
 
@@ -144,8 +145,8 @@ func (m model) View() string {
 	title := "Update keylight"
 	if m.state != initial {
 		on := fmt.Sprintf("%s", m.on.View())
-		brightness := fmt.Sprintf("Brightness %s%%", m.brightness.View())
-		temperature := fmt.Sprintf("Temperature %s", m.temperature.View())
+		brightness := kl_textinput.CreateTextInputView(m.brightness, "Brightness", "%")
+		temperature := kl_textinput.CreateTextInputView(m.temperature, "Temperature", "")
 		on = m.renderLine(on, m.cursor == 0, m.state == edit)
 		brightness = m.renderLine(brightness, m.cursor == 1, m.state == edit)
 		temperature = m.renderLine(temperature, m.cursor == 2, m.state == edit)
@@ -161,6 +162,8 @@ func (m *model) renderLine(line string, isActive bool, isEdit bool) string {
 	cursor := ""
 	if isActive {
 		style = style.UnsetPaddingLeft()
+		cursorStyles := lipgloss.NewStyle()
+		cursorStyles.Foreground(styles.AccentColor)
 		cursor = styles.TextAccentColor.Render(">")
 	}
 	edit := ""

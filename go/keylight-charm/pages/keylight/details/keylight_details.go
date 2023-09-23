@@ -25,8 +25,9 @@ const (
 
 type initMsg struct{}
 
-type model struct {
+type Model struct {
 	state           viewState
+	id              int
 	on              checkbox.Model
 	brightness      textinput.Model
 	temperature     textinput.Model
@@ -35,16 +36,16 @@ type model struct {
 	message         string
 }
 
-func InitModel(keylightAdapter keylight.KeylightAdapter) model {
-	model := model{state: initial, on: checkbox.New("On: ", false), brightness: kl_textinput.CreateTextInputModel(), temperature: kl_textinput.CreateTextInputModel(), cursor: 0, keylightAdapter: &keylightAdapter, message: ""}
+func InitModel(id int, keylightAdapter keylight.KeylightAdapter) Model {
+	model := Model{id: id, state: initial, on: checkbox.New("On: ", false), brightness: kl_textinput.CreateTextInputModel(), temperature: kl_textinput.CreateTextInputModel(), cursor: 0, keylightAdapter: &keylightAdapter, message: ""}
 	return model
 }
 
-func (m model) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	return m.discoverKeylights()
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
@@ -59,7 +60,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
+func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "esc":
@@ -74,7 +75,7 @@ func (m *model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	return cmd
 }
 
-func (m *model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
+func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "i":
@@ -93,7 +94,7 @@ func (m *model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	return cmd
 }
 
-func (m *model) updateChild(msg tea.Msg) tea.Cmd {
+func (m *Model) updateChild(msg tea.Msg) tea.Cmd {
 	switch m.cursor {
 	case 0:
 		on, cmd := m.on.Update(msg)
@@ -112,7 +113,7 @@ func (m *model) updateChild(msg tea.Msg) tea.Cmd {
 	}
 }
 
-func (m *model) selectedElement() {
+func (m *Model) selectedElement() {
 	m.on.Focus = false
 	m.brightness.Blur()
 	m.temperature.Blur()
@@ -126,21 +127,21 @@ func (m *model) selectedElement() {
 	}
 }
 
-func (m *model) increaseCursor() {
+func (m *Model) increaseCursor() {
 	m.cursor++
 	if m.cursor > 2 {
 		m.cursor = 0
 	}
 }
 
-func (m *model) decreaseCursor() {
+func (m *Model) decreaseCursor() {
 	m.cursor--
 	if m.cursor < 0 {
 		m.cursor = 2
 	}
 }
 
-func (m model) View() string {
+func (m Model) View() string {
 	title := "Update keylight"
 	if m.state != initial {
 		on := fmt.Sprintf("%s", m.on.View())
@@ -156,7 +157,7 @@ func (m model) View() string {
 	}
 }
 
-func (m *model) renderLine(line string, isActive bool, isEdit bool) string {
+func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {
 	style := lipgloss.NewStyle().PaddingLeft(styles.Padding)
 	cursor := ""
 	if isActive {
@@ -172,8 +173,8 @@ func (m *model) renderLine(line string, isActive bool, isEdit bool) string {
 	return style.Render(fmt.Sprintf("%s %s %s", cursor, line, edit))
 }
 
-func (m *model) sendCommand() {
-	err := m.keylightAdapter.SendCommand(m.on.Checked, m.brightness.Value(), m.temperature.Value())
+func (m *Model) sendCommand() {
+	err := m.keylightAdapter.SendCommand(m.id, m.on.Checked, m.brightness.Value(), m.temperature.Value())
 	if err != nil {
 		m.message = "Could not set light values"
 	} else {
@@ -182,14 +183,14 @@ func (m *model) sendCommand() {
 	m.updateKeylight()
 }
 
-func (m *model) discoverKeylights() tea.Cmd {
+func (m *Model) discoverKeylights() tea.Cmd {
 	return func() tea.Msg {
 		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		return initMsg{}
 	}
 }
 
-func (m *model) updateKeylight() {
+func (m *Model) updateKeylight() {
 	keylight := m.keylightAdapter.Control.KeylightWithId(0)
 	if keylight == nil {
 		log.Error().Msg("No keylight found")

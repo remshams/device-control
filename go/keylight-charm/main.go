@@ -15,7 +15,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	keylightAdapter := keylight.NewKeylightAdapter()
-	p := tea.NewProgram(keylight_details.InitModel(keylightAdapter))
+	p := tea.NewProgram(keylight_details.InitModel(0, keylightAdapter))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

@@ -21,11 +21,11 @@ func NewKeylightAdapter() KeylightAdapter {
 	return KeylightAdapter{Control: keylightAdapter}
 }
 
-func (keylightAdapter *KeylightAdapter) SendCommand(on bool, brightness string, temperature string) error {
+func (keylightAdapter *KeylightAdapter) SendCommand(id int, on bool, brightness string, temperature string) error {
 	convertedBrightness, err := strconv.Atoi(brightness)
 	convertedTemperature, err := strconv.Atoi(temperature)
 	convertedTemperature = keylightAdapter.normalizeTemperature(convertedTemperature)
-	err = keylightAdapter.Control.SendKeylightCommand(control.KeylightCommand{Id: 0, Command: control.LightCommand{On: &on, Brightness: &convertedBrightness, Temperature: &convertedTemperature}})
+	err = keylightAdapter.Control.SendKeylightCommand(control.KeylightCommand{Id: id, Command: control.LightCommand{On: &on, Brightness: &convertedBrightness, Temperature: &convertedTemperature}})
 	return err
 }
 

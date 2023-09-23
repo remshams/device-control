@@ -89,6 +89,10 @@ func (control *KeylightControl) KeylightWithId(id int) *Keylight {
 	return control.findKeylight(id)
 }
 
+func (control *KeylightControl) Keylights() []Keylight {
+	return control.keylights
+}
+
 func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) error {
 	log.Debug().Msgf("Send command: %+v", command)
 	keylight := control.findKeylight(command.Id)
@@ -106,7 +110,7 @@ func (control *KeylightControl) findKeylight(id int) *Keylight {
 	var selectedKeylight *Keylight
 	for i := range control.keylights {
 		light := &control.keylights[i]
-		if light.Id == id {
+		if light.Metadata.Id == id {
 			selectedKeylight = light
 			return selectedKeylight
 		}

@@ -16,17 +16,21 @@ type Light struct {
 	Temperature int
 }
 
+type KeylightMetadata struct {
+	Id   int
+	Name string
+	Ip   []net.IP
+	Port int
+}
+
 type Keylight struct {
-	Id      int
-	Name    string
-	Ip      []net.IP
-	Port    int
-	Light   *Light
-	adapter KeylightAdapter
+	Metadata KeylightMetadata
+	Light    *Light
+	adapter  KeylightAdapter
 }
 
 func (keylight *Keylight) loadLights() error {
-	lights, err := keylight.adapter.Load(keylight.Ip, keylight.Port)
+	lights, err := keylight.adapter.Load(keylight.Metadata.Ip, keylight.Metadata.Port)
 	if err != nil {
 		return err
 	}
@@ -54,7 +58,7 @@ func (keylight *Keylight) setLight(lightCommand LightCommand) error {
 		Temperature: *temperature,
 		Brightness:  *brightness,
 	}
-	err := keylight.adapter.Set(keylight.Ip, keylight.Port, []Light{light})
+	err := keylight.adapter.Set(keylight.Metadata.Ip, keylight.Metadata.Port, []Light{light})
 	if err == nil {
 		keylight.Light = &light
 	}

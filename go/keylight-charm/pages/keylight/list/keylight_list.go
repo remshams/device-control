@@ -12,29 +12,24 @@ import (
 
 type viewState string
 
-type initMsg struct{}
-
 type Model struct {
 	keylights       []control.Keylight
 	keylightAdapter *keylight.KeylightAdapter
 	table           table.Model
 }
 
-func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
-	model := Model{keylights: []control.Keylight{}, keylightAdapter: keylightAdapter}
+func InitModel(keylightAdapter *keylight.KeylightAdapter, keylights []control.Keylight) Model {
+	model := Model{keylights: []control.Keylight{}, keylightAdapter: keylightAdapter, table: createTable(keylights)}
 	return model
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.discoverKeylights()
+	return nil
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case initMsg:
-		m.keylights = loadKeylights(m.keylightAdapter)
-		m.table = m.createTable()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -47,29 +42,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func loadKeylights(keylightAdapter *keylight.KeylightAdapter) []control.Keylight {
-	keylights := keylightAdapter.Control.Keylights()
-	return keylights
-}
-
 func (m Model) View() string {
 	return m.table.View()
 }
 
-func (m *Model) discoverKeylights() tea.Cmd {
-	return func() tea.Msg {
-		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
-		return initMsg{}
-	}
-}
-
-func (m *Model) createTable() table.Model {
+func createTable(keylights []control.Keylight) table.Model {
 	columns := []table.Column{
 		{Title: "Id", Width: 4},
 		{Title: "Name", Width: 30},
 	}
 	rows := []table.Row{}
-	for _, keylight := range m.keylights {
+	for _, keylight := range keylights {
 		rows = append(rows, table.Row{strconv.Itoa(keylight.Metadata.Id), keylight.Metadata.Name})
 	}
 

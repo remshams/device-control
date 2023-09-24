@@ -27,25 +27,25 @@ const (
 type initMsg struct{}
 
 type Model struct {
-	state            viewState
-	keylight         *keylight.KeylightAdapter
-	KeylightMetadata control.KeylightMetadata
-	on               checkbox.Model
-	brightness       textinput.Model
-	temperature      textinput.Model
-	cursor           int
-	keylightAdapter  *keylight.KeylightAdapter
-	message          string
+	state           viewState
+	keylight        *control.Keylight
+	on              checkbox.Model
+	brightness      textinput.Model
+	temperature     textinput.Model
+	cursor          int
+	keylightAdapter *keylight.KeylightAdapter
+	message         string
 }
 
-func InitModel(keylightMetadata control.KeylightMetadata, keylightAdapter *keylight.KeylightAdapter) Model {
+func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAdapter) Model {
 	model := Model{
-		KeylightMetadata: keylightMetadata,
-		state:            initial,
-		on:               checkbox.New("On: ", false),
-		brightness:       kl_textinput.CreateTextInputModel(),
-		temperature:      kl_textinput.CreateTextInputModel(),
-		cursor:           0, keylightAdapter: keylightAdapter, message: ""}
+		keylight:    keylight,
+		state:       initial,
+		on:          checkbox.New("On: ", false),
+		brightness:  kl_textinput.CreateTextInputModel(),
+		temperature: kl_textinput.CreateTextInputModel(),
+		cursor:      0, keylightAdapter: keylightAdapter, message: ""}
+	model.updateKeylight()
 	return model
 }
 
@@ -182,7 +182,7 @@ func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {
 }
 
 func (m *Model) sendCommand() {
-	err := m.keylightAdapter.SendCommand(m.KeylightMetadata.Id, m.on.Checked, m.brightness.Value(), m.temperature.Value())
+	err := m.keylightAdapter.SendCommand(m.keylight.Metadata.Id, m.on.Checked, m.brightness.Value(), m.temperature.Value())
 	if err != nil {
 		m.message = "Could not set light values"
 	} else {

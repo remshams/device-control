@@ -10,6 +10,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type SelectKeylight struct {
+	Keylight *control.Keylight
+}
+
 type viewState string
 
 type Model struct {
@@ -19,7 +23,7 @@ type Model struct {
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter, keylights []control.Keylight) Model {
-	model := Model{keylights: []control.Keylight{}, keylightAdapter: keylightAdapter, table: createTable(keylights)}
+	model := Model{keylights: keylights, keylightAdapter: keylightAdapter, table: createTable(keylights)}
 	return model
 }
 
@@ -35,6 +39,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
 		case "enter":
+			cmd = m.selectKeylight(m.table.SelectedRow()[0])
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}
@@ -76,4 +81,12 @@ func createTable(keylights []control.Keylight) table.Model {
 	t.SetStyles(s)
 
 	return t
+}
+
+func (m *Model) selectKeylight(keylightId string) tea.Cmd {
+	return func() tea.Msg {
+		index, _ := strconv.Atoi(keylightId)
+		keylight := &m.keylights[index]
+		return SelectKeylight{Keylight: keylight}
+	}
 }

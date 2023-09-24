@@ -42,19 +42,26 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
+	case keylight_list.SelectKeylight:
+		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
+		m.details = &keylightDetails
+		m.state = details
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
-		}
-	default:
-		switch m.state {
-		case list:
-			m.list, cmd = m.list.Update(msg)
-		case details:
-			var details keylight_details.Model
-			details, cmd = m.details.Update(msg)
-			m.details = &details
+		case "b":
+			m.details = nil
+			m.state = list
+		default:
+			switch m.state {
+			case list:
+				m.list, cmd = m.list.Update(msg)
+			case details:
+				var details keylight_details.Model
+				details, cmd = m.details.Update(msg)
+				m.details = &details
+			}
 		}
 	}
 	return m, cmd

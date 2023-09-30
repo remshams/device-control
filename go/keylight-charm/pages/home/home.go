@@ -2,6 +2,7 @@ package home
 
 import (
 	"keylight-charm/keylight"
+	keylight_details "keylight-charm/pages/keylight/details"
 	"keylight-charm/pages/keylight/details/content"
 	keylight_list "keylight-charm/pages/keylight/list"
 	"keylight-control/control"
@@ -24,7 +25,7 @@ type Model struct {
 	state           viewState
 	keylights       []control.Keylight
 	list            keylight_list.Model
-	details         *keylight_content.Model
+	details         *keylight_details.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
@@ -43,7 +44,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
 	case keylight_list.SelectedKeylight:
-		keylightDetails := keylight_content.InitModel(msg.Keylight, m.keylightAdapter)
+		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails
 		m.state = details
 	case keylight_content.AbortAction:
@@ -58,7 +59,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case list:
 				m.list, cmd = m.list.Update(msg)
 			case details:
-				var details keylight_content.Model
+				var details keylight_details.Model
 				details, cmd = m.details.Update(msg)
 				m.details = &details
 			}

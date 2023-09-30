@@ -153,7 +153,7 @@ func (m Model) View() string {
 		brightness = m.renderLine(brightness, m.cursor == 1, m.state == edit)
 		temperature = m.renderLine(temperature, m.cursor == 2, m.state == edit)
 
-		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", title, on, brightness, temperature, m.state, m.message)
+		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", on, brightness, temperature, m.state, m.message)
 	} else {
 		return fmt.Sprintf("%s \n\n %s", title, "Loading...")
 	}

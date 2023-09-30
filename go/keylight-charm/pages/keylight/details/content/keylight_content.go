@@ -1,4 +1,4 @@
-package keylight_details
+package keylight_content
 
 import (
 	"fmt"

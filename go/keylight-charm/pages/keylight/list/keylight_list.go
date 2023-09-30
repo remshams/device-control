@@ -1,6 +1,7 @@
 package keylight_list
 
 import (
+	"fmt"
 	"keylight-charm/keylight"
 	"keylight-control/control"
 	"strconv"
@@ -53,10 +54,12 @@ func createTable(keylights []control.Keylight) table.Model {
 	columns := []table.Column{
 		{Title: "Id", Width: 4},
 		{Title: "Name", Width: 30},
+		{Title: "Ip", Width: 20},
+		{Title: "Port", Width: 20},
 	}
 	rows := []table.Row{}
 	for _, keylight := range keylights {
-		rows = append(rows, table.Row{strconv.Itoa(keylight.Metadata.Id), keylight.Metadata.Name})
+		rows = append(rows, table.Row{strconv.Itoa(keylight.Metadata.Id), keylight.Metadata.Name, fmt.Sprintf("%s", keylight.Metadata.Ip), strconv.Itoa(keylight.Metadata.Port)})
 	}
 
 	t := table.New(

@@ -94,8 +94,6 @@ func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	case "k", "up":
 		m.decreaseCursor()
 		m.selectedElement()
-	case "ctrl+c", "q":
-		cmd = tea.Quit
 	case "enter":
 		m.sendCommand()
 	}

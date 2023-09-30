@@ -36,8 +36,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
-			cmd = tea.Quit
 		case "enter":
 			cmd = m.selectKeylight(m.table.SelectedRow()[0])
 		default:

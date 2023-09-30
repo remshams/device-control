@@ -20,10 +20,9 @@ type AbortAction struct{}
 type viewState string
 
 const (
-	initial  viewState = "initial"
-	edit               = "edit"
-	navigate           = "navigate"
-	inError            = "error"
+	edit     = "edit"
+	navigate = "navigate"
+	inError  = "error"
 )
 
 type Model struct {
@@ -40,7 +39,7 @@ type Model struct {
 func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAdapter) Model {
 	model := Model{
 		keylight:    keylight,
-		state:       initial,
+		state:       navigate,
 		on:          checkbox.New("On: ", false),
 		brightness:  kl_textinput.CreateTextInputModel(),
 		temperature: kl_textinput.CreateTextInputModel(),
@@ -144,19 +143,14 @@ func (m *Model) decreaseCursor() {
 }
 
 func (m Model) View() string {
-	title := "Update keylight"
-	if m.state != initial {
-		on := fmt.Sprintf("%s", m.on.View())
-		brightness := kl_textinput.CreateTextInputView(m.brightness, "Brightness", "%")
-		temperature := kl_textinput.CreateTextInputView(m.temperature, "Temperature", "")
-		on = m.renderLine(on, m.cursor == 0, m.state == edit)
-		brightness = m.renderLine(brightness, m.cursor == 1, m.state == edit)
-		temperature = m.renderLine(temperature, m.cursor == 2, m.state == edit)
+	on := fmt.Sprintf("%s", m.on.View())
+	brightness := kl_textinput.CreateTextInputView(m.brightness, "Brightness", "%")
+	temperature := kl_textinput.CreateTextInputView(m.temperature, "Temperature", "")
+	on = m.renderLine(on, m.cursor == 0, m.state == edit)
+	brightness = m.renderLine(brightness, m.cursor == 1, m.state == edit)
+	temperature = m.renderLine(temperature, m.cursor == 2, m.state == edit)
 
-		return fmt.Sprintf("%s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", on, brightness, temperature, m.state, m.message)
-	} else {
-		return fmt.Sprintf("%s \n\n %s", title, "Loading...")
-	}
+	return fmt.Sprintf("%s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", on, brightness, temperature, m.state, m.message)
 }
 
 func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {

@@ -15,6 +15,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type AbortAction struct{}
+
 type viewState string
 
 const (
@@ -88,6 +90,8 @@ func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 		m.selectedElement()
 	case "enter":
 		m.sendCommand()
+	case "esc":
+		cmd = m.abortAction()
 	}
 	return cmd
 }
@@ -192,4 +196,10 @@ func (m *Model) updateKeylight() {
 	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
 	m.state = navigate
 	m.selectedElement()
+}
+
+func (m *Model) abortAction() tea.Cmd {
+	return func() tea.Msg {
+		return AbortAction{}
+	}
 }

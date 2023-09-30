@@ -46,13 +46,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails
 		m.state = details
+	case keylight_details.AbortAction:
+		m.details = nil
+		m.state = list
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
-		case "b":
-			m.details = nil
-			m.state = list
 		default:
 			switch m.state {
 			case list:

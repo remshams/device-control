@@ -24,8 +24,6 @@ const (
 	inError            = "error"
 )
 
-type initMsg struct{}
-
 type Model struct {
 	state           viewState
 	keylight        *control.Keylight
@@ -49,15 +47,9 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 	return model
 }
 
-func (m Model) Init() tea.Cmd {
-	return m.discoverKeylights()
-}
-
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case initMsg:
-		m.updateKeylight()
 	case tea.KeyMsg:
 		if m.state == edit {
 			cmd = m.processInInsertMode(msg)
@@ -187,13 +179,6 @@ func (m *Model) sendCommand() {
 		m.message = "Light values set"
 	}
 	m.updateKeylight()
-}
-
-func (m *Model) discoverKeylights() tea.Cmd {
-	return func() tea.Msg {
-		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
-		return initMsg{}
-	}
 }
 
 func (m *Model) updateKeylight() {

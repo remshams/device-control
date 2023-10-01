@@ -7,7 +7,7 @@ type ViewState string
 const (
 	Navigate ViewState = "navigate"
 	Insert             = "insert"
-	InError            = "inError"
+	isError            = "inError"
 )
 
 type UpdateKeylight struct{}
@@ -15,5 +15,23 @@ type UpdateKeylight struct{}
 func CreateUpdateKeylight() tea.Cmd {
 	return func() tea.Msg {
 		return UpdateKeylight{}
+	}
+}
+
+type CommandStatus string
+
+const (
+	NoCommand CommandStatus = "noCommand"
+	Success                 = "success"
+	Error                   = "error"
+)
+
+type CommandResult struct {
+	Status CommandStatus
+}
+
+func CreateCommandResult(status CommandStatus) tea.Cmd {
+	return func() tea.Msg {
+		return CommandResult{status}
 	}
 }

@@ -54,26 +54,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
 		default:
-			switch m.state {
-			case list:
-				m.list, cmd = m.list.Update(msg)
-			case details:
-				var details keylight_details.Model
-				details, cmd = m.details.Update(msg)
-				m.details = &details
-			}
+			cmd = m.updateChilds(msg)
 		}
 	default:
-		switch m.state {
-		case list:
-			m.list, cmd = m.list.Update(msg)
-		case details:
-			var details keylight_details.Model
-			details, cmd = m.details.Update(msg)
-			m.details = &details
-		}
+		cmd = m.updateChilds(msg)
 	}
 	return m, cmd
+}
+
+func (m *Model) updateChilds(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	switch m.state {
+	case list:
+		m.list, cmd = m.list.Update(msg)
+	case details:
+		var details keylight_details.Model
+		details, cmd = m.details.Update(msg)
+		m.details = &details
+	}
+	return cmd
 }
 
 func (m Model) View() string {

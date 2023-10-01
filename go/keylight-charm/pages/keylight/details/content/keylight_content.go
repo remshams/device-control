@@ -5,6 +5,7 @@ import (
 	"keylight-charm/components/checkbox"
 	"keylight-charm/components/textinput"
 	"keylight-charm/keylight"
+	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
 	"keylight-control/control"
 	"os"
@@ -16,17 +17,11 @@ import (
 )
 
 type AbortAction struct{}
-
-type viewState string
-
-const (
-	edit     = "edit"
-	navigate = "navigate"
-	inError  = "error"
-)
+type StateChanged struct {
+	State keylight_model.ViewState
+}
 
 type Model struct {
-	state           viewState
 	keylight        *control.Keylight
 	on              checkbox.Model
 	brightness      textinput.Model
@@ -39,7 +34,6 @@ type Model struct {
 func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAdapter) Model {
 	model := Model{
 		keylight:    keylight,
-		state:       navigate,
 		on:          checkbox.New("On: ", false),
 		brightness:  kl_textinput.CreateTextInputModel(),
 		temperature: kl_textinput.CreateTextInputModel(),
@@ -48,11 +42,11 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 	return model
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg, state keylight_model.ViewState) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if m.state == edit {
+		if state == keylight_model.Insert {
 			cmd = m.processInInsertMode(msg)
 		} else {
 			cmd = m.processInNavigateMode(msg)
@@ -65,11 +59,9 @@ func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "esc":
-		m.state = navigate
-		m.updateKeylight()
+		cmd = m.updateKeylight()
 	case "enter":
-		m.state = navigate
-		m.sendCommand()
+		cmd = m.sendCommand()
 	default:
 		cmd = m.updateChild(msg)
 	}
@@ -80,7 +72,7 @@ func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "i":
-		m.state = edit
+		cmd = m.stateChanged(keylight_model.Insert)
 	case "j", "down":
 		m.increaseCursor()
 		m.selectedElement()
@@ -88,7 +80,7 @@ func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 		m.decreaseCursor()
 		m.selectedElement()
 	case "enter":
-		m.sendCommand()
+		cmd = m.sendCommand()
 	case "esc":
 		cmd = m.abortAction()
 	}
@@ -142,15 +134,15 @@ func (m *Model) decreaseCursor() {
 	}
 }
 
-func (m Model) View() string {
+func (m Model) View(state keylight_model.ViewState) string {
 	on := fmt.Sprintf("%s", m.on.View())
 	brightness := kl_textinput.CreateTextInputView(m.brightness, "Brightness", "%")
 	temperature := kl_textinput.CreateTextInputView(m.temperature, "Temperature", "")
-	on = m.renderLine(on, m.cursor == 0, m.state == edit)
-	brightness = m.renderLine(brightness, m.cursor == 1, m.state == edit)
-	temperature = m.renderLine(temperature, m.cursor == 2, m.state == edit)
+	on = m.renderLine(on, m.cursor == 0, state == keylight_model.Insert)
+	brightness = m.renderLine(brightness, m.cursor == 1, state == keylight_model.Insert)
+	temperature = m.renderLine(temperature, m.cursor == 2, state == keylight_model.Insert)
 
-	return fmt.Sprintf("%s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", on, brightness, temperature, m.state, m.message)
+	return fmt.Sprintf("%s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", on, brightness, temperature, state, m.message)
 }
 
 func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {
@@ -169,17 +161,17 @@ func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {
 	return style.Render(fmt.Sprintf("%s %s %s", cursor, line, edit))
 }
 
-func (m *Model) sendCommand() {
+func (m *Model) sendCommand() tea.Cmd {
 	err := m.keylightAdapter.SendCommand(m.keylight.Metadata.Id, m.on.Checked, m.brightness.Value(), m.temperature.Value())
 	if err != nil {
 		m.message = "Could not set light values"
 	} else {
 		m.message = "Light values set"
 	}
-	m.updateKeylight()
+	return m.updateKeylight()
 }
 
-func (m *Model) updateKeylight() {
+func (m *Model) updateKeylight() tea.Cmd {
 	keylight := m.keylightAdapter.Control.KeylightWithId(0)
 	if keylight == nil {
 		log.Error().Msg("No keylight found")
@@ -188,12 +180,18 @@ func (m *Model) updateKeylight() {
 	m.on = checkbox.New("On: ", keylight.Light.On)
 	m.brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
 	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
-	m.state = navigate
 	m.selectedElement()
+	return m.stateChanged(keylight_model.Navigate)
 }
 
 func (m *Model) abortAction() tea.Cmd {
 	return func() tea.Msg {
 		return AbortAction{}
+	}
+}
+
+func (m *Model) stateChanged(state keylight_model.ViewState) tea.Cmd {
+	return func() tea.Msg {
+		return StateChanged{state}
 	}
 }

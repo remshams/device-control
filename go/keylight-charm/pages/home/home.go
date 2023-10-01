@@ -64,6 +64,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.details = &details
 			}
 		}
+	default:
+		switch m.state {
+		case list:
+			m.list, cmd = m.list.Update(msg)
+		case details:
+			var details keylight_details.Model
+			details, cmd = m.details.Update(msg)
+			m.details = &details
+		}
 	}
 	return m, cmd
 }

@@ -27,7 +27,6 @@ type Model struct {
 	temperature     textinput.Model
 	cursor          int
 	keylightAdapter *keylight.KeylightAdapter
-	message         string
 }
 
 func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAdapter) Model {
@@ -36,7 +35,8 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 		on:          checkbox.New("On: ", false),
 		brightness:  kl_textinput.CreateTextInputModel(),
 		temperature: kl_textinput.CreateTextInputModel(),
-		cursor:      0, keylightAdapter: keylightAdapter, message: ""}
+		cursor:      0, keylightAdapter: keylightAdapter,
+	}
 	model.updateKeylight()
 	return model
 }
@@ -137,7 +137,7 @@ func (m Model) View(state keylight_model.ViewState) string {
 	brightness = m.renderLine(brightness, m.cursor == 1, state == keylight_model.Insert)
 	temperature = m.renderLine(temperature, m.cursor == 2, state == keylight_model.Insert)
 
-	return fmt.Sprintf("%s \n\n %s \n\n %s \n\n\n Mode: %s \n\n\n Status: %s", on, brightness, temperature, state, m.message)
+	return fmt.Sprintf("%s \n\n %s \n\n %s", on, brightness, temperature)
 }
 
 func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {
@@ -158,12 +158,13 @@ func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {
 
 func (m *Model) sendCommand() tea.Cmd {
 	err := m.keylightAdapter.SendCommand(m.keylight.Metadata.Id, m.on.Checked, m.brightness.Value(), m.temperature.Value())
+	var status keylight_model.CommandStatus
 	if err != nil {
-		m.message = "Could not set light values"
+		status = keylight_model.Error
 	} else {
-		m.message = "Light values set"
+		status = keylight_model.Success
 	}
-	return m.updateKeylight()
+	return tea.Batch(m.updateKeylight(), keylight_model.CreateCommandResult(status))
 }
 
 func (m *Model) updateKeylight() tea.Cmd {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"keylight-charm/keylight"
 	keylight_content "keylight-charm/pages/keylight/details/content"
+	keylight_footer "keylight-charm/pages/keylight/details/footer"
 	keylight_header "keylight-charm/pages/keylight/details/header"
 	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
@@ -20,6 +21,7 @@ type AbortAction struct{}
 type Model struct {
 	header  keylight_header.Model
 	content keylight_content.Model
+	footer  keylight_footer.Model
 	state   keylight_model.ViewState
 }
 
@@ -27,12 +29,13 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 	return Model{
 		header:  keylight_header.InitModel(keylight),
 		content: keylight_content.InitModel(keylight, keylightAdapter),
+		footer:  keylight_footer.InitModel(),
 		state:   keylight_model.Navigate,
 	}
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
-	var cmd tea.Cmd
+	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case keylight_content.StateChanged:
 		m.state = msg.State
@@ -43,22 +46,28 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case "esc":
 			if m.state == keylight_model.Insert {
 				m.state = keylight_model.Navigate
-				cmd = keylight_model.CreateUpdateKeylight()
+				cmds = append(cmds, keylight_model.CreateUpdateKeylight())
 			} else {
-				cmd = m.abortAction()
+				cmds = append(cmds, m.abortAction())
 			}
 		default:
-			m.content, cmd = m.content.Update(msg, m.state)
+			var contentCommand tea.Cmd
+			m.content, contentCommand = m.content.Update(msg, m.state)
+			cmds = append(cmds, contentCommand)
 		}
 	default:
-		m.content, cmd = m.content.Update(msg, m.state)
+		var contentCommand tea.Cmd
+		var footerCommand tea.Cmd
+		m.content, contentCommand = m.content.Update(msg, m.state)
+		m.footer, footerCommand = m.footer.Update(msg)
+		cmds = append(cmds, contentCommand, footerCommand)
 	}
-	return m, cmd
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
-	return fmt.Sprintf("%s\n%s", style.Render(m.header.View()), m.content.View(m.state))
+	return fmt.Sprintf("%s\n%s\n%s", style.Render(m.header.View()), style.Render(m.content.View(m.state)), m.footer.View(m.state))
 }
 
 func (m *Model) abortAction() tea.Cmd {

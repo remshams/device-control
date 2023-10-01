@@ -15,6 +15,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type AbortAction struct{}
+
 type Model struct {
 	header  keylight_header.Model
 	content keylight_content.Model
@@ -34,6 +36,20 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case keylight_content.StateChanged:
 		m.state = msg.State
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "i":
+			m.state = keylight_model.Insert
+		case "esc":
+			if m.state == keylight_model.Insert {
+				m.state = keylight_model.Navigate
+				cmd = keylight_model.CreateUpdateKeylight()
+			} else {
+				cmd = m.abortAction()
+			}
+		default:
+			m.content, cmd = m.content.Update(msg, m.state)
+		}
 	default:
 		m.content, cmd = m.content.Update(msg, m.state)
 	}
@@ -43,4 +59,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
 	return fmt.Sprintf("%s\n%s", style.Render(m.header.View()), m.content.View(m.state))
+}
+
+func (m *Model) abortAction() tea.Cmd {
+	return func() tea.Msg {
+		return AbortAction{}
+	}
 }

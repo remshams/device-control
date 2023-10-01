@@ -16,7 +16,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type AbortAction struct{}
 type StateChanged struct {
 	State keylight_model.ViewState
 }
@@ -45,6 +44,8 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 func (m Model) Update(msg tea.Msg, state keylight_model.ViewState) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case keylight_model.UpdateKeylight:
+		cmd = m.updateKeylight()
 	case tea.KeyMsg:
 		if state == keylight_model.Insert {
 			cmd = m.processInInsertMode(msg)
@@ -58,8 +59,6 @@ func (m Model) Update(msg tea.Msg, state keylight_model.ViewState) (Model, tea.C
 func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
-	case "esc":
-		cmd = m.updateKeylight()
 	case "enter":
 		cmd = m.sendCommand()
 	default:
@@ -71,8 +70,6 @@ func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg.String() {
-	case "i":
-		cmd = m.stateChanged(keylight_model.Insert)
 	case "j", "down":
 		m.increaseCursor()
 		m.selectedElement()
@@ -81,8 +78,6 @@ func (m *Model) processInNavigateMode(msg tea.KeyMsg) tea.Cmd {
 		m.selectedElement()
 	case "enter":
 		cmd = m.sendCommand()
-	case "esc":
-		cmd = m.abortAction()
 	}
 	return cmd
 }
@@ -182,12 +177,6 @@ func (m *Model) updateKeylight() tea.Cmd {
 	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
 	m.selectedElement()
 	return m.stateChanged(keylight_model.Navigate)
-}
-
-func (m *Model) abortAction() tea.Cmd {
-	return func() tea.Msg {
-		return AbortAction{}
-	}
 }
 
 func (m *Model) stateChanged(state keylight_model.ViewState) tea.Cmd {

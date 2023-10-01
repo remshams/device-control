@@ -3,7 +3,6 @@ package home
 import (
 	"keylight-charm/keylight"
 	keylight_details "keylight-charm/pages/keylight/details"
-	"keylight-charm/pages/keylight/details/content"
 	keylight_list "keylight-charm/pages/keylight/list"
 	"keylight-control/control"
 
@@ -47,7 +46,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails
 		m.state = details
-	case keylight_content.AbortAction:
+	case keylight_details.AbortAction:
 		m.details = nil
 		m.state = list
 	case tea.KeyMsg:

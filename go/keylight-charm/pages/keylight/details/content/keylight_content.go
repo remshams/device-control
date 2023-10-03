@@ -137,7 +137,7 @@ func (m Model) View(state keylight_model.ViewState) string {
 	brightness = m.renderLine(brightness, m.cursor == 1, state == keylight_model.Insert)
 	temperature = m.renderLine(temperature, m.cursor == 2, state == keylight_model.Insert)
 
-	return fmt.Sprintf("%s \n\n %s \n\n %s", on, brightness, temperature)
+	return fmt.Sprintf("%s\n\n%s\n\n%s", on, brightness, temperature)
 }
 
 func (m *Model) renderLine(line string, isActive bool, isEdit bool) string {

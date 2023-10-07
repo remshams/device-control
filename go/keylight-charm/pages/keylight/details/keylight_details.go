@@ -16,8 +16,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type AbortAction struct{}
-
 type Model struct {
 	header  keylight_header.Model
 	content keylight_content.Model
@@ -48,7 +46,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				m.state = keylight_model.Navigate
 				cmds = append(cmds, keylight_model.CreateUpdateKeylight())
 			} else {
-				cmds = append(cmds, m.abortAction())
+				cmds = append(cmds, keylight_model.CreateAbortAction())
 			}
 		default:
 			var contentCommand tea.Cmd
@@ -68,10 +66,4 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
 	return fmt.Sprintf("%s\n%s\n%s", style.Render(m.header.View()), style.Render(m.content.View(m.state)), m.footer.View(m.state))
-}
-
-func (m *Model) abortAction() tea.Cmd {
-	return func() tea.Msg {
-		return AbortAction{}
-	}
 }

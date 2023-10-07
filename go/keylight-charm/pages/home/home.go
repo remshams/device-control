@@ -18,6 +18,7 @@ const (
 	list              = "list"
 	details           = "details"
 	add               = "add"
+	edit              = "edit"
 )
 
 type initMsg struct{}
@@ -54,6 +55,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		newKeylight := keylight_edit.InitModel(nil)
 		m.edit = &newKeylight
 		m.state = add
+	case keylight_list.EditKeylight:
+		editKeylight := keylight_edit.InitModel(msg.Keylight)
+		m.edit = &editKeylight
+		m.state = edit
 	case keylight_model.AbortAction:
 		m.details = nil
 		m.edit = nil
@@ -84,6 +89,10 @@ func (m *Model) updateChilds(msg tea.Msg) tea.Cmd {
 		var edit keylight_edit.Model
 		edit, cmd = m.edit.Update(msg)
 		m.edit = &edit
+	case edit:
+		var edit keylight_edit.Model
+		edit, cmd = m.edit.Update(msg)
+		m.edit = &edit
 	}
 	return cmd
 }
@@ -97,6 +106,8 @@ func (m Model) View() string {
 	case details:
 		return m.details.View()
 	case add:
+		return m.edit.View()
+	case edit:
 		return m.edit.View()
 	default:
 		return "Error"

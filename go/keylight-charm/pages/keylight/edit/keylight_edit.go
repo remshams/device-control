@@ -131,7 +131,21 @@ func (m *Model) updateChildren() {
 
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
-	return fmt.Sprintf("%s\n%s\n%s\n%s", style.Render("Create/Edit keylight"), style.Render(m.renderLine("Name", m.name.View())), style.Render(m.renderLine("Ip", m.ip.View())), m.renderLine("Port", m.port.View()))
+	return fmt.Sprintf("%s\n%s\n%s\n%s", style.Render(m.renderHeadline()), style.Render(m.renderLine("Name", m.name.View())), style.Render(m.renderLine("Ip", m.ip.View())), m.renderLine("Port", m.port.View()))
+}
+
+func (m Model) renderHeadline() string {
+	prefix := ""
+	if m.keylight != nil {
+		prefix = "Edit"
+	} else {
+		prefix = "Create"
+	}
+	name := "keylight"
+	if m.name.Value() != "" {
+		name = m.name.Value()
+	}
+	return fmt.Sprintf("%s %s", prefix, name)
 }
 
 func (m *Model) renderLine(label string, value string) string {

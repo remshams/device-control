@@ -3,6 +3,8 @@ package home
 import (
 	"keylight-charm/keylight"
 	keylight_details "keylight-charm/pages/keylight/details"
+	keylight_model "keylight-charm/pages/keylight/details/model"
+	keylight_edit "keylight-charm/pages/keylight/edit"
 	keylight_list "keylight-charm/pages/keylight/list"
 	"keylight-control/control"
 
@@ -15,6 +17,7 @@ const (
 	initial viewState = "init"
 	list              = "list"
 	details           = "details"
+	add               = "add"
 )
 
 type initMsg struct{}
@@ -25,10 +28,11 @@ type Model struct {
 	keylights       []control.Keylight
 	list            keylight_list.Model
 	details         *keylight_details.Model
+	edit            *keylight_edit.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
-	return Model{keylightAdapter: keylightAdapter, state: initial, details: nil}
+	return Model{keylightAdapter: keylightAdapter, state: initial, details: nil, edit: nil}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -46,8 +50,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails
 		m.state = details
+	case keylight_list.AddKeylight:
+		newKeylight := keylight_edit.InitModel(nil)
+		m.edit = &newKeylight
+		m.state = add
 	case keylight_details.AbortAction:
 		m.details = nil
+		m.state = list
+	case keylight_model.AbortAction:
+		m.details = nil
+		m.edit = nil
 		m.state = list
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -71,6 +83,10 @@ func (m *Model) updateChilds(msg tea.Msg) tea.Cmd {
 		var details keylight_details.Model
 		details, cmd = m.details.Update(msg)
 		m.details = &details
+	case add:
+		var edit keylight_edit.Model
+		edit, cmd = m.edit.Update(msg)
+		m.edit = &edit
 	}
 	return cmd
 }
@@ -83,6 +99,8 @@ func (m Model) View() string {
 		return m.list.View()
 	case details:
 		return m.details.View()
+	case add:
+		return m.edit.View()
 	default:
 		return "Error"
 	}

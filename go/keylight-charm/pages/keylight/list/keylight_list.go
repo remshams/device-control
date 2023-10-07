@@ -15,6 +15,8 @@ type SelectedKeylight struct {
 	Keylight *control.Keylight
 }
 
+type AddKeylight struct{}
+
 type viewState string
 
 type Model struct {
@@ -39,6 +41,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		switch msg.String() {
 		case "enter":
 			cmd = m.selectedKeylight(m.table.SelectedRow()[0])
+		case "a":
+			cmd = m.addNewKeylight()
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}
@@ -89,5 +93,11 @@ func (m *Model) selectedKeylight(keylightId string) tea.Cmd {
 		index, _ := strconv.Atoi(keylightId)
 		keylight := &m.keylights[index]
 		return SelectedKeylight{Keylight: keylight}
+	}
+}
+
+func (m *Model) addNewKeylight() tea.Cmd {
+	return func() tea.Msg {
+		return AddKeylight{}
 	}
 }

@@ -35,3 +35,11 @@ func CreateCommandResult(status CommandStatus) tea.Cmd {
 		return CommandResult{status}
 	}
 }
+
+type AbortAction struct{}
+
+func CreateAbortAction() tea.Cmd {
+	return func() tea.Msg {
+		return AbortAction{}
+	}
+}

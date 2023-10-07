@@ -68,7 +68,13 @@ func createTable(keylights []control.Keylight) table.Model {
 	}
 	rows := []table.Row{}
 	for _, keylight := range keylights {
-		rows = append(rows, table.Row{strconv.Itoa(keylight.Metadata.Id), keylight.Metadata.Name, keylight.Metadata.Ip[0].String(), strconv.Itoa(keylight.Metadata.Port)})
+		rows = append(
+			rows,
+			table.Row{strconv.Itoa(keylight.Metadata.Id),
+				keylight.Metadata.Name,
+				keylight.Metadata.Ip.String(),
+				strconv.Itoa(keylight.Metadata.Port)},
+		)
 	}
 
 	t := table.New(

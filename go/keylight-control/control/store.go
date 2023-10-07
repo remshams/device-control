@@ -12,7 +12,7 @@ import (
 type KeylightDto struct {
 	Id   int
 	Name string
-	Ip   []net.IP
+	Ip   net.IP
 	Port int
 }
 

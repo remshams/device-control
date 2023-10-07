@@ -7,8 +7,8 @@ type KeylightFinder interface {
 }
 
 type KeylightAdapter interface {
-	Load(ip []net.IP, port int) ([]Light, error)
-	Set(ip []net.IP, port int, lights []Light) error
+	Load(ip net.IP, port int) ([]Light, error)
+	Set(ip net.IP, port int, lights []Light) error
 }
 
 type KeylightStore interface {

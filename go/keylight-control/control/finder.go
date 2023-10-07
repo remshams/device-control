@@ -44,7 +44,7 @@ func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroc
 			Metadata: KeylightMetadata{
 				Id:   index,
 				Name: entry.ServiceRecord.Instance,
-				Ip:   entry.AddrIPv4,
+				Ip:   entry.AddrIPv4[0],
 				Port: entry.Port,
 			},
 			adapter: adapter,

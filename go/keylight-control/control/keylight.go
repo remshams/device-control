@@ -19,7 +19,7 @@ type Light struct {
 type KeylightMetadata struct {
 	Id   int
 	Name string
-	Ip   []net.IP
+	Ip   net.IP
 	Port int
 }
 

@@ -34,7 +34,7 @@ func InitModel(keylight *control.Keylight) Model {
 	port := textinput.New()
 	if keylight != nil {
 		name.SetValue(keylight.Metadata.Name)
-		ip.SetValue(fmt.Sprintf("%s", keylight.Metadata.Ip))
+		ip.SetValue(keylight.Metadata.Ip[0].String())
 		port.SetValue(strconv.Itoa(keylight.Metadata.Port))
 	}
 	cursor := 0

@@ -2,9 +2,11 @@ package keylight_edit
 
 import (
 	"fmt"
+	"keylight-charm/keylight"
 	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
 	"keylight-control/control"
+	"net"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -20,15 +22,16 @@ const (
 )
 
 type Model struct {
-	keylight *control.Keylight
-	name     textinput.Model
-	ip       textinput.Model
-	port     textinput.Model
-	cursor   int
-	state    state
+	keylight       *control.Keylight
+	name           textinput.Model
+	ip             textinput.Model
+	port           textinput.Model
+	cursor         int
+	state          state
+	kelightAdapter *keylight.KeylightAdapter
 }
 
-func InitModel(keylight *control.Keylight) Model {
+func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAdapter) Model {
 	name := textinput.New()
 	ip := textinput.New()
 	port := textinput.New()
@@ -39,7 +42,7 @@ func InitModel(keylight *control.Keylight) Model {
 	}
 	cursor := 0
 	state := navigate
-	model := Model{keylight, name, ip, port, cursor, state}
+	model := Model{keylight, name, ip, port, cursor, state, keylightAdapter}
 	model.updateChildren()
 	return model
 }
@@ -67,6 +70,8 @@ func (m *Model) processNavigateUpdate(msg tea.KeyMsg) tea.Cmd {
 		m.decreaseCursor()
 	case "i":
 		m.state = insert
+	case "s":
+		cmd = m.updateKeylight()
 	case "esc":
 		cmd = keylight_model.CreateAbortAction()
 	}
@@ -127,6 +132,23 @@ func (m *Model) updateChildren() {
 	case 2:
 		m.port.Focus()
 	}
+}
+
+func (m *Model) updateKeylight() tea.Cmd {
+	keylightMetadata := control.KeylightMetadata{}
+	if m.keylight != nil {
+		keylightMetadata.Id = m.keylight.Metadata.Id
+	} else {
+		keylightMetadata = control.KeylightMetadata{Id: -1}
+	}
+	name := m.name.Value()
+	ip := net.ParseIP(m.ip.Value())
+	port, _ := strconv.Atoi(m.port.Value())
+	keylightMetadata.Name = name
+	keylightMetadata.Ip = ip
+	keylightMetadata.Port = port
+	m.kelightAdapter.UpdateKeylight(keylightMetadata)
+	return keylight_model.CreateSaveAction(m.keylight)
 }
 
 func (m Model) View() string {

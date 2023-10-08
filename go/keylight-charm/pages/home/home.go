@@ -52,11 +52,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.details = &keylightDetails
 		m.state = details
 	case keylight_list.AddKeylight:
-		newKeylight := keylight_edit.InitModel(nil)
+		newKeylight := keylight_edit.InitModel(nil, m.keylightAdapter)
 		m.edit = &newKeylight
 		m.state = add
 	case keylight_list.EditKeylight:
-		editKeylight := keylight_edit.InitModel(msg.Keylight)
+		editKeylight := keylight_edit.InitModel(msg.Keylight, m.keylightAdapter)
 		m.edit = &editKeylight
 		m.state = edit
 	case keylight_model.AbortAction:

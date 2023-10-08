@@ -86,7 +86,7 @@ func (control *KeylightControl) loadKeylights() bool {
 }
 
 func (control *KeylightControl) KeylightWithId(id int) *Keylight {
-	return control.findKeylight(id)
+	return FindKeylightWithId(control.keylights, id)
 }
 
 func (control *KeylightControl) Keylights() []Keylight {
@@ -95,26 +95,13 @@ func (control *KeylightControl) Keylights() []Keylight {
 
 func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) error {
 	log.Debug().Msgf("Send command: %+v", command)
-	keylight := control.findKeylight(command.Id)
+	keylight := FindKeylightWithId(control.keylights, command.Id)
 	if keylight == nil {
 		return errors.New("Keylight not found")
 	}
 	keylight.setLight(command.Command)
 	log.Print(keylight.Light.Brightness)
-	log.Print(control.findKeylight(0).Light.Brightness)
+	log.Print(FindKeylightWithId(control.keylights, 0).Light.Brightness)
 	log.Debug().Msg("Send command success")
 	return nil
-}
-
-func (control *KeylightControl) findKeylight(id int) *Keylight {
-	var selectedKeylight *Keylight
-	for i := range control.keylights {
-		light := &control.keylights[i]
-		if light.Metadata.Id == id {
-			selectedKeylight = light
-			return selectedKeylight
-		}
-	}
-	return nil
-
 }

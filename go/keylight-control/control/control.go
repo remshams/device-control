@@ -105,3 +105,15 @@ func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) err
 	log.Debug().Msg("Send command success")
 	return nil
 }
+
+func (control *KeylightControl) UpdateKeylight(keylightMetadata KeylightMetadata) (Keylight, error) {
+	newKeylight := Keylight{Metadata: keylightMetadata, adapter: control.adapter}
+	updatedKeylights, updatedKeylight := UpdateKeylights(control.keylights, newKeylight)
+	err := control.store.Save(updatedKeylights)
+	if err != nil {
+		return newKeylight, err
+	}
+	control.keylights = updatedKeylights
+	return updatedKeylight, nil
+
+}

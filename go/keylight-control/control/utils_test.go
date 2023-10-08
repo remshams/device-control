@@ -8,7 +8,7 @@ import (
 )
 
 func prepareKeylights() []Keylight {
-	return []Keylight{Keylight{Metadata: KeylightMetadata{
+	return []Keylight{{Metadata: KeylightMetadata{
 		Id:   0,
 		Name: "First",
 		Ip:   net.ParseIP("192.168.2.1"),
@@ -22,10 +22,9 @@ func TestShouldUpdateExistingKeylight(t *testing.T) {
 	newName := "Updated"
 	newKeylight := keylights[0]
 	newKeylight.Metadata.Name = newName
-	updatedKeylights := UpdateKeylight(keylights, newKeylight)
-	updatedKeylight := FindKeylightWithId(updatedKeylights, newKeylight.Metadata.Id)
+	updatedKeylights, updatedKeylight := UpdateKeylights(keylights, newKeylight)
 
-	assert.Equal(t, numberOfKeylights, len(keylights))
+	assert.Equal(t, numberOfKeylights, len(updatedKeylights))
 	assert.Equal(t, updatedKeylight.Metadata.Name, newName)
 }
 
@@ -38,8 +37,7 @@ func TestShouldAddNewKeylight(t *testing.T) {
 		Ip:   net.ParseIP("192.168.1.1"),
 		Port: 9998,
 	}}
-	updatedKeylights := UpdateKeylight(keylights, newKeylight)
-	updatedKeylight := updatedKeylights[len(updatedKeylights)-1]
+	updatedKeylights, updatedKeylight := UpdateKeylights(keylights, newKeylight)
 
 	assert.Equal(t, numberOfKeylights+1, len(updatedKeylights))
 	assert.Equal(t, 1, updatedKeylight.Metadata.Id)

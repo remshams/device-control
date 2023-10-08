@@ -1,14 +1,15 @@
 package control
 
-func UpdateKeylight(keylights []Keylight, newKeylight Keylight) []Keylight {
-	oldKeylight := FindKeylightWithId(keylights, newKeylight.Metadata.Id)
-	if oldKeylight != nil {
-		oldKeylight.Metadata = newKeylight.Metadata
+func UpdateKeylights(keylights []Keylight, newKeylight Keylight) ([]Keylight, Keylight) {
+	updatedKeylight := FindKeylightWithId(keylights, newKeylight.Metadata.Id)
+	if updatedKeylight != nil {
+		updatedKeylight.Metadata = newKeylight.Metadata
 	} else {
-		newKeylight.Metadata.Id = len(keylights)
-		keylights = append(keylights, newKeylight)
+		updatedKeylight = &newKeylight
+		updatedKeylight.Metadata.Id = len(keylights)
+		keylights = append(keylights, *updatedKeylight)
 	}
-	return keylights
+	return keylights, *updatedKeylight
 }
 
 func FindKeylightWithId(keylights []Keylight, keylightId int) *Keylight {

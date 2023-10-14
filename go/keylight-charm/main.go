@@ -14,7 +14,11 @@ import (
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	logLevel, err := zerolog.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		logLevel = zerolog.Disabled
+	}
+	zerolog.SetGlobalLevel(logLevel)
 	keylightAdapter := keylight.NewKeylightAdapter()
 	p := tea.NewProgram(home.InitModel(&keylightAdapter))
 	if _, err := p.Run(); err != nil {

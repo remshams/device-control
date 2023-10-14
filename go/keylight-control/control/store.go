@@ -23,7 +23,7 @@ type JsonKeylightStore struct {
 func (store *JsonKeylightStore) Save(keylights []Keylight) error {
 	keylightDtos := []KeylightDto{}
 	for _, keylight := range keylights {
-		keylightDtos = append(keylightDtos, KeylightDto{Name: keylight.Metadata.Name, Ip: keylight.Metadata.Ip, Port: keylight.Metadata.Port})
+		keylightDtos = append(keylightDtos, KeylightDto{Id: keylight.Metadata.Id, Name: keylight.Metadata.Name, Ip: keylight.Metadata.Ip, Port: keylight.Metadata.Port})
 	}
 	keylightsJson, err := json.Marshal(keylightDtos)
 	if err != nil {

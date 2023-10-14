@@ -2,9 +2,9 @@ package home
 
 import (
 	"fmt"
+	"keylight-charm/components/actions"
 	"keylight-charm/keylight"
 	keylight_details "keylight-charm/pages/keylight/details"
-	keylight_model "keylight-charm/pages/keylight/details/model"
 	keylight_edit "keylight-charm/pages/keylight/edit"
 	keylight_list "keylight-charm/pages/keylight/list"
 	"keylight-charm/styles"
@@ -51,7 +51,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
-	case keylight_model.ErrorAction:
+	case actions.ErrorAction:
 		m.error = msg.Error
 		m.state = list
 	case keylight_list.SelectedKeylight:
@@ -66,10 +66,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		editKeylight := keylight_edit.InitModel(msg.Keylight, m.keylightAdapter)
 		m.edit = &editKeylight
 		m.state = edit
-	case keylight_model.SaveAction:
+	case actions.SaveAction:
 		m.state = initial
 		cmd = m.discoverKeylights()
-	case keylight_model.AbortAction:
+	case actions.AbortAction:
 		m.details = nil
 		m.edit = nil
 		m.state = list

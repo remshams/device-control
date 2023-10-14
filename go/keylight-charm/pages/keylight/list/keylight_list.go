@@ -1,8 +1,8 @@
 package keylight_list
 
 import (
+	"keylight-charm/components/actions"
 	"keylight-charm/keylight"
-	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/utils"
 	"keylight-control/control"
 	"strconv"
@@ -112,7 +112,7 @@ func (m *Model) selectedKeylight(keylightId string) tea.Cmd {
 		if keylight != nil && keylight.Metadata.Connected {
 			return SelectedKeylight{Keylight: keylight}
 		} else {
-			return keylight_model.ErrorAction{Error: "Keylight could not be found or not connected"}
+			return actions.ErrorAction{Error: "Keylight could not be found or not connected"}
 		}
 	}
 }

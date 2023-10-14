@@ -2,8 +2,8 @@ package keylight_edit
 
 import (
 	"fmt"
+	"keylight-charm/components/actions"
 	"keylight-charm/keylight"
-	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
 	"keylight-control/control"
 	"net"
@@ -73,7 +73,7 @@ func (m *Model) processNavigateUpdate(msg tea.KeyMsg) tea.Cmd {
 	case "s":
 		cmd = m.updateKeylight()
 	case "esc":
-		cmd = keylight_model.CreateAbortAction()
+		cmd = actions.CreateAbortAction()
 	}
 	m.updateChildren()
 	return cmd
@@ -148,7 +148,7 @@ func (m *Model) updateKeylight() tea.Cmd {
 	keylightMetadata.Ip = ip
 	keylightMetadata.Port = port
 	m.kelightAdapter.UpdateKeylight(keylightMetadata)
-	return keylight_model.CreateSaveAction(m.keylight)
+	return actions.CreateSaveAction(m.keylight)
 }
 
 func (m Model) View() string {

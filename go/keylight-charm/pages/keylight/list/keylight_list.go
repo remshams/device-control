@@ -2,6 +2,7 @@ package keylight_list
 
 import (
 	"keylight-charm/keylight"
+	"keylight-charm/utils"
 	"keylight-control/control"
 	"strconv"
 
@@ -101,9 +102,12 @@ func createTable(keylights []control.Keylight) table.Model {
 
 func (m *Model) selectedKeylight(keylightId string) tea.Cmd {
 	return func() tea.Msg {
-		index, _ := strconv.Atoi(keylightId)
-		keylight := &m.keylights[index]
-		return SelectedKeylight{Keylight: keylight}
+		keylight := utils.FindKeylightWithId(m.keylights, keylightId)
+		if keylight != nil {
+			return SelectedKeylight{Keylight: keylight}
+		} else {
+			return nil
+		}
 	}
 }
 

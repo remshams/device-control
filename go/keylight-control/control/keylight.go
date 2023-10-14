@@ -17,10 +17,11 @@ type Light struct {
 }
 
 type KeylightMetadata struct {
-	Id   int
-	Name string
-	Ip   net.IP
-	Port int
+	Id        int
+	Name      string
+	Ip        net.IP
+	Port      int
+	Connected bool
 }
 
 type Keylight struct {
@@ -35,6 +36,7 @@ func (keylight *Keylight) loadLights() error {
 		return err
 	}
 	if len(lights) > 0 {
+		keylight.Metadata.Connected = true
 		keylight.Light = &lights[0]
 	}
 	return nil

@@ -2,6 +2,7 @@ package keylight_list
 
 import (
 	"keylight-charm/keylight"
+	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/utils"
 	"keylight-control/control"
 	"strconv"
@@ -53,6 +54,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.table, cmd = m.table.Update(msg)
 		}
 	}
+
 	return m, cmd
 }
 
@@ -110,7 +112,7 @@ func (m *Model) selectedKeylight(keylightId string) tea.Cmd {
 		if keylight != nil && keylight.Metadata.Connected {
 			return SelectedKeylight{Keylight: keylight}
 		} else {
-			return nil
+			return keylight_model.ErrorAction{Error: "Keylight could not be found or not connected"}
 		}
 	}
 }

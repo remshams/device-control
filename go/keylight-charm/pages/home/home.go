@@ -1,11 +1,13 @@
 package home
 
 import (
+	"fmt"
 	"keylight-charm/keylight"
 	keylight_details "keylight-charm/pages/keylight/details"
 	keylight_model "keylight-charm/pages/keylight/details/model"
 	keylight_edit "keylight-charm/pages/keylight/edit"
 	keylight_list "keylight-charm/pages/keylight/list"
+	"keylight-charm/styles"
 	"keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,6 +32,7 @@ type Model struct {
 	list            keylight_list.Model
 	details         *keylight_details.Model
 	edit            *keylight_edit.Model
+	error           string
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
@@ -41,11 +44,15 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.error = ""
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
+		m.state = list
+	case keylight_model.ErrorAction:
+		m.error = msg.Error
 		m.state = list
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
@@ -101,20 +108,23 @@ func (m *Model) updateChilds(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
+	component := ""
 	switch m.state {
 	case initial:
 		return "Loading..."
 	case list:
-		return m.list.View()
+		component = m.list.View()
 	case details:
-		return m.details.View()
+		component = m.details.View()
 	case add:
-		return m.edit.View()
+		component = m.edit.View()
 	case edit:
-		return m.edit.View()
+		component = m.edit.View()
 	default:
 		return "Error"
 	}
+
+	return fmt.Sprintf("%s\n%s", component, styles.TextWarningColor.Render(m.error))
 }
 
 func (m *Model) discoverKeylights() tea.Cmd {

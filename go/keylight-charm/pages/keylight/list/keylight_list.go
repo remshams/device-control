@@ -62,19 +62,23 @@ func (m Model) View() string {
 
 func createTable(keylights []control.Keylight) table.Model {
 	columns := []table.Column{
-		{Title: "Id", Width: 4},
-		{Title: "Name", Width: 30},
-		{Title: "Ip", Width: 20},
-		{Title: "Port", Width: 20},
+		{Title: "Id", Width: 5},
+		{Title: "Name", Width: 20},
+		{Title: "Ip", Width: 15},
+		{Title: "Port", Width: 5},
+		{Title: "Connected", Width: 10},
 	}
 	rows := []table.Row{}
+
 	for _, keylight := range keylights {
 		rows = append(
 			rows,
-			table.Row{strconv.Itoa(keylight.Metadata.Id),
+			table.Row{
+				strconv.Itoa(keylight.Metadata.Id),
 				keylight.Metadata.Name,
 				keylight.Metadata.Ip.String(),
-				strconv.Itoa(keylight.Metadata.Port)},
+				strconv.Itoa(keylight.Metadata.Port),
+				strconv.FormatBool(keylight.Metadata.Connected)},
 		)
 	}
 
@@ -103,7 +107,7 @@ func createTable(keylights []control.Keylight) table.Model {
 func (m *Model) selectedKeylight(keylightId string) tea.Cmd {
 	return func() tea.Msg {
 		keylight := utils.FindKeylightWithId(m.keylights, keylightId)
-		if keylight != nil {
+		if keylight != nil && keylight.Metadata.Connected {
 			return SelectedKeylight{Keylight: keylight}
 		} else {
 			return nil

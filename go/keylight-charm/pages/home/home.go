@@ -3,11 +3,11 @@ package home
 import (
 	"fmt"
 	"keylight-charm/components/actions"
+	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
 	keylight_details "keylight-charm/pages/keylight/details"
 	keylight_edit "keylight-charm/pages/keylight/edit"
 	keylight_list "keylight-charm/pages/keylight/list"
-	"keylight-charm/styles"
 	"keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -32,11 +32,17 @@ type Model struct {
 	list            keylight_list.Model
 	details         *keylight_details.Model
 	edit            *keylight_edit.Model
-	error           string
+	toast           toast.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
-	return Model{keylightAdapter: keylightAdapter, state: initial, details: nil, edit: nil}
+	return Model{
+		keylightAdapter: keylightAdapter,
+		state:           initial,
+		details:         nil,
+		edit:            nil,
+		toast:           toast.InitModel(),
+	}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -44,15 +50,12 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.error = ""
 	var cmd tea.Cmd
+	m.toast, _ = m.toast.Update(msg)
 	switch msg := msg.(type) {
 	case initMsg:
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
-		m.state = list
-	case actions.ErrorAction:
-		m.error = msg.Error
 		m.state = list
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
@@ -124,7 +127,7 @@ func (m Model) View() string {
 		return "Error"
 	}
 
-	return fmt.Sprintf("%s\n%s", component, styles.TextWarningColor.Render(m.error))
+	return fmt.Sprintf("%s\n%s", component, m.toast.View())
 }
 
 func (m *Model) discoverKeylights() tea.Cmd {

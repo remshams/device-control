@@ -23,13 +23,3 @@ func CreateSaveAction(keylight *control.Keylight) tea.Cmd {
 		return SaveAction{Keylight: keylight}
 	}
 }
-
-type ErrorAction struct {
-	Error string
-}
-
-func CreateErrorAction(error string) tea.Cmd {
-	return func() tea.Msg {
-		return ErrorAction{Error: error}
-	}
-}

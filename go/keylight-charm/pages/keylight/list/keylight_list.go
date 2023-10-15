@@ -1,7 +1,7 @@
 package keylight_list
 
 import (
-	"keylight-charm/components/actions"
+	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
 	"keylight-charm/utils"
 	"keylight-control/control"
@@ -14,6 +14,12 @@ import (
 
 type SelectedKeylight struct {
 	Keylight *control.Keylight
+}
+
+func createSelectedKeylightAction(keylight *control.Keylight) tea.Cmd {
+	return func() tea.Msg {
+		return SelectedKeylight{keylight}
+	}
 }
 
 type AddKeylight struct{}
@@ -107,13 +113,11 @@ func createTable(keylights []control.Keylight) table.Model {
 }
 
 func (m *Model) selectedKeylight(keylightId string) tea.Cmd {
-	return func() tea.Msg {
-		keylight := utils.FindKeylightWithId(m.keylights, keylightId)
-		if keylight != nil && keylight.Metadata.Connected {
-			return SelectedKeylight{Keylight: keylight}
-		} else {
-			return actions.ErrorAction{Error: "Keylight could not be found or not connected"}
-		}
+	keylight := utils.FindKeylightWithId(m.keylights, keylightId)
+	if keylight != nil && keylight.Metadata.Connected {
+		return createSelectedKeylightAction(keylight)
+	} else {
+		return toast.CreateErrorToastAction("Keylight could not be found or not connected")
 	}
 }
 

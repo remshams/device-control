@@ -44,8 +44,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.state = keylight_model.Insert
 		case "esc":
 			if m.state == keylight_model.Insert {
+				var contentCommand tea.Cmd
+				cmds = append(cmds, contentCommand)
+				m.content, contentCommand = m.content.Update(msg, m.state)
 				m.state = keylight_model.Navigate
-				cmds = append(cmds, keylight_model.CreateUpdateKeylight())
 			} else {
 				cmds = append(cmds, actions.CreateAbortAction())
 			}

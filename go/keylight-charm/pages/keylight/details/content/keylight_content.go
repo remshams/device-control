@@ -60,6 +60,8 @@ func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	switch msg.String() {
 	case "enter":
 		cmd = m.sendCommand()
+	case "esc":
+		cmd = m.updateKeylight()
 	default:
 		cmd = m.updateChild(msg)
 	}

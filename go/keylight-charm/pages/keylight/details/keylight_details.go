@@ -36,8 +36,6 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
-	case keylight_content.StateChanged:
-		m.state = msg.State
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "i":

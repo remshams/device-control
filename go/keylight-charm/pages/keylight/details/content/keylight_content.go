@@ -17,10 +17,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type StateChanged struct {
-	State keylight_model.ViewState
-}
-
 type Model struct {
 	keylight        *control.Keylight
 	on              checkbox.Model
@@ -61,7 +57,7 @@ func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 	case "enter":
 		cmd = m.sendCommand()
 	case "esc":
-		cmd = m.updateKeylight()
+		m.updateKeylight()
 	default:
 		cmd = m.updateChild(msg)
 	}
@@ -168,7 +164,7 @@ func (m *Model) sendCommand() tea.Cmd {
 	return toast.CreateWarningToastAction(m.createStatusMessage(status))
 }
 
-func (m *Model) updateKeylight() tea.Cmd {
+func (m *Model) updateKeylight() {
 	keylight := m.keylightAdapter.Control.KeylightWithId(0)
 	if keylight == nil {
 		log.Error().Msg("No keylight found")
@@ -178,13 +174,6 @@ func (m *Model) updateKeylight() tea.Cmd {
 	m.brightness.SetValue(fmt.Sprintf("%d", keylight.Light.Brightness))
 	m.temperature.SetValue(fmt.Sprintf("%d", keylight.Light.Temperature))
 	m.selectedElement()
-	return m.stateChanged(keylight_model.Navigate)
-}
-
-func (m *Model) stateChanged(state keylight_model.ViewState) tea.Cmd {
-	return func() tea.Msg {
-		return StateChanged{state}
-	}
 }
 
 func (m Model) createStatusMessage(commandStatus keylight_model.CommandStatus) string {

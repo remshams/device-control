@@ -3,7 +3,6 @@ package keylight_details
 import (
 	"fmt"
 	"keylight-charm/components/actions"
-	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
 	keylight_content "keylight-charm/pages/keylight/details/content"
 	keylight_footer "keylight-charm/pages/keylight/details/footer"
@@ -39,8 +38,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case keylight_content.StateChanged:
 		m.state = msg.State
-	case keylight_model.CommandResult:
-		cmds = append(cmds, toast.CreateWarningToastAction(m.createStatusMessage(msg.Status)))
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "i":
@@ -70,16 +67,4 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
 	return fmt.Sprintf("%s\n%s\n%s", style.Render(m.header.View()), style.Render(m.content.View(m.state)), m.footer.View(m.state))
-}
-
-func (m Model) createStatusMessage(commandStatus keylight_model.CommandStatus) string {
-	switch commandStatus {
-	case keylight_model.Success:
-		return "Light values set"
-	case keylight_model.Error:
-		return "Could not set light values"
-	default:
-		return ""
-	}
-
 }

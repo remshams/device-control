@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"keylight-charm/components/checkbox"
 	"keylight-charm/components/textinput"
+	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
 	keylight_model "keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
@@ -44,8 +45,6 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 func (m Model) Update(msg tea.Msg, state keylight_model.ViewState) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case keylight_model.UpdateKeylight:
-		cmd = m.updateKeylight()
 	case tea.KeyMsg:
 		if state == keylight_model.Insert {
 			cmd = m.processInInsertMode(msg)
@@ -164,7 +163,7 @@ func (m *Model) sendCommand() tea.Cmd {
 	} else {
 		status = keylight_model.Success
 	}
-	return tea.Batch(m.updateKeylight(), keylight_model.CreateCommandResult(status))
+	return toast.CreateWarningToastAction(m.createStatusMessage(status))
 }
 
 func (m *Model) updateKeylight() tea.Cmd {
@@ -184,4 +183,16 @@ func (m *Model) stateChanged(state keylight_model.ViewState) tea.Cmd {
 	return func() tea.Msg {
 		return StateChanged{state}
 	}
+}
+
+func (m Model) createStatusMessage(commandStatus keylight_model.CommandStatus) string {
+	switch commandStatus {
+	case keylight_model.Success:
+		return "Light values set"
+	case keylight_model.Error:
+		return "Could not set light values"
+	default:
+		return ""
+	}
+
 }

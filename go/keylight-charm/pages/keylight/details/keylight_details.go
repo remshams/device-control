@@ -69,7 +69,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
-	return fmt.Sprintf("%s\n%s", style.Render(m.header.View()), style.Render(m.content.View(m.state)))
+	return fmt.Sprintf("%s\n%s\n%s", style.Render(m.header.View()), style.Render(m.content.View(m.state)), m.footer.View(m.state))
 }
 
 func (m Model) createStatusMessage(commandStatus keylight_model.CommandStatus) string {

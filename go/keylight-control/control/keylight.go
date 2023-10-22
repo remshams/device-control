@@ -30,7 +30,7 @@ type Keylight struct {
 	adapter  KeylightAdapter
 }
 
-func (keylight *Keylight) loadLights() error {
+func (keylight *Keylight) LoadLights() error {
 	lights, err := keylight.adapter.Load(keylight.Metadata.Ip, keylight.Metadata.Port)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (keylight *Keylight) loadLights() error {
 	return nil
 }
 
-func (keylight *Keylight) setLight(lightCommand LightCommand) error {
+func (keylight *Keylight) SetLight(lightCommand LightCommand) error {
 	on := lightCommand.On
 	if on == nil {
 		on = &keylight.Light.On

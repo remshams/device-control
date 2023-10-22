@@ -48,7 +48,7 @@ func (control *KeylightControl) discoverKeylights() bool {
 	isSuccess := true
 	for i := range control.keylights {
 		keylight := &control.keylights[i]
-		err := keylight.loadLights()
+		err := keylight.LoadLights()
 		if err != nil {
 			isSuccess = false
 		}
@@ -75,7 +75,7 @@ func (control *KeylightControl) loadKeylights() bool {
 	}
 	for i := range keylights {
 		keylight := &keylights[i]
-		err = keylight.loadLights()
+		err = keylight.LoadLights()
 		if err != nil {
 			isSuccess = false
 		}
@@ -99,7 +99,7 @@ func (control *KeylightControl) SendKeylightCommand(command KeylightCommand) err
 	if keylight == nil {
 		return errors.New("Keylight not found")
 	}
-	keylight.setLight(command.Command)
+	keylight.SetLight(command.Command)
 	log.Print(keylight.Light.Brightness)
 	log.Print(FindKeylightWithId(control.keylights, 0).Light.Brightness)
 	log.Debug().Msg("Send command success")

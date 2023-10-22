@@ -14,6 +14,8 @@ func InitModel() Model {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case InfoToast:
+		m.toast = msg
 	case ErrorToast:
 		m.toast = msg
 	case WarningToast:

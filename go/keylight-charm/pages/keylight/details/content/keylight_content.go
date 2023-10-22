@@ -161,7 +161,7 @@ func (m *Model) sendCommand() tea.Cmd {
 	} else {
 		status = keylight_model.Success
 	}
-	return toast.CreateWarningToastAction(m.createStatusMessage(status))
+	return toast.CreateInfoToastAction(m.createStatusMessage(status))
 }
 
 func (m *Model) updateKeylight() {

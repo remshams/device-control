@@ -2,12 +2,14 @@ package control
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -29,7 +31,12 @@ type KeylightRestAdapter struct {
 }
 
 func (adapter *KeylightRestAdapter) Load(ip net.IP, port int) ([]Light, error) {
-	response, err := http.Get(fmt.Sprintf(path, ip, port))
+	req, client, cancel, err := adapter.requestWithTimeout(http.MethodGet, fmt.Sprintf(path, ip, port), nil, nil)
+	defer cancel()
+	var response *http.Response
+	if err == nil {
+		response, err = client.Do(req)
+	}
 	if err != nil || response.StatusCode >= 300 {
 		log.Error().Msg("Could not load lights")
 		return nil, errors.New("Could not load lights")
@@ -59,13 +66,13 @@ func (adapter *KeylightRestAdapter) Load(ip net.IP, port int) ([]Light, error) {
 func (adapter *KeylightRestAdapter) Set(ip net.IP, port int, lights []Light) error {
 	requestDto := adapter.createRequestDto(lights)
 	requestString, err := json.Marshal(requestDto)
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf(path, ip, port), bytes.NewBuffer(requestString))
+	req, client, cancel, err := adapter.requestWithTimeout(http.MethodPut, fmt.Sprintf(path, ip, port), bytes.NewBuffer(requestString), nil)
+	defer cancel()
 	if err != nil {
 		log.Error().Msg("Could not update lights")
 		return errors.New("Could not update lights")
 	}
 	req.Header.Add("Content-Type", "application/json")
-	client := http.DefaultClient
 	res, err := client.Do(req)
 	if err != nil {
 		log.Error().Msg("Could not update lights")
@@ -90,4 +97,16 @@ func (adapter *KeylightRestAdapter) createRequestDto(lights []Light) LightRespon
 	requestDto := LightResponseDto{NumberOfLights: len(lights), Lights: lightDtos}
 	return requestDto
 
+}
+
+func (adapter *KeylightRestAdapter) requestWithTimeout(method string, url string, body io.Reader, timeout *time.Duration) (*http.Request, *http.Client, context.CancelFunc, error) {
+	defaultTimeout := 2 * time.Second
+	requestTimeout := timeout
+	if requestTimeout == nil {
+		requestTimeout = &defaultTimeout
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), *requestTimeout)
+	client := &http.Client{}
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	return req, client, cancel, err
 }

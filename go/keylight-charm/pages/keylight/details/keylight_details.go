@@ -25,6 +25,7 @@ type Model struct {
 }
 
 func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAdapter) Model {
+	keylight.LoadLights()
 	return Model{
 		header:  keylight_header.InitModel(keylight),
 		content: keylight_content.InitModel(keylight, keylightAdapter),

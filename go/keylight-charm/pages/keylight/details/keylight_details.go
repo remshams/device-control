@@ -40,28 +40,31 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		switch msg.String() {
 		case "i":
 			m.state = keylight_model.Insert
+		case "enter":
+			cmds = append(cmds, m.updateContent(msg))
+			m.state = keylight_model.Navigate
 		case "esc":
 			if m.state == keylight_model.Insert {
-				var contentCommand tea.Cmd
-				cmds = append(cmds, contentCommand)
-				m.content, contentCommand = m.content.Update(msg, m.state)
+				cmds = append(cmds, m.updateContent(msg))
 				m.state = keylight_model.Navigate
 			} else {
 				cmds = append(cmds, actions.CreateAbortAction())
 			}
 		default:
-			var contentCommand tea.Cmd
-			m.content, contentCommand = m.content.Update(msg, m.state)
-			cmds = append(cmds, contentCommand)
+			cmds = append(cmds, m.updateContent(msg))
 		}
 	default:
-		var contentCommand tea.Cmd
 		var footerCommand tea.Cmd
-		m.content, contentCommand = m.content.Update(msg, m.state)
 		m.footer, footerCommand = m.footer.Update(msg)
-		cmds = append(cmds, contentCommand, footerCommand)
+		cmds = append(cmds, m.updateContent(msg), footerCommand)
 	}
 	return m, tea.Batch(cmds...)
+}
+
+func (m *Model) updateContent(msg tea.Msg) tea.Cmd {
+	var contentCommand tea.Cmd
+	m.content, contentCommand = m.content.Update(msg, m.state)
+	return contentCommand
 }
 
 func (m Model) View() string {

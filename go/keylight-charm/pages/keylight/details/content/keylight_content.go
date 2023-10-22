@@ -6,7 +6,7 @@ import (
 	"keylight-charm/components/textinput"
 	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
-	keylight_model "keylight-charm/pages/keylight/details/model"
+	"keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
 	"keylight-control/control"
 	"os"
@@ -58,6 +58,7 @@ func (m *Model) processInInsertMode(msg tea.KeyMsg) tea.Cmd {
 		cmd = m.sendCommand()
 	case "esc":
 		m.updateKeylight()
+		fmt.Println("stop polling")
 	default:
 		cmd = m.updateChild(msg)
 	}
@@ -166,6 +167,7 @@ func (m *Model) sendCommand() tea.Cmd {
 
 func (m *Model) updateKeylight() {
 	keylight := m.keylightAdapter.Control.KeylightWithId(0)
+	keylight.LoadLights()
 	if keylight == nil {
 		log.Error().Msg("No keylight found")
 		os.Exit(1)

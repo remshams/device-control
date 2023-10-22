@@ -12,6 +12,16 @@ func UpdateKeylights(keylights []Keylight, newKeylight Keylight) ([]Keylight, Ke
 	return keylights, *updatedKeylight
 }
 
+func RemoveKeylight(keylights []Keylight, id int) ([]Keylight, *Keylight) {
+	for i, _ := range keylights {
+		keylight := &keylights[i]
+		if keylight.Metadata.Id == id {
+			return append(keylights[:i], keylights[i+1:]...), keylight
+		}
+	}
+	return keylights, nil
+}
+
 func FindKeylightWithId(keylights []Keylight, keylightId int) *Keylight {
 	for i := range keylights {
 		keylight := &keylights[i]

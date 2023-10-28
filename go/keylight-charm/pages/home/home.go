@@ -87,6 +87,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
+		case "r":
+			cmd = tea.Batch(m.discoverKeylights(), toast.CreateInfoToastAction("Keylight list reloaded"))
 		default:
 			cmd = m.updateChilds(msg)
 		}

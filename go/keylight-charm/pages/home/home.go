@@ -25,8 +25,6 @@ const (
 
 type initMsg struct{}
 
-type reloadKeylights struct{}
-
 type Model struct {
 	keylightAdapter *keylight.KeylightAdapter
 	state           viewState
@@ -59,7 +57,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
-	case reloadKeylights:
+	case actions.ReloadKeylights:
+		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 	case keylight_list.SelectedKeylight:
@@ -79,12 +78,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if err != nil {
 			cmd = toast.CreateErrorToastAction("Keylight could not be deleted")
 		} else {
-			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), m.reloadKeylights())
+			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), actions.CreateReloadKeylights())
 		}
 	case keylight_list.ReloadKeylights:
-		cmd = m.reloadKeylights()
-	case actions.SaveAction:
-		cmd = m.reloadKeylights()
+		cmd = actions.CreateReloadKeylights()
 	case actions.AbortAction:
 		m.details = nil
 		m.edit = nil
@@ -94,7 +91,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
 		case "r":
-			cmd = tea.Batch(m.reloadKeylights(), toast.CreateInfoToastAction("Keylight list reloaded"))
+			cmd = tea.Batch(actions.CreateReloadKeylights(), toast.CreateInfoToastAction("Keylight list reloaded"))
 		default:
 			cmd = m.updateChilds(msg)
 		}
@@ -149,12 +146,5 @@ func (m *Model) init() tea.Cmd {
 	return func() tea.Msg {
 		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		return initMsg{}
-	}
-}
-
-func (m *Model) reloadKeylights() tea.Cmd {
-	return func() tea.Msg {
-		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
-		return reloadKeylights{}
 	}
 }

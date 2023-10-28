@@ -18,8 +18,10 @@ type SaveAction struct {
 	Keylight *control.Keylight
 }
 
-func CreateSaveAction(keylight *control.Keylight) tea.Cmd {
+type ReloadKeylights struct{}
+
+func CreateReloadKeylights() tea.Cmd {
 	return func() tea.Msg {
-		return SaveAction{Keylight: keylight}
+		return ReloadKeylights{}
 	}
 }

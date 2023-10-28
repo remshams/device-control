@@ -3,6 +3,7 @@ package keylight_edit
 import (
 	"fmt"
 	"keylight-charm/components/actions"
+	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
 	"keylight-charm/styles"
 	"keylight-control/control"
@@ -148,7 +149,7 @@ func (m *Model) updateKeylight() tea.Cmd {
 	keylightMetadata.Ip = ip
 	keylightMetadata.Port = port
 	m.kelightAdapter.UpdateKeylight(keylightMetadata)
-	return actions.CreateSaveAction(m.keylight)
+	return tea.Batch(toast.CreateInfoToastAction("Light saved"), actions.CreateReloadKeylights())
 }
 
 func (m Model) View() string {

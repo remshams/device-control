@@ -69,6 +69,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		editKeylight := keylight_edit.InitModel(msg.Keylight, m.keylightAdapter)
 		m.edit = &editKeylight
 		m.state = edit
+	case keylight_list.RemoveKeylight:
+		_, err := m.keylightAdapter.RemoveKeylight(msg.Keylight.Metadata.Id)
+		if err != nil {
+			cmd = toast.CreateErrorToastAction("Keylight could not be deleted")
+		} else {
+			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), m.discoverKeylights())
+		}
 	case actions.SaveAction:
 		m.state = initial
 		cmd = m.discoverKeylights()

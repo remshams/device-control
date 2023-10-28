@@ -33,6 +33,10 @@ func (keylightAdapter *KeylightAdapter) UpdateKeylight(keylightMetadata control.
 	return keylightAdapter.Control.UpdateKeylight(keylightMetadata)
 }
 
+func (keylightAdapter *KeylightAdapter) RemoveKeylight(id int) (*control.Keylight, error) {
+	return keylightAdapter.Control.RemoveKeylight(id)
+}
+
 func (keylightAdapter *KeylightAdapter) normalizeTemperature(temperature int) int {
 	if temperature < 144 {
 		return 144

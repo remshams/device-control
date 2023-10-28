@@ -2,9 +2,9 @@ package home
 
 import (
 	"fmt"
-	"keylight-charm/components/actions"
 	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
+	pages_keylight "keylight-charm/pages/keylight"
 	"keylight-charm/pages/keylight/details"
 	"keylight-charm/pages/keylight/edit"
 	"keylight-charm/pages/keylight/list"
@@ -57,10 +57,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
-	case actions.ReloadKeylights:
+	case pages_keylight.ReloadKeylights:
 		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
+		cmd = toast.CreateInfoToastAction("Keylights relaoded")
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails
@@ -78,11 +79,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if err != nil {
 			cmd = toast.CreateErrorToastAction("Keylight could not be deleted")
 		} else {
-			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), actions.CreateReloadKeylights())
+			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), pages_keylight.CreateReloadKeylights())
 		}
 	case keylight_list.ReloadKeylights:
-		cmd = actions.CreateReloadKeylights()
-	case actions.AbortAction:
+		cmd = pages_keylight.CreateReloadKeylights()
+	case pages_keylight.BackAction:
 		m.details = nil
 		m.edit = nil
 		m.state = list
@@ -90,8 +91,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
-		case "r":
-			cmd = tea.Batch(actions.CreateReloadKeylights(), toast.CreateInfoToastAction("Keylight list reloaded"))
 		default:
 			cmd = m.updateChilds(msg)
 		}

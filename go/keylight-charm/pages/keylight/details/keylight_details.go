@@ -2,8 +2,8 @@ package keylight_details
 
 import (
 	"fmt"
-	"keylight-charm/components/actions"
 	"keylight-charm/keylight"
+	pages_keylight "keylight-charm/pages/keylight"
 	keylight_content "keylight-charm/pages/keylight/details/content"
 	keylight_footer "keylight-charm/pages/keylight/details/footer"
 	keylight_header "keylight-charm/pages/keylight/details/header"
@@ -49,7 +49,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				cmds = append(cmds, m.updateContent(msg))
 				m.state = keylight_model.Navigate
 			} else {
-				cmds = append(cmds, actions.CreateAbortAction())
+				cmds = append(cmds, pages_keylight.CreateBackAction())
 			}
 		default:
 			cmds = append(cmds, m.updateContent(msg))

@@ -28,6 +28,10 @@ type EditKeylight struct {
 	Keylight *control.Keylight
 }
 
+type RemoveKeylight struct {
+	Keylight *control.Keylight
+}
+
 type viewState string
 
 type Model struct {
@@ -56,6 +60,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = m.addNewKeylight()
 		case "e":
 			cmd = m.editKeylight(m.table.SelectedRow()[0])
+		case "d":
+			cmd = m.removeKeylight(m.table.SelectedRow()[0])
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}
@@ -133,6 +139,19 @@ func (m *Model) editKeylight(keylightId string) tea.Cmd {
 		keylight := &m.keylights[index]
 		return EditKeylight{
 			Keylight: keylight,
+		}
+	}
+}
+
+func (m *Model) removeKeylight(keylightId string) tea.Cmd {
+	return func() tea.Msg {
+		keylight := utils.FindKeylightWithId(m.keylights, keylightId)
+		if keylight != nil {
+			return RemoveKeylight{
+				Keylight: keylight,
+			}
+		} else {
+			return toast.CreateInfoToastAction("Keylight does not exist")
 		}
 	}
 }

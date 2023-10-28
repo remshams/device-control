@@ -5,9 +5,9 @@ import (
 	"keylight-charm/components/actions"
 	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
-	keylight_details "keylight-charm/pages/keylight/details"
-	keylight_edit "keylight-charm/pages/keylight/edit"
-	keylight_list "keylight-charm/pages/keylight/list"
+	"keylight-charm/pages/keylight/details"
+	"keylight-charm/pages/keylight/edit"
+	"keylight-charm/pages/keylight/list"
 	"keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -24,6 +24,8 @@ const (
 )
 
 type initMsg struct{}
+
+type reloadKeylights struct{}
 
 type Model struct {
 	keylightAdapter *keylight.KeylightAdapter
@@ -46,7 +48,7 @@ func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.discoverKeylights()
+	return m.init()
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -57,6 +59,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
+	case reloadKeylights:
+		m.keylights = m.keylightAdapter.Control.Keylights()
+		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails
@@ -74,11 +79,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if err != nil {
 			cmd = toast.CreateErrorToastAction("Keylight could not be deleted")
 		} else {
-			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), m.discoverKeylights())
+			cmd = tea.Batch(toast.CreateInfoToastAction("Keylight deleted"), m.reloadKeylights())
 		}
+	case keylight_list.ReloadKeylights:
+		cmd = m.reloadKeylights()
 	case actions.SaveAction:
-		m.state = initial
-		cmd = m.discoverKeylights()
+		cmd = m.reloadKeylights()
 	case actions.AbortAction:
 		m.details = nil
 		m.edit = nil
@@ -88,7 +94,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
 		case "r":
-			cmd = tea.Batch(m.discoverKeylights(), toast.CreateInfoToastAction("Keylight list reloaded"))
+			cmd = tea.Batch(m.reloadKeylights(), toast.CreateInfoToastAction("Keylight list reloaded"))
 		default:
 			cmd = m.updateChilds(msg)
 		}
@@ -139,9 +145,16 @@ func (m Model) View() string {
 	return fmt.Sprintf("%s\n%s", component, m.toast.View())
 }
 
-func (m *Model) discoverKeylights() tea.Cmd {
+func (m *Model) init() tea.Cmd {
 	return func() tea.Msg {
 		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		return initMsg{}
+	}
+}
+
+func (m *Model) reloadKeylights() tea.Cmd {
+	return func() tea.Msg {
+		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
+		return reloadKeylights{}
 	}
 }

@@ -117,3 +117,13 @@ func (control *KeylightControl) UpdateKeylight(keylightMetadata KeylightMetadata
 	return updatedKeylight, nil
 
 }
+
+func (control *KeylightControl) RemoveKeylight(id int) (*Keylight, error) {
+	newKeylights, removedKeylight := RemoveKeylight(control.keylights, id)
+	err := control.store.Save(newKeylights)
+	if err != nil {
+		return nil, err
+	}
+	control.keylights = newKeylights
+	return removedKeylight, err
+}

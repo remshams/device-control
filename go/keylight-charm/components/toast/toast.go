@@ -20,7 +20,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.toast = msg
 	case WarningToast:
 		m.toast = msg
-	default:
+	case tea.KeyMsg:
 		m.toast = nil
 	}
 	return m, nil

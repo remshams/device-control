@@ -8,9 +8,11 @@ import (
 	"keylight-charm/pages/keylight/details"
 	"keylight-charm/pages/keylight/edit"
 	"keylight-charm/pages/keylight/list"
+	"keylight-charm/styles"
 	"keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type viewState string
@@ -138,7 +140,8 @@ func (m Model) View() string {
 		return "Error"
 	}
 
-	return fmt.Sprintf("%s\n%s", component, m.toast.View())
+	styles := lipgloss.NewStyle().PaddingTop(styles.Padding)
+	return fmt.Sprintf("%s\n%s", component, styles.Render(m.toast.View()))
 }
 
 func (m *Model) init() tea.Cmd {

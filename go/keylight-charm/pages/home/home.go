@@ -63,7 +63,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
-		cmd = toast.CreateInfoToastAction("Keylights relaoded")
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
 		m.details = &keylightDetails

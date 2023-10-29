@@ -18,9 +18,20 @@ import (
 type state string
 
 const (
-	navigate state = "view"
-	insert         = "edit"
+	navigate state = "navigate"
+	insert         = "insert"
 )
+
+func (state state) String() string {
+	switch state {
+	case navigate:
+		return "navigate"
+	case insert:
+		return "insert"
+	default:
+		return ""
+	}
+}
 
 type Model struct {
 	keylight       *control.Keylight
@@ -154,7 +165,14 @@ func (m *Model) updateKeylight() tea.Cmd {
 
 func (m Model) View() string {
 	style := lipgloss.NewStyle().PaddingBottom(styles.Padding)
-	return fmt.Sprintf("%s\n%s\n%s\n%s", style.Render(m.renderHeadline()), style.Render(m.renderLine("Name", m.name.View())), style.Render(m.renderLine("Ip", m.ip.View())), m.renderLine("Port", m.port.View()))
+	return fmt.Sprintf(
+		"%s\n%s\n%s\n%s\n%s",
+		style.Render(m.renderHeadline()),
+		style.Render(m.renderLine("Name", m.name.View())),
+		style.Render(m.renderLine("Ip", m.ip.View())),
+		style.Render(m.renderLine("Port", m.port.View())),
+		m.renderMode(),
+	)
 }
 
 func (m Model) renderHeadline() string {
@@ -173,4 +191,8 @@ func (m Model) renderHeadline() string {
 
 func (m *Model) renderLine(label string, value string) string {
 	return fmt.Sprintf("%s %s", label, value)
+}
+
+func (m *Model) renderMode() string {
+	return fmt.Sprintf("%s%s", styles.TextInfoColor.Render("Mode: "), styles.TextInfoColor.Render(m.state.String()))
 }

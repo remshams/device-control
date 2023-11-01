@@ -64,6 +64,10 @@ type BridgesJsonStore struct {
 	FilePath string
 }
 
+func InitBridgesJsonStore() BridgesJsonStore {
+	return BridgesJsonStore{}
+}
+
 func (store BridgesJsonStore) Save(bridges []Bridge) error {
 	bridgeJson, err := jsonFromBridges(bridges)
 	if err != nil {

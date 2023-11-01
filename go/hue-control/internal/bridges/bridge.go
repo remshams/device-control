@@ -1,8 +1,8 @@
 package bridges
 
 type BridgesStore interface {
-	Save(bridge Bridge) error
-	Load() (*Bridge, error)
+	Save(bridges []Bridge) error
+	Load() ([]Bridge, error)
 }
 
 type Bridge struct {

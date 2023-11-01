@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"hue-control/internal/bridges"
 	"io"
+	"net"
 	"net/http"
 	"time"
 
@@ -31,17 +31,18 @@ func (groupDto GroupDto) toGroup(id string) Group {
 }
 
 type GroupHttpAdapter struct {
-	bridge bridges.Bridge
+	ip     net.IP
+	apiKey string
 }
 
-func InitGroupHttpAdapter(bridge bridges.Bridge) GroupHttpAdapter {
-	return GroupHttpAdapter{bridge}
+func InitGroupHttpAdapter(ip net.IP, apiKey string) GroupHttpAdapter {
+	return GroupHttpAdapter{ip, apiKey}
 }
 
 func (adapter GroupHttpAdapter) All() ([]Group, error) {
 	req, client, cancel, err := adapter.requestWithTimeout(
 		http.MethodGet,
-		fmt.Sprintf(path, adapter.bridge.GetIp(), adapter.bridge.GetApiKey()),
+		fmt.Sprintf(path, adapter.ip, adapter.apiKey),
 		nil,
 		nil,
 	)

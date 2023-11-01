@@ -1,6 +1,9 @@
 package bridges
 
-import "net"
+import (
+	"hue-control/internal/groups"
+	"net"
+)
 
 type BridgesStore interface {
 	Save(bridges []Bridge) error
@@ -8,18 +11,28 @@ type BridgesStore interface {
 }
 
 type Bridge struct {
-	ip     net.IP
-	apiKey string
-}
-
-func (bridge Bridge) GetIp() net.IP {
-	return bridge.ip
-}
-
-func (bridge Bridge) GetApiKey() string {
-	return bridge.apiKey
+	groupAdapter groups.GroupAdapter
+	ip           net.IP
+	apiKey       string
+	groups       []groups.Group
 }
 
 func InitBridge(ip net.IP, apiKey string) Bridge {
-	return Bridge{ip: ip, apiKey: apiKey}
+	return Bridge{
+		ip:           ip,
+		apiKey:       apiKey,
+		groupAdapter: groups.InitGroupHttpAdapter(ip, apiKey),
+	}
+}
+
+func (bridge *Bridge) LoadGroups() error {
+	groups, err := bridge.groupAdapter.All()
+	if err == nil {
+		bridge.groups = groups
+	}
+	return nil
+}
+
+func (bridge Bridge) GetGroups() []groups.Group {
+	return bridge.groups
 }

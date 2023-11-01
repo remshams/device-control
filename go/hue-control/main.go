@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"hue-control/internal/bridges"
+	"hue-control/internal/groups"
 	"net"
 	"os"
 	"path/filepath"
@@ -23,7 +24,9 @@ func main() {
 	zerolog.SetGlobalLevel(logLevel)
 	var store bridges.BridgesStore
 	store = bridges.BridgesJsonStore{FilePath: filepath.Join(home, fmt.Sprintf(".config/bridges/%s", bridgesFileName))}
-	store.Save([]bridges.Bridge{bridges.InitBridge(net.ParseIP("192.168.2.1"), "My key")})
-	bridges, err := store.Load()
-	fmt.Println(bridges)
+	bridge := bridges.InitBridge(net.ParseIP("192.168.1.108"), "baWMkZuQianzULbq5Z5d4pp-F9g4ECDiHYzJBiGR")
+	store.Save([]bridges.Bridge{bridge})
+	var groupAdapter groups.GroupAdapter
+	groupAdapter = groups.InitGroupHttpAdapter(bridge)
+	fmt.Println(groupAdapter.All())
 }

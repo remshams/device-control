@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"hue-control/internal/account"
+	"hue-control/internal/bridges"
 	"os"
 	"path/filepath"
 
@@ -10,16 +10,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var bridgesFileName = "bridges.json"
+
 func main() {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		home = "account.json"
+		home = bridgesFileName
 	}
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	logLevel, err := zerolog.ParseLevel(os.Getenv("LOG_LEVEL"))
 	zerolog.SetGlobalLevel(logLevel)
-	store := account.AccountJsonStore{FilePath: filepath.Join(home, ".config/account/account.json")}
-	store.Save(account.InitAccount("My api key"))
-	account, err := store.Load()
-	fmt.Println(account)
+	var store bridges.BridgesStore
+	store = bridges.BridgesJsonStore{FilePath: filepath.Join(home, fmt.Sprintf(".config/bridges/%s", bridgesFileName))}
+	store.Save(bridges.InitBridge("My key"))
+	bridge, err := store.Load()
+	fmt.Println(bridge)
 }

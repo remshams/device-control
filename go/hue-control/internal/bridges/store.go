@@ -2,6 +2,7 @@ package bridges
 
 import (
 	"encoding/json"
+	"net"
 	"os"
 	"path/filepath"
 
@@ -9,15 +10,17 @@ import (
 )
 
 type BridgeDto struct {
+	IP     net.IP
 	ApiKey string
 }
 
 func (bridgeDto BridgeDto) toBridge() Bridge {
-	return InitBridge(bridgeDto.ApiKey)
+	return InitBridge(bridgeDto.IP, bridgeDto.ApiKey)
 }
 
 func dtoFromBridge(bridge Bridge) BridgeDto {
 	return BridgeDto{
+		IP:     bridge.ip,
 		ApiKey: bridge.apiKey,
 	}
 }

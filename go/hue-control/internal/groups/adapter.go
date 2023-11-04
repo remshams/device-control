@@ -23,11 +23,7 @@ type GroupDto struct {
 }
 
 func (groupDto GroupDto) toGroup(id string) Group {
-	return Group{
-		id:     id,
-		name:   groupDto.Name,
-		lights: groupDto.Lights,
-	}
+	return InitGroup(id, groupDto.Name, groupDto.Lights)
 }
 
 type GroupHttpAdapter struct {

@@ -5,9 +5,19 @@ type GroupAdapter interface {
 }
 
 type Group struct {
-	id     string
-	name   string
-	lights []string
+	id        string
+	name      string
+	lights    []string
+	connected bool
+}
+
+func InitGroup(id string, name string, lights []string) Group {
+	return Group{
+		id,
+		name,
+		lights,
+		true,
+	}
 }
 
 func (group Group) GetId() string {
@@ -16,4 +26,8 @@ func (group Group) GetId() string {
 
 func (group Group) GetName() string {
 	return group.name
+}
+
+func (group Group) GetConnected() bool {
+	return group.connected
 }

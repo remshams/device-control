@@ -23,9 +23,10 @@ func InitKeylightAdapter() KeylightAdapter {
 		&control.KeylightRestAdapter{},
 		&control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")},
 	)
+	store := hue_control.InitBridgesJsonStore(filepath.Join(home, ".config/bridges/bridges.json"))
 	return KeylightAdapter{
 		KeylightControl: keylightAdapter,
-		HueControl:      hue_control.InitHueControl(nil),
+		HueControl:      hue_control.InitHueControl(store),
 	}
 }
 

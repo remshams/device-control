@@ -9,14 +9,10 @@ import (
 type Group = groups.Group
 type Control = control.HueControl
 
-func InitHueControl(bridgesStore *bridges.BridgesStore) control.HueControl {
-	if bridgesStore != nil {
-		return control.InitHueControl(*bridgesStore)
-	} else {
-		return control.InitHueControl(bridges.InitBridgesJsonStore())
-	}
+func InitHueControl(bridgesStore bridges.BridgesStore) control.HueControl {
+	return control.InitHueControl(bridgesStore)
 }
 
-func InitBridgesJsonStore() bridges.BridgesJsonStore {
-	return bridges.InitBridgesJsonStore()
+func InitBridgesJsonStore(filePath string) bridges.BridgesJsonStore {
+	return bridges.InitBridgesJsonStore(filePath)
 }

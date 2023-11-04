@@ -11,7 +11,7 @@ type KeylightAdapter struct {
 	KeylightControl control.KeylightControl
 }
 
-func NewKeylightAdapter() KeylightAdapter {
+func InitKeylightAdapter() KeylightAdapter {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		home = "keylight.json"

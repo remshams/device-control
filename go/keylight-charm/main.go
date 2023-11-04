@@ -19,7 +19,7 @@ func main() {
 		logLevel = zerolog.Disabled
 	}
 	zerolog.SetGlobalLevel(logLevel)
-	keylightAdapter := keylight.NewKeylightAdapter()
+	keylightAdapter := keylight.InitKeylightAdapter()
 	p := tea.NewProgram(home.InitModel(&keylightAdapter))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)

@@ -1,6 +1,9 @@
 package control
 
-import "hue-control/internal/bridges"
+import (
+	"github.com/rs/zerolog/log"
+	"hue-control/internal/bridges"
+)
 
 type HueControl struct {
 	store   bridges.BridgesStore
@@ -18,10 +21,23 @@ func (hueControl *HueControl) LoadOrFindBridges() error {
 	bridges, err := hueControl.store.Load()
 	if err == nil {
 		hueControl.bridges = bridges
+		err = hueControl.loadBridgeGroups()
 		return err
 	} else {
 		return err
 	}
+}
+
+func (hueControl HueControl) loadBridgeGroups() error {
+	var err error
+	for i := range hueControl.bridges {
+		bridge := &hueControl.bridges[i]
+		err = bridge.LoadGroups()
+	}
+	if err != nil {
+		log.Error().Msg("Failed to load bridge groups")
+	}
+	return err
 }
 
 func (control HueControl) GetBridges() []bridges.Bridge {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	hue_control "hue-control/pubilc"
 	"keylight-charm/components/toast"
-	"keylight-charm/keylight"
+	"keylight-charm/lights/keylight"
 	"keylight-charm/pages/keylight"
 	"keylight-charm/pages/keylight/details"
 	"keylight-charm/pages/keylight/edit"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"keylight-charm/keylight"
+	"keylight-charm/lights/keylight"
 	"keylight-charm/pages/home"
 
 	"os"

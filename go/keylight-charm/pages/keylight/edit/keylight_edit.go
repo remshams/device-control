@@ -3,7 +3,7 @@ package keylight_edit
 import (
 	"fmt"
 	"keylight-charm/components/toast"
-	"keylight-charm/keylight"
+	"keylight-charm/lights/keylight"
 	pages_keylight "keylight-charm/pages/keylight"
 	"keylight-charm/styles"
 	"keylight-control/control"

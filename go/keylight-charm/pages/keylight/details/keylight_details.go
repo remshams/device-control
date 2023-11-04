@@ -2,7 +2,7 @@ package keylight_details
 
 import (
 	"fmt"
-	"keylight-charm/keylight"
+	"keylight-charm/lights/keylight"
 	pages_keylight "keylight-charm/pages/keylight"
 	keylight_content "keylight-charm/pages/keylight/details/content"
 	keylight_footer "keylight-charm/pages/keylight/details/footer"

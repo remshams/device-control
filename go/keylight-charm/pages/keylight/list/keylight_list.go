@@ -2,7 +2,7 @@ package keylight_list
 
 import (
 	"keylight-charm/components/toast"
-	"keylight-charm/keylight"
+	"keylight-charm/lights/keylight"
 	"keylight-charm/utils"
 	"keylight-control/control"
 	"strconv"

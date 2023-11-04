@@ -5,7 +5,7 @@ import (
 	"keylight-charm/components/checkbox"
 	"keylight-charm/components/textinput"
 	"keylight-charm/components/toast"
-	"keylight-charm/keylight"
+	"keylight-charm/lights/keylight"
 	"keylight-charm/pages/keylight/details/model"
 	"keylight-charm/styles"
 	"keylight-control/control"

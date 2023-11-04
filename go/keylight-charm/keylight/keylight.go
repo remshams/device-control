@@ -8,7 +8,7 @@ import (
 )
 
 type KeylightAdapter struct {
-	Control control.KeylightControl
+	KeylightControl control.KeylightControl
 }
 
 func NewKeylightAdapter() KeylightAdapter {
@@ -18,23 +18,23 @@ func NewKeylightAdapter() KeylightAdapter {
 	}
 
 	keylightAdapter := control.New(&control.ZeroConfKeylightFinder{}, &control.KeylightRestAdapter{}, &control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")})
-	return KeylightAdapter{Control: keylightAdapter}
+	return KeylightAdapter{KeylightControl: keylightAdapter}
 }
 
 func (keylightAdapter *KeylightAdapter) SendCommand(id int, on bool, brightness string, temperature string) error {
 	convertedBrightness, err := strconv.Atoi(brightness)
 	convertedTemperature, err := strconv.Atoi(temperature)
 	convertedTemperature = keylightAdapter.normalizeTemperature(convertedTemperature)
-	err = keylightAdapter.Control.SendKeylightCommand(control.KeylightCommand{Id: id, Command: control.LightCommand{On: &on, Brightness: &convertedBrightness, Temperature: &convertedTemperature}})
+	err = keylightAdapter.KeylightControl.SendKeylightCommand(control.KeylightCommand{Id: id, Command: control.LightCommand{On: &on, Brightness: &convertedBrightness, Temperature: &convertedTemperature}})
 	return err
 }
 
 func (keylightAdapter *KeylightAdapter) UpdateKeylight(keylightMetadata control.KeylightMetadata) (control.Keylight, error) {
-	return keylightAdapter.Control.UpdateKeylight(keylightMetadata)
+	return keylightAdapter.KeylightControl.UpdateKeylight(keylightMetadata)
 }
 
 func (keylightAdapter *KeylightAdapter) RemoveKeylight(id int) (*control.Keylight, error) {
-	return keylightAdapter.Control.RemoveKeylight(id)
+	return keylightAdapter.KeylightControl.RemoveKeylight(id)
 }
 
 func (keylightAdapter *KeylightAdapter) normalizeTemperature(temperature int) int {

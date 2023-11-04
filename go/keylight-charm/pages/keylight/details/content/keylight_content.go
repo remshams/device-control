@@ -166,7 +166,7 @@ func (m *Model) sendCommand() tea.Cmd {
 }
 
 func (m *Model) updateKeylight() {
-	keylight := m.keylightAdapter.Control.KeylightWithId(0)
+	keylight := m.keylightAdapter.KeylightControl.KeylightWithId(0)
 	keylight.LoadLights()
 	if keylight == nil {
 		log.Error().Msg("No keylight found")

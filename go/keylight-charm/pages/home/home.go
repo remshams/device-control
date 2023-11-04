@@ -2,9 +2,10 @@ package home
 
 import (
 	"fmt"
+	hue_control "hue-control/pubilc"
 	"keylight-charm/components/toast"
 	"keylight-charm/keylight"
-	pages_keylight "keylight-charm/pages/keylight"
+	"keylight-charm/pages/keylight"
 	"keylight-charm/pages/keylight/details"
 	"keylight-charm/pages/keylight/edit"
 	"keylight-charm/pages/keylight/list"
@@ -31,6 +32,7 @@ type Model struct {
 	keylightAdapter *keylight.KeylightAdapter
 	state           viewState
 	keylights       []control.Keylight
+	hueGroups       []hue_control.Group
 	list            keylight_list.Model
 	details         *keylight_details.Model
 	edit            *keylight_edit.Model
@@ -56,12 +58,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.toast, _ = m.toast.Update(msg)
 	switch msg := msg.(type) {
 	case initMsg:
-		m.keylights = m.keylightAdapter.Control.Keylights()
+		m.keylights = m.keylightAdapter.KeylightControl.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
 	case pages_keylight.ReloadKeylights:
-		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
-		m.keylights = m.keylightAdapter.Control.Keylights()
+		m.keylightAdapter.KeylightControl.LoadOrDiscoverKeylights()
+		m.keylights = m.keylightAdapter.KeylightControl.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
@@ -145,7 +147,7 @@ func (m Model) View() string {
 
 func (m *Model) init() tea.Cmd {
 	return func() tea.Msg {
-		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
+		m.keylightAdapter.KeylightControl.LoadOrDiscoverKeylights()
 		return initMsg{}
 	}
 }

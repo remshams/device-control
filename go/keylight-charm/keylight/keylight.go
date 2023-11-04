@@ -1,6 +1,7 @@
 package keylight
 
 import (
+	hue_control "hue-control/pubilc"
 	"keylight-control/control"
 	"os"
 	"path/filepath"
@@ -9,16 +10,23 @@ import (
 
 type KeylightAdapter struct {
 	KeylightControl control.KeylightControl
+	HueControl      hue_control.Control
 }
 
 func InitKeylightAdapter() KeylightAdapter {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		home = "keylight.json"
+		home = ""
 	}
-
-	keylightAdapter := control.New(&control.ZeroConfKeylightFinder{}, &control.KeylightRestAdapter{}, &control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")})
-	return KeylightAdapter{KeylightControl: keylightAdapter}
+	keylightAdapter := control.New(
+		&control.ZeroConfKeylightFinder{},
+		&control.KeylightRestAdapter{},
+		&control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")},
+	)
+	return KeylightAdapter{
+		KeylightControl: keylightAdapter,
+		HueControl:      hue_control.InitHueControl(nil),
+	}
 }
 
 func (keylightAdapter *KeylightAdapter) SendCommand(id int, on bool, brightness string, temperature string) error {

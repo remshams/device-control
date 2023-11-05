@@ -2,6 +2,7 @@ package home
 
 import (
 	"keylight-charm/lights/keylight"
+	hue_home "keylight-charm/pages/hue"
 	keylight_home "keylight-charm/pages/keylight/home"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -35,6 +36,7 @@ const (
 
 type Model struct {
 	keylight keylight_home.Model
+	hue      hue_home.Model
 	menu     list.Model
 	state    viewState
 }
@@ -42,13 +44,14 @@ type Model struct {
 func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
 	return Model{
 		keylight: keylight_home.InitModel(keylightAdapter),
+		hue:      hue_home.InitModel(),
 		menu:     createMenu(),
 		state:    menu,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.keylight.Init()
+	return nil
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -58,6 +61,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = m.processMenuUpdate(msg)
 	case keylights:
 		cmd = m.processKeylightsUpdate(msg)
+	case hue:
+		cmd = m.processHueUpate(msg)
 	}
 	return m, cmd
 }
@@ -73,8 +78,12 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 		case menu:
 			switch msg.String() {
 			case "enter":
-				m.state = keylights
-				cmd = m.keylight.Init()
+				if m.menu.Index() == 0 {
+					m.state = keylights
+					cmd = m.keylight.Init()
+				} else {
+					m.state = hue
+				}
 			default:
 				m.menu, cmd = m.menu.Update(msg)
 			}
@@ -101,12 +110,30 @@ func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
+func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			m.state = menu
+		default:
+			m.hue, cmd = m.hue.Update(msg)
+		}
+	default:
+		m.hue, cmd = m.hue.Update(msg)
+	}
+	return cmd
+}
+
 func (m Model) View() string {
 	switch m.state {
 	case menu:
 		return menuStyle.Render(m.menu.View())
 	case keylights:
 		return m.keylight.View()
+	case hue:
+		return m.hue.View()
 	default:
 		return ""
 	}

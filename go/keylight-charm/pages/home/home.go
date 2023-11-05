@@ -58,12 +58,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.toast, _ = m.toast.Update(msg)
 	switch msg := msg.(type) {
 	case initMsg:
-		m.keylights = m.keylightAdapter.KeylightControl.Keylights()
+		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 		m.state = list
 	case pages_keylight.ReloadKeylights:
-		m.keylightAdapter.KeylightControl.LoadOrDiscoverKeylights()
-		m.keylights = m.keylightAdapter.KeylightControl.Keylights()
+		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
+		m.keylights = m.keylightAdapter.Control.Keylights()
 		m.list = keylight_list.InitModel(m.keylightAdapter, m.keylights)
 	case keylight_list.SelectedKeylight:
 		keylightDetails := keylight_details.InitModel(msg.Keylight, m.keylightAdapter)
@@ -147,7 +147,7 @@ func (m Model) View() string {
 
 func (m *Model) init() tea.Cmd {
 	return func() tea.Msg {
-		m.keylightAdapter.KeylightControl.LoadOrDiscoverKeylights()
+		m.keylightAdapter.Control.LoadOrDiscoverKeylights()
 		return initMsg{}
 	}
 }

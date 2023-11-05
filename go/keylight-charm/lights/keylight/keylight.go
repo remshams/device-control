@@ -1,7 +1,6 @@
 package keylight
 
 import (
-	hue_control "hue-control/pubilc"
 	"keylight-control/control"
 	"os"
 	"path/filepath"
@@ -10,7 +9,6 @@ import (
 
 type KeylightAdapter struct {
 	KeylightControl control.KeylightControl
-	HueControl      hue_control.Control
 }
 
 func InitKeylightAdapter() KeylightAdapter {
@@ -23,10 +21,8 @@ func InitKeylightAdapter() KeylightAdapter {
 		&control.KeylightRestAdapter{},
 		&control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")},
 	)
-	store := hue_control.InitBridgesJsonStore(filepath.Join(home, ".config/bridges/bridges.json"))
 	return KeylightAdapter{
 		KeylightControl: keylightAdapter,
-		HueControl:      hue_control.InitHueControl(store),
 	}
 }
 

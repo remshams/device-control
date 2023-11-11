@@ -7,7 +7,7 @@ import (
 )
 
 type HueAdapter struct {
-	control hue_control.Control
+	Control hue_control.Control
 }
 
 func InitHueAdapter() HueAdapter {
@@ -17,6 +17,6 @@ func InitHueAdapter() HueAdapter {
 	}
 	store := hue_control.InitBridgesJsonStore(filepath.Join(home, ".config/bridges/bridges.json"))
 	return HueAdapter{
-		control: hue_control.InitHueControl(store),
+		Control: hue_control.InitHueControl(store),
 	}
 }

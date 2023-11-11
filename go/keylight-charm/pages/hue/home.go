@@ -1,17 +1,50 @@
 package hue_home
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"fmt"
+	hue_control "hue-control/pubilc"
+	"keylight-charm/lights/hue"
 
-type Model struct{}
+	tea "github.com/charmbracelet/bubbletea"
+)
 
-func InitModel() Model {
-	return Model{}
+type initMsg struct {
+	Bridges []hue_control.Bridge
 }
 
-func (m Model) Update(mgs tea.Msg) (Model, tea.Cmd) {
+type Model struct {
+	adapter *hue.HueAdapter
+	bridges []hue_control.Bridge
+}
+
+func InitModel(adapter *hue.HueAdapter) Model {
+	return Model{
+		adapter: adapter,
+		bridges: []hue_control.Bridge{},
+	}
+}
+
+func (m Model) Init() tea.Cmd {
+	return m.init()
+}
+
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case initMsg:
+		m.bridges = msg.Bridges
+	}
 	return m, nil
 }
 
 func (m Model) View() string {
-	return "HueLights"
+	return fmt.Sprintf("HueLights: %d", len(m.bridges))
+}
+
+func (m *Model) init() tea.Cmd {
+	return func() tea.Msg {
+		m.adapter.Control.LoadOrFindBridges()
+		return initMsg{
+			Bridges: m.adapter.Control.GetBridges(),
+		}
+	}
 }

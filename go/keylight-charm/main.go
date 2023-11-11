@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"keylight-charm/lights/hue"
 	"keylight-charm/lights/keylight"
 	"keylight-charm/pages/home"
 
@@ -20,7 +21,8 @@ func main() {
 	}
 	zerolog.SetGlobalLevel(logLevel)
 	keylightAdapter := keylight.InitKeylightAdapter()
-	p := tea.NewProgram(home.InitModel(&keylightAdapter))
+	hueAdapter := hue.InitHueAdapter()
+	p := tea.NewProgram(home.InitModel(&keylightAdapter, &hueAdapter))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

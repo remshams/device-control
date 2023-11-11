@@ -1,6 +1,7 @@
 package home
 
 import (
+	"keylight-charm/lights/hue"
 	"keylight-charm/lights/keylight"
 	hue_home "keylight-charm/pages/hue"
 	keylight_home "keylight-charm/pages/keylight/home"
@@ -31,7 +32,7 @@ type viewState string
 const (
 	menu      viewState = "menu"
 	keylights viewState = "keylights"
-	hue       viewState = "hue"
+	hueLights viewState = "hueLights"
 )
 
 type Model struct {
@@ -41,10 +42,10 @@ type Model struct {
 	state    viewState
 }
 
-func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
+func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter) Model {
 	return Model{
 		keylight: keylight_home.InitModel(keylightAdapter),
-		hue:      hue_home.InitModel(),
+		hue:      hue_home.InitModel(hueAdapter),
 		menu:     createMenu(),
 		state:    menu,
 	}
@@ -61,7 +62,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = m.processMenuUpdate(msg)
 	case keylights:
 		cmd = m.processKeylightsUpdate(msg)
-	case hue:
+	case hueLights:
 		cmd = m.processHueUpate(msg)
 	}
 	return m, cmd
@@ -82,7 +83,8 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 					m.state = keylights
 					cmd = m.keylight.Init()
 				} else {
-					m.state = hue
+					m.state = hueLights
+					cmd = m.hue.Init()
 				}
 			default:
 				m.menu, cmd = m.menu.Update(msg)
@@ -132,7 +134,7 @@ func (m Model) View() string {
 		return menuStyle.Render(m.menu.View())
 	case keylights:
 		return m.keylight.View()
-	case hue:
+	case hueLights:
 		return m.hue.View()
 	default:
 		return ""

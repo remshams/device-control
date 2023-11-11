@@ -4,16 +4,22 @@ import (
 	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/lights/hue"
+	hue_group_details "keylight-charm/pages/hue/groups/details"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type GroupSelect struct {
+	Group hue_control.Group
+}
+
 type Model struct {
 	adapter *hue.HueAdapter
 	bridges []hue_control.Bridge
 	table   table.Model
+	details hue_group_details.Model
 }
 
 func InitModel(adapter *hue.HueAdapter, bridges []hue_control.Bridge) Model {
@@ -25,7 +31,15 @@ func InitModel(adapter *hue.HueAdapter, bridges []hue_control.Bridge) Model {
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
-	return m, nil
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "enter":
+			cmd = m.selectGroup(m.table.SelectedRow()[0])
+		}
+	}
+	return m, cmd
 }
 
 func (m Model) View() string {
@@ -55,4 +69,20 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 		}
 	}
 	return kl_table.CreateTable(columns, rows)
+}
+
+func (m *Model) selectGroup(id string) tea.Cmd {
+	return func() tea.Msg {
+		var selectedGroup hue_control.Group
+		for _, bridge := range m.bridges {
+			for _, group := range bridge.GetGroups() {
+				if group.GetId() == id {
+					selectedGroup = group
+				}
+			}
+		}
+		return GroupSelect{
+			Group: selectedGroup,
+		}
+	}
 }

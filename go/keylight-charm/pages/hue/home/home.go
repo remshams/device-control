@@ -1,6 +1,7 @@
 package hue_home
 
 import (
+	"fmt"
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
 	hue_group_list "keylight-charm/pages/hue/groups/list"
@@ -39,13 +40,18 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
 		m.bridges = msg.Bridges
 		m.list = hue_group_list.InitModel(m.adapter, msg.Bridges)
 		m.state = list
+	case hue_group_list.GroupSelect:
+		fmt.Println(msg.Group.GetId())
+	default:
+		m.list, cmd = m.list.Update(msg)
 	}
-	return m, nil
+	return m, cmd
 }
 
 func (m Model) View() string {

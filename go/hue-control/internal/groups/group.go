@@ -31,3 +31,7 @@ func (group Group) GetName() string {
 func (group Group) GetConnected() bool {
 	return group.connected
 }
+
+func (group Group) GetLightIds() []string {
+	return group.lights
+}

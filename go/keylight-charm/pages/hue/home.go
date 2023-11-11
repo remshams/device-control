@@ -1,7 +1,6 @@
 package hue_home
 
 import (
-	"fmt"
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
 	hue_list "keylight-charm/pages/hue/list"
@@ -43,7 +42,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case initMsg:
 		m.bridges = msg.Bridges
-		m.list = hue_list.InitModel(m.adapter)
+		m.list = hue_list.InitModel(m.adapter, msg.Bridges)
 		m.state = list
 	}
 	return m, nil
@@ -55,8 +54,9 @@ func (m Model) View() string {
 		return "Loading..."
 	case list:
 		return m.list.View()
+	default:
+		return ""
 	}
-	return fmt.Sprintf("HueLights: %d", len(m.bridges))
 }
 
 func (m *Model) init() tea.Cmd {

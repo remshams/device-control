@@ -78,6 +78,8 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 		switch m.state {
 		case menu:
 			switch msg.String() {
+			case "ctrl+c", "q":
+				cmd = tea.Quit
 			case "enter":
 				if m.menu.Index() == 0 {
 					m.state = keylights
@@ -101,6 +103,8 @@ func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "ctrl+c", "q":
+			cmd = tea.Quit
 		case "esc":
 			m.state = menu
 		default:
@@ -117,6 +121,8 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "ctrl+c", "q":
+			cmd = tea.Quit
 		case "esc":
 			m.state = menu
 		default:

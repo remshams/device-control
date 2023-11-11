@@ -90,13 +90,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.details = nil
 		m.edit = nil
 		m.state = list
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			cmd = tea.Quit
-		default:
-			cmd = m.updateChilds(msg)
-		}
 	default:
 		cmd = m.updateChilds(msg)
 	}

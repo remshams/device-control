@@ -3,7 +3,7 @@ package home
 import (
 	"keylight-charm/lights/hue"
 	"keylight-charm/lights/keylight"
-	hue_home "keylight-charm/pages/hue"
+	hue_home "keylight-charm/pages/hue/home"
 	keylight_home "keylight-charm/pages/keylight/home"
 
 	"github.com/charmbracelet/bubbles/list"

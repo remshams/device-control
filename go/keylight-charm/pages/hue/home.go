@@ -3,7 +3,7 @@ package hue_home
 import (
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
-	hue_list "keylight-charm/pages/hue/list"
+	hue_group_list "keylight-charm/pages/hue/groups/list"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -23,7 +23,7 @@ type Model struct {
 	adapter *hue.HueAdapter
 	bridges []hue_control.Bridge
 	state   viewState
-	list    hue_list.Model
+	list    hue_group_list.Model
 }
 
 func InitModel(adapter *hue.HueAdapter) Model {
@@ -42,7 +42,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case initMsg:
 		m.bridges = msg.Bridges
-		m.list = hue_list.InitModel(m.adapter, msg.Bridges)
+		m.list = hue_group_list.InitModel(m.adapter, msg.Bridges)
 		m.state = list
 	}
 	return m, nil

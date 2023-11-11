@@ -1,4 +1,4 @@
-package hue_list
+package hue_group_list
 
 import (
 	hue_control "hue-control/pubilc"

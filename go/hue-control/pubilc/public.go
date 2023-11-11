@@ -6,6 +6,7 @@ import (
 	"hue-control/internal/groups"
 )
 
+type Bridge = bridges.Bridge
 type Group = groups.Group
 type Control = control.HueControl
 

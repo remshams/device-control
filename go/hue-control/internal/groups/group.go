@@ -9,14 +9,16 @@ type Group struct {
 	name      string
 	lights    []string
 	connected bool
+	on        bool
 }
 
-func InitGroup(id string, name string, lights []string) Group {
+func InitGroup(id string, name string, lights []string, on bool) Group {
 	return Group{
 		id,
 		name,
 		lights,
 		true,
+		on,
 	}
 }
 
@@ -34,4 +36,8 @@ func (group Group) GetConnected() bool {
 
 func (group Group) GetLightIds() []string {
 	return group.lights
+}
+
+func (group Group) GetOn() bool {
+	return group.on
 }

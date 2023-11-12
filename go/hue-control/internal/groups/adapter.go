@@ -15,15 +15,26 @@ import (
 
 const path = "http://%s/api/%s/groups"
 
+type GroupStateDto struct {
+	All_on bool
+	Any_on bool
+}
+
 type GroupDtoById = map[string]GroupDto
 
 type GroupDto struct {
 	Name   string
 	Lights []string
+	State  GroupStateDto
 }
 
 func (groupDto GroupDto) toGroup(id string) Group {
-	return InitGroup(id, groupDto.Name, groupDto.Lights)
+	return InitGroup(
+		id,
+		groupDto.Name,
+		groupDto.Lights,
+		groupDto.State.All_on,
+	)
 }
 
 type GroupHttpAdapter struct {

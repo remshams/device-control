@@ -3,6 +3,7 @@ package hue_home
 import (
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
+	pages_hue "keylight-charm/pages/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
 	hue_group_details "keylight-charm/pages/hue/groups/details"
 	hue_group_list "keylight-charm/pages/hue/groups/list"
@@ -18,9 +19,7 @@ const (
 	details viewState = "details"
 )
 
-type initMsg struct {
-	Bridges []hue_control.Bridge
-}
+type initMsg struct{}
 
 type Model struct {
 	adapter *hue.HueAdapter
@@ -46,11 +45,15 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
-		m.bridges = msg.Bridges
-		m.list = hue_group_list.InitModel(m.adapter, msg.Bridges)
+		m.reloadLights()
+		m.bridges = m.adapter.Control.GetBridges()
+		m.list = hue_group_list.InitModel(m.adapter, m.bridges)
 		m.state = list
+	case pages_hue.ReloadBridgesAction:
+		m.reloadLights()
 	case hue_group_list.GroupSelect:
-		m.details = hue_group_details.InitModel(m.adapter, msg.Group)
+		m.reloadLights()
+		m.details = hue_group_details.InitModel(m.adapter, *m.bridges[0].FindGroup(msg.Group.GetId()))
 		m.state = details
 	case hue_groups.BackToListAction:
 		m.state = list
@@ -84,11 +87,13 @@ func (m Model) View() string {
 	}
 }
 
+func (m *Model) reloadLights() {
+	m.adapter.Control.LoadOrFindBridges()
+	m.bridges = m.adapter.Control.GetBridges()
+}
+
 func (m *Model) init() tea.Cmd {
 	return func() tea.Msg {
-		m.adapter.Control.LoadOrFindBridges()
-		return initMsg{
-			Bridges: m.adapter.Control.GetBridges(),
-		}
+		return initMsg{}
 	}
 }

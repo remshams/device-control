@@ -2,6 +2,7 @@ package hue_group_details
 
 import (
 	hue_control "hue-control/pubilc"
+	"keylight-charm/components/checkbox"
 	"keylight-charm/lights/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
 
@@ -11,12 +12,14 @@ import (
 type Model struct {
 	adapter *hue.HueAdapter
 	group   hue_control.Group
+	on      checkbox.Model
 }
 
 func InitModel(adapter *hue.HueAdapter, group hue_control.Group) Model {
 	return Model{
-		adapter,
-		group,
+		adapter: adapter,
+		group:   group,
+		on:      checkbox.New("On", group.GetOn()),
 	}
 }
 
@@ -33,5 +36,5 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	return "Group details"
+	return m.on.View()
 }

@@ -85,7 +85,7 @@ func (m *Model) processNavigateUpdate(msg tea.KeyMsg) tea.Cmd {
 	case "s":
 		cmd = m.updateKeylight()
 	case "esc":
-		cmd = pages_keylight.CreateBackAction()
+		cmd = pages_keylight.CreateBackToListAction()
 	}
 	m.updateChildren()
 	return cmd

@@ -86,7 +86,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	case keylight_list.ReloadKeylights:
 		cmd = pages_keylight.CreateReloadKeylights()
-	case pages_keylight.BackAction:
+	case pages_keylight.BackToListAction:
 		m.details = nil
 		m.edit = nil
 		m.state = list

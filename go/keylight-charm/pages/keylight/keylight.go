@@ -2,11 +2,11 @@ package pages_keylight
 
 import tea "github.com/charmbracelet/bubbletea"
 
-type BackAction struct{}
+type BackToListAction struct{}
 
-func CreateBackAction() tea.Cmd {
+func CreateBackToListAction() tea.Cmd {
 	return func() tea.Msg {
-		return BackAction{}
+		return BackToListAction{}
 	}
 }
 

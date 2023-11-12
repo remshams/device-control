@@ -49,7 +49,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				cmds = append(cmds, m.updateContent(msg))
 				m.state = keylight_model.Navigate
 			} else {
-				cmds = append(cmds, pages_keylight.CreateBackAction())
+				cmds = append(cmds, pages_keylight.CreateBackToListAction())
 			}
 		default:
 			cmds = append(cmds, m.updateContent(msg))

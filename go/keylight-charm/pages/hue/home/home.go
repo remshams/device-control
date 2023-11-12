@@ -1,9 +1,9 @@
 package hue_home
 
 import (
-	"fmt"
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
+	hue_group_details "keylight-charm/pages/hue/groups/details"
 	hue_group_list "keylight-charm/pages/hue/groups/list"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,6 +14,7 @@ type viewState string
 const (
 	initial viewState = "init"
 	list    viewState = "list"
+	details viewState = "details"
 )
 
 type initMsg struct {
@@ -25,6 +26,7 @@ type Model struct {
 	bridges []hue_control.Bridge
 	state   viewState
 	list    hue_group_list.Model
+	details hue_group_details.Model
 }
 
 func InitModel(adapter *hue.HueAdapter) Model {
@@ -47,7 +49,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.list = hue_group_list.InitModel(m.adapter, msg.Bridges)
 		m.state = list
 	case hue_group_list.GroupSelect:
-		fmt.Println(msg.Group.GetId())
+		m.details = hue_group_details.InitModel(m.adapter, msg.Group)
+		m.state = details
 	default:
 		m.list, cmd = m.list.Update(msg)
 	}
@@ -60,6 +63,8 @@ func (m Model) View() string {
 		return "Loading..."
 	case list:
 		return m.list.View()
+	case details:
+		return m.details.View()
 	default:
 		return ""
 	}

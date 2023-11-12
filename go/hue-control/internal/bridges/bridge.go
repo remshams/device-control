@@ -36,3 +36,12 @@ func (bridge *Bridge) LoadGroups() error {
 func (bridge Bridge) GetGroups() []groups.Group {
 	return bridge.groups
 }
+
+func (bridge Bridge) FindGroup(id string) *groups.Group {
+	for _, group := range bridge.groups {
+		if id == group.GetId() {
+			return &group
+		}
+	}
+	return nil
+}

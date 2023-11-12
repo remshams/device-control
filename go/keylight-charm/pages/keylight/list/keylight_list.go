@@ -4,6 +4,7 @@ import (
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/components/toast"
 	"keylight-charm/lights/keylight"
+	"keylight-charm/pages"
 	"keylight-charm/utils"
 	"keylight-control/control"
 	"strconv"
@@ -66,6 +67,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = m.removeKeylight(m.table.SelectedRow()[0])
 		case "r":
 			cmd = tea.Batch(m.reloadKeylights(), toast.CreateInfoToastAction("Keylights reloaded"))
+		case "esc":
+			cmd = pages.CreateBackToMenuAction()
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}

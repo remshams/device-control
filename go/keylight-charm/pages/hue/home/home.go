@@ -3,6 +3,7 @@ package hue_home
 import (
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
+	hue_groups "keylight-charm/pages/hue/groups"
 	hue_group_details "keylight-charm/pages/hue/groups/details"
 	hue_group_list "keylight-charm/pages/hue/groups/list"
 
@@ -51,10 +52,23 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case hue_group_list.GroupSelect:
 		m.details = hue_group_details.InitModel(m.adapter, msg.Group)
 		m.state = details
+	case hue_groups.BackToListAction:
+		m.state = list
 	default:
-		m.list, cmd = m.list.Update(msg)
+		cmd = m.forwardUpdate(msg)
 	}
 	return m, cmd
+}
+
+func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	switch m.state {
+	case list:
+		m.list, cmd = m.list.Update(msg)
+	case details:
+		m.details, cmd = m.details.Update(msg)
+	}
+	return cmd
 }
 
 func (m Model) View() string {

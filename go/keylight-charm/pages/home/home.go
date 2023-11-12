@@ -3,6 +3,7 @@ package home
 import (
 	"keylight-charm/lights/hue"
 	"keylight-charm/lights/keylight"
+	"keylight-charm/pages"
 	hue_home "keylight-charm/pages/hue/home"
 	keylight_home "keylight-charm/pages/keylight/home"
 
@@ -101,12 +102,12 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case pages.BackToMenuAction:
+		m.state = menu
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
-		case "esc":
-			m.state = menu
 		default:
 			m.keylight, cmd = m.keylight.Update(msg)
 		}
@@ -119,12 +120,12 @@ func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case pages.BackToMenuAction:
+		m.state = menu
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			cmd = tea.Quit
-		case "esc":
-			m.state = menu
 		default:
 			m.hue, cmd = m.hue.Update(msg)
 		}

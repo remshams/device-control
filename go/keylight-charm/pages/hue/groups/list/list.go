@@ -76,16 +76,15 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 
 func (m *Model) selectGroup(id string) tea.Cmd {
 	return func() tea.Msg {
-		var selectedGroup hue_control.Group
+		var selectedGroup *hue_control.Group
 		for _, bridge := range m.bridges {
-			for _, group := range bridge.GetGroups() {
-				if group.GetId() == id {
-					selectedGroup = group
-				}
+			selectedGroup = bridge.FindGroup(id)
+			if selectedGroup != nil {
+				break
 			}
 		}
 		return GroupSelect{
-			Group: selectedGroup,
+			Group: *selectedGroup,
 		}
 	}
 }

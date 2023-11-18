@@ -9,17 +9,21 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/charmbracelet/log"
 )
 
 func main() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	logLevel, err := zerolog.ParseLevel(os.Getenv("LOG_LEVEL"))
+	logLevel, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
 	if err != nil {
-		logLevel = zerolog.Disabled
+		logLevel = log.ErrorLevel
 	}
-	zerolog.SetGlobalLevel(logLevel)
+	log.SetLevel(logLevel)
+	f, err := tea.LogToFileWith("debug.log", "keylight-charm", log.Default())
+	if err != nil {
+		fmt.Println("fatal:", err)
+		os.Exit(1)
+	}
+	defer f.Close()
 	keylightAdapter := keylight.InitKeylightAdapter()
 	hueAdapter := hue.InitHueAdapter()
 	p := tea.NewProgram(home.InitModel(&keylightAdapter, &hueAdapter))

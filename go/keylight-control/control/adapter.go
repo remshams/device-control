@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/charmbracelet/log"
 )
 
 const path = "http://%s:%d/elgato/lights"
@@ -38,12 +38,12 @@ func (adapter *KeylightRestAdapter) Load(ip net.IP, port int) ([]Light, error) {
 		response, err = client.Do(req)
 	}
 	if err != nil || response.StatusCode >= 300 {
-		log.Error().Msg("Could not load lights")
+		log.Error("Could not load lights")
 		return nil, errors.New("Could not load lights")
 	}
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Error().Msg("Could not load lights")
+		log.Error("Could not load lights")
 		return nil, errors.New("Could not load lights")
 	}
 	defer response.Body.Close()
@@ -51,7 +51,7 @@ func (adapter *KeylightRestAdapter) Load(ip net.IP, port int) ([]Light, error) {
 	var lightResponseDto LightResponseDto
 	err = json.Unmarshal(body, &lightResponseDto)
 	if err != nil {
-		log.Error().Msg("Could not parse lights")
+		log.Error("Could not parse lights")
 		return nil, errors.New("Could not parse lights")
 	}
 	loadedLights := []Light{}
@@ -69,13 +69,13 @@ func (adapter *KeylightRestAdapter) Set(ip net.IP, port int, lights []Light) err
 	req, client, cancel, err := adapter.requestWithTimeout(http.MethodPut, fmt.Sprintf(path, ip, port), bytes.NewBuffer(requestString), nil)
 	defer cancel()
 	if err != nil {
-		log.Error().Msg("Could not update lights")
+		log.Error("Could not update lights")
 		return errors.New("Could not update lights")
 	}
 	req.Header.Add("Content-Type", "application/json")
 	res, err := client.Do(req)
 	if err != nil {
-		log.Error().Msg("Could not update lights")
+		log.Error("Could not update lights")
 		return errors.New("Could not update lights")
 	}
 	defer res.Body.Close()

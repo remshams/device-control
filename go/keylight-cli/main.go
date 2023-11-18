@@ -6,12 +6,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/charmbracelet/log"
 )
 
 func main() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	logLevel, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		logLevel = log.ErrorLevel
+	}
+	log.SetLevel(logLevel)
 	home, err := os.UserHomeDir()
 	if err != nil {
 		home = "keylight.json"
@@ -19,7 +22,6 @@ func main() {
 
 	keylightControl := control.New(&control.ZeroConfKeylightFinder{}, &control.KeylightRestAdapter{}, &control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")})
 	keylightControl.LoadOrDiscoverKeylights()
-
 	cli.AddDiscoverCommand(&keylightControl)
 	cli.AddSendCommand(&keylightControl)
 	err = cli.RootCommand.Execute()

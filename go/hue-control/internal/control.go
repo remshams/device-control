@@ -1,7 +1,7 @@
 package control
 
 import (
-	"github.com/rs/zerolog/log"
+	"github.com/charmbracelet/log"
 	"hue-control/internal/bridges"
 )
 
@@ -35,7 +35,7 @@ func (hueControl HueControl) loadBridgeGroups() error {
 		err = bridge.LoadGroups()
 	}
 	if err != nil {
-		log.Error().Msg("Failed to load bridge groups")
+		log.Error("Failed to load bridge groups")
 	}
 	return err
 }

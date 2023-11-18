@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/grandcat/zeroconf"
-	"github.com/rs/zerolog/log"
 )
 
 type ZeroConfKeylightFinder struct{}
@@ -13,7 +13,7 @@ type ZeroConfKeylightFinder struct{}
 func (finder *ZeroConfKeylightFinder) Discover(adapter KeylightAdapter, store KeylightStore) []Keylight {
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
-		log.Debug().Msgf("Failed to initialize resolver: %+v", err.Error())
+		log.Debug("Failed to initialize resolver: %+v", err.Error())
 	}
 
 	serviceEntryCh := make(chan *zeroconf.ServiceEntry)
@@ -24,7 +24,7 @@ func (finder *ZeroConfKeylightFinder) Discover(adapter KeylightAdapter, store Ke
 
 	err = resolver.Browse(ctx, "_elg._tcp", "local", serviceEntryCh)
 	if err != nil {
-		log.Debug().Msgf("Failed to browse: %+v", err.Error())
+		log.Debug("Failed to browse: %+v", err.Error())
 	}
 
 	keylights := []Keylight{}
@@ -50,7 +50,7 @@ func (finder *ZeroConfKeylightFinder) searchKeylights(serviceEntryCh chan *zeroc
 			adapter: adapter,
 			Light:   nil,
 		}
-		log.Debug().Msgf("Found keylight: %+v", keylight)
+		log.Debug("Found keylight: %+v", keylight)
 		keylightCh <- keylight
 		index += 1
 	}

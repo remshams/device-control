@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/charmbracelet/log"
 )
 
 const path = "http://%s/api/%s/groups"
@@ -59,19 +59,19 @@ func (adapter GroupHttpAdapter) All() ([]Group, error) {
 		response, err = client.Do(req)
 	}
 	if err != nil || response.StatusCode >= 300 {
-		log.Error().Msg("Could not load groups")
+		log.Error("Could not load groups")
 		return nil, errors.New("Could not load groups")
 	}
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Error().Msg("Could not load lights")
+		log.Error("Could not load lights")
 		return nil, errors.New("Could not load groups")
 	}
 	defer response.Body.Close()
 	var groupResponseDto GroupDtoById
 	err = json.Unmarshal(body, &groupResponseDto)
 	if err != nil {
-		log.Error().Msg("Could not parse groups")
+		log.Error("Could not parse groups")
 		return nil, errors.New("Could not parse groups")
 	}
 	groups := []Group{}

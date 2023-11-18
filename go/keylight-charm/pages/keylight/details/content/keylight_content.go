@@ -14,7 +14,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/rs/zerolog/log"
+	"github.com/charmbracelet/log"
 )
 
 type Model struct {
@@ -169,7 +169,7 @@ func (m *Model) updateKeylight() {
 	keylight := m.keylightAdapter.Control.KeylightWithId(0)
 	keylight.LoadLights()
 	if keylight == nil {
-		log.Error().Msg("No keylight found")
+		log.Error("No keylight found")
 		os.Exit(1)
 	}
 	m.on = checkbox.New("On: ", keylight.Light.On)

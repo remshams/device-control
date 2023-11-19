@@ -2,6 +2,7 @@ package groups
 
 type GroupAdapter interface {
 	All() ([]Group, error)
+	Set(group Group) error
 }
 
 type Group struct {

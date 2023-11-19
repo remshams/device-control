@@ -1,10 +1,12 @@
 package groups
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	hue_control_http "hue-control/internal/http"
 	"io"
 	"net"
 	"net/http"
@@ -14,6 +16,11 @@ import (
 )
 
 const path = "http://%s/api/%s/groups"
+const actionPath = "http://%s/api/%s/groups/%s/action"
+
+type GroupActionDto struct {
+	On bool `json:"on"`
+}
 
 type GroupStateDto struct {
 	All_on bool
@@ -28,13 +35,39 @@ type GroupDto struct {
 	State  GroupStateDto
 }
 
-func (groupDto GroupDto) toGroup(id string) Group {
+func (groupDto GroupDto) toGroup(adapter GroupAdapter, id string) Group {
 	return InitGroup(
+		adapter,
 		id,
 		groupDto.Name,
 		groupDto.Lights,
 		groupDto.State.All_on,
 	)
+}
+
+func (groupDto GroupDto) toAction() GroupActionDto {
+	return GroupActionDto{
+		On: groupDto.State.All_on,
+	}
+}
+
+func (actionDto GroupActionDto) toJson() ([]byte, error) {
+	json, err := json.Marshal(actionDto)
+	if err != nil {
+		log.Error("Could not create group action json")
+	}
+	return json, err
+}
+
+func fromGroup(group Group) GroupDto {
+	return GroupDto{
+		Name:   group.name,
+		Lights: group.lights,
+		State: GroupStateDto{
+			All_on: group.on,
+			Any_on: group.on,
+		},
+	}
 }
 
 type GroupHttpAdapter struct {
@@ -77,10 +110,32 @@ func (adapter GroupHttpAdapter) All() ([]Group, error) {
 	groups := []Group{}
 	if len(groupResponseDto) > 0 {
 		for id, groupDto := range groupResponseDto {
-			groups = append(groups, groupDto.toGroup(id))
+			groups = append(groups, groupDto.toGroup(adapter, id))
 		}
 	}
 	return groups, nil
+}
+
+func (adapter GroupHttpAdapter) Set(group Group) error {
+	actionDto, err := fromGroup(group).toAction().toJson()
+	if err != nil {
+		return err
+	}
+	req, client, cancel, err := adapter.requestWithTimeout(
+		http.MethodPut,
+		fmt.Sprintf(actionPath, adapter.ip, adapter.apiKey, group.GetId()),
+		bytes.NewBuffer(actionDto),
+		nil,
+	)
+	defer cancel()
+	res, err := client.Do(req)
+	body, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil || hue_control_http.HasError(res, &body) {
+		log.Error("Could not set group")
+		return fmt.Errorf("Could not set group")
+	}
+	return nil
 }
 
 func (adapter GroupHttpAdapter) requestWithTimeout(method string, url string, body io.Reader, timeout *time.Duration) (*http.Request, *http.Client, context.CancelFunc, error) {

@@ -6,6 +6,7 @@ type GroupAdapter interface {
 }
 
 type Group struct {
+	adapter   GroupAdapter
 	id        string
 	name      string
 	lights    []string
@@ -13,8 +14,9 @@ type Group struct {
 	on        bool
 }
 
-func InitGroup(id string, name string, lights []string, on bool) Group {
+func InitGroup(adapter GroupAdapter, id string, name string, lights []string, on bool) Group {
 	return Group{
+		adapter,
 		id,
 		name,
 		lights,
@@ -41,4 +43,12 @@ func (group Group) GetLightIds() []string {
 
 func (group Group) GetOn() bool {
 	return group.on
+}
+
+func (group *Group) SetOn(on bool) {
+	group.on = on
+}
+
+func (group Group) SendGroup() error {
+	return group.adapter.Set(group)
 }

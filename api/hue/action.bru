@@ -1,0 +1,17 @@
+meta {
+  name: action
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://{{ip}}/api/{{apiKey}}/groups/{{groupId}}/action
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "on": true
+  }
+}

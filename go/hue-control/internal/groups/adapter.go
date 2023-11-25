@@ -2,15 +2,14 @@ package groups
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	hue_control_http "hue-control/internal/http"
+	"hue-control/internal/scenes"
 	"io"
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/charmbracelet/log"
 )
@@ -35,9 +34,10 @@ type GroupDto struct {
 	State  GroupStateDto
 }
 
-func (groupDto GroupDto) toGroup(adapter GroupAdapter, id string) Group {
+func (groupDto GroupDto) toGroup(groupAdapter GroupAdapter, sceneAdapter scenes.SceneAdapter, id string) Group {
 	return InitGroup(
-		adapter,
+		groupAdapter,
+		sceneAdapter,
 		id,
 		groupDto.Name,
 		groupDto.Lights,
@@ -79,7 +79,7 @@ func InitGroupHttpAdapter(ip net.IP, apiKey string) GroupHttpAdapter {
 	return GroupHttpAdapter{ip, apiKey}
 }
 
-func (adapter GroupHttpAdapter) All() ([]Group, error) {
+func (adapter GroupHttpAdapter) All(sceneAdapter scenes.SceneAdapter) ([]Group, error) {
 	req, client, cancel, err := hue_control_http.RequestWithTimeout(
 		http.MethodGet,
 		fmt.Sprintf(path, adapter.ip, adapter.apiKey),
@@ -110,7 +110,7 @@ func (adapter GroupHttpAdapter) All() ([]Group, error) {
 	groups := []Group{}
 	if len(groupResponseDto) > 0 {
 		for id, groupDto := range groupResponseDto {
-			groups = append(groups, groupDto.toGroup(adapter, id))
+			groups = append(groups, groupDto.toGroup(adapter, sceneAdapter, id))
 		}
 	}
 	return groups, nil

@@ -80,7 +80,7 @@ func InitGroupHttpAdapter(ip net.IP, apiKey string) GroupHttpAdapter {
 }
 
 func (adapter GroupHttpAdapter) All() ([]Group, error) {
-	req, client, cancel, err := adapter.requestWithTimeout(
+	req, client, cancel, err := hue_control_http.RequestWithTimeout(
 		http.MethodGet,
 		fmt.Sprintf(path, adapter.ip, adapter.apiKey),
 		nil,
@@ -121,7 +121,7 @@ func (adapter GroupHttpAdapter) Set(group Group) error {
 	if err != nil {
 		return err
 	}
-	req, client, cancel, err := adapter.requestWithTimeout(
+	req, client, cancel, err := hue_control_http.RequestWithTimeout(
 		http.MethodPut,
 		fmt.Sprintf(actionPath, adapter.ip, adapter.apiKey, group.GetId()),
 		bytes.NewBuffer(actionDto),
@@ -136,16 +136,4 @@ func (adapter GroupHttpAdapter) Set(group Group) error {
 		return fmt.Errorf("Could not set group")
 	}
 	return nil
-}
-
-func (adapter GroupHttpAdapter) requestWithTimeout(method string, url string, body io.Reader, timeout *time.Duration) (*http.Request, *http.Client, context.CancelFunc, error) {
-	defaultTimeout := 2 * time.Second
-	requestTimeout := timeout
-	if requestTimeout == nil {
-		requestTimeout = &defaultTimeout
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), *requestTimeout)
-	client := &http.Client{}
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
-	return req, client, cancel, err
 }

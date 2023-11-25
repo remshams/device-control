@@ -25,10 +25,4 @@ func main() {
 	store = bridges.BridgesJsonStore{FilePath: filepath.Join(home, fmt.Sprintf(".config/bridges/%s", bridgesFileName))}
 	control := control.InitHueControl(store)
 	control.LoadOrFindBridges()
-	group := control.GetBridges()[0].GetGroups()[0]
-	group.SetOn(false)
-	err = group.SendGroup()
-	if err != nil {
-		log.Error("Could not update group")
-	}
 }

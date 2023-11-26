@@ -9,3 +9,11 @@ func CreateBackToListAction() tea.Cmd {
 		return BackToListAction{}
 	}
 }
+
+type BackToGroupDetailsAction struct{}
+
+func CreateBackToGroupDetailsAction() tea.Cmd {
+	return func() tea.Msg {
+		return BackToGroupDetailsAction{}
+	}
+}

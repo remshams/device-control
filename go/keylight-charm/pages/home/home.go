@@ -6,6 +6,7 @@ import (
 	"keylight-charm/pages"
 	hue_home "keylight-charm/pages/hue/home"
 	keylight_home "keylight-charm/pages/keylight/home"
+	"keylight-charm/stores"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -77,6 +78,8 @@ func (m *Model) processSystemUpdate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		stores.LayoutStore.Width = msg.Width
+		stores.LayoutStore.Height = msg.Height
 		cmd = pages.CreateWindowResizeAction(msg.Width, msg.Height)
 	}
 	return cmd

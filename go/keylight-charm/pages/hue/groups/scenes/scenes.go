@@ -5,6 +5,7 @@ import (
 	"keylight-charm/lights/hue"
 	"keylight-charm/pages"
 	hue_groups "keylight-charm/pages/hue/groups"
+	"keylight-charm/stores"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -41,6 +42,7 @@ func InitModel(adapter *hue.HueAdapter, group hue_control.Group) Model {
 		group:   group,
 		scenes:  createScenes(group.GetScenes()),
 	}
+	updateScenesLayout(&model.scenes)
 	return model
 }
 
@@ -48,8 +50,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case pages.WindowResizeAction:
-		h, v := scenesStyle.GetFrameSize()
-		m.scenes.SetSize(msg.Width-h, msg.Height-v)
+		updateScenesLayout(&m.scenes)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
@@ -75,4 +76,9 @@ func createScenes(scenes []hue_control.Scene) list.Model {
 	list := list.New(items, list.NewDefaultDelegate(), 0, 0)
 	list.Title = "Scenes"
 	return list
+}
+
+func updateScenesLayout(scenes *list.Model) {
+	h, v := scenesStyle.GetFrameSize()
+	scenes.SetSize(stores.LayoutStore.Width-h, stores.LayoutStore.Height-v)
 }

@@ -74,6 +74,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				m.on, cmd = m.on.Update(msg)
 			}
 		}
+	default:
+		if m.state == scenes {
+			m.scenes, cmd = m.scenes.Update(msg)
+		}
 
 	}
 	return m, cmd

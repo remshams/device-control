@@ -59,9 +59,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			case "j":
 				m.decrementCursor()
 			case "enter":
-				m.state = navigate
-				m.unfocusView()
-				m.sendGroup()
+				if m.state == navigate {
+					m.state = scenes
+				} else {
+					m.state = navigate
+					m.unfocusView()
+					m.sendGroup()
+				}
 			case "esc":
 				if m.state == navigate {
 					cmd = hue_groups.CreateBackToListAction()

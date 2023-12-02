@@ -3,6 +3,7 @@ package hue_group_scenes
 import (
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
+	"keylight-charm/pages"
 	hue_groups "keylight-charm/pages/hue/groups"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -20,6 +21,10 @@ func (sceneItem sceneItem) Title() string {
 	return sceneItem.title
 }
 
+func (sceneItem sceneItem) Description() string {
+	return ""
+}
+
 func (sceneItem sceneItem) FilterValue() string {
 	return sceneItem.title
 }
@@ -31,17 +36,18 @@ type Model struct {
 }
 
 func InitModel(adapter *hue.HueAdapter, group hue_control.Group) Model {
-	return Model{
+	model := Model{
 		adapter: adapter,
 		group:   group,
 		scenes:  createScenes(group.GetScenes()),
 	}
+	return model
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case pages.WindowResizeAction:
 		h, v := scenesStyle.GetFrameSize()
 		m.scenes.SetSize(msg.Width-h, msg.Height-v)
 	case tea.KeyMsg:

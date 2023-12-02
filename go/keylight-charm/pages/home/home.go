@@ -58,21 +58,34 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-	switch m.state {
-	case menu:
-		cmd = m.processMenuUpdate(msg)
-	case keylights:
-		cmd = m.processKeylightsUpdate(msg)
-	case hueLights:
-		cmd = m.processHueUpate(msg)
+	if pages.IsSystemMsg(msg) {
+		cmd = m.processSystemUpdate(msg)
+	} else {
+		switch m.state {
+		case menu:
+			cmd = m.processMenuUpdate(msg)
+		case keylights:
+			cmd = m.processKeylightsUpdate(msg)
+		case hueLights:
+			cmd = m.processHueUpate(msg)
+		}
 	}
 	return m, cmd
+}
+
+func (m *Model) processSystemUpdate(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		cmd = pages.CreateWindowResizeAction(msg.Width, msg.Height)
+	}
+	return cmd
 }
 
 func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case pages.WindowResizeAction:
 		h, v := menuStyle.GetFrameSize()
 		m.menu.SetSize(msg.Width-h, msg.Height-v)
 	case tea.KeyMsg:

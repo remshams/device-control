@@ -18,7 +18,8 @@ const path = "http://%s/api/%s/groups"
 const actionPath = "http://%s/api/%s/groups/%s/action"
 
 type GroupActionDto struct {
-	On bool `json:"on"`
+	On    *bool   `json:"on"`
+	Scene *string `json:"scene"`
 }
 
 type GroupStateDto struct {
@@ -47,7 +48,7 @@ func (groupDto GroupDto) toGroup(groupAdapter GroupAdapter, sceneAdapter scenes.
 
 func (groupDto GroupDto) toAction() GroupActionDto {
 	return GroupActionDto{
-		On: groupDto.State.All_on,
+		On: &groupDto.State.All_on,
 	}
 }
 
@@ -67,6 +68,13 @@ func fromGroup(group Group) GroupDto {
 			All_on: group.on,
 			Any_on: group.on,
 		},
+	}
+}
+
+func fromScene(scene scenes.Scene) GroupActionDto {
+	sceneId := scene.Id()
+	return GroupActionDto{
+		Scene: &sceneId,
 	}
 }
 
@@ -134,6 +142,28 @@ func (adapter GroupHttpAdapter) Set(group Group) error {
 	if err != nil || hue_control_http.HasError(res, &body) {
 		log.Error("Could not set group")
 		return fmt.Errorf("Could not set group")
+	}
+	return nil
+}
+
+func (adapter GroupHttpAdapter) SetScene(group Group, scene scenes.Scene) error {
+	actionDto, err := fromScene(scene).toJson()
+	if err != nil {
+		return err
+	}
+	req, client, cancel, err := hue_control_http.RequestWithTimeout(
+		http.MethodPut,
+		fmt.Sprintf(actionPath, adapter.ip, adapter.apiKey, group.GetId()),
+		bytes.NewBuffer(actionDto),
+		nil,
+	)
+	defer cancel()
+	res, err := client.Do(req)
+	body, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil || hue_control_http.HasError(res, &body) {
+		log.Error("Could not set scene")
+		return fmt.Errorf("Could not set scene")
 	}
 	return nil
 }

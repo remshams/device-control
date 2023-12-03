@@ -7,6 +7,7 @@ import (
 type GroupAdapter interface {
 	All(sceneAdapter scenes.SceneAdapter) ([]Group, error)
 	Set(group Group) error
+	SetScene(group Group, scene scenes.Scene) error
 }
 
 type Group struct {
@@ -54,6 +55,10 @@ func (group Group) GetOn() bool {
 
 func (group Group) GetScenes() []scenes.Scene {
 	return group.scenes
+}
+
+func (group Group) SetScene(scene scenes.Scene) error {
+	return group.groupAdapter.SetScene(group, scene)
 }
 
 func (group *Group) SetOn(on bool) {

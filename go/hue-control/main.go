@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/charmbracelet/log"
-	"hue-control/internal"
+	control "hue-control/internal"
 	"hue-control/internal/bridges"
 	"os"
 	"path/filepath"
+
+	"github.com/charmbracelet/log"
 )
 
 var bridgesFileName = "bridges.json"
@@ -25,4 +26,6 @@ func main() {
 	store = bridges.BridgesJsonStore{FilePath: filepath.Join(home, fmt.Sprintf(".config/bridges/%s", bridgesFileName))}
 	control := control.InitHueControl(store)
 	control.LoadOrFindBridges()
+	group := control.GetBridges()[0].GetGroups()[0]
+	group.SetScene(group.GetScenes()[0])
 }

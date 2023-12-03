@@ -28,6 +28,10 @@ func (s Scene) GroupId() string {
 	return s.groupId
 }
 
+func (s Scene) Id() string {
+	return s.id
+}
+
 func (s Scene) SceneType() string {
 	return s.sceneType
 }

@@ -12,6 +12,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type SceneSelectedAction struct {
+	Scene hue_control.Scene
+}
+
+func CreateSceneSelectedAction(scene hue_control.Scene) tea.Cmd {
+	return func() tea.Msg {
+		return SceneSelectedAction{
+			Scene: scene,
+		}
+	}
+}
+
 var scenesStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type sceneItem struct {
@@ -55,6 +67,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc":
 			cmd = hue_groups.CreateBackToGroupDetailsAction()
+		case "enter":
+			scene := m.findScene(m.scenes.Index())
+			cmd = CreateSceneSelectedAction(scene)
 		default:
 			m.scenes, cmd = m.scenes.Update(msg)
 		}
@@ -81,4 +96,8 @@ func createScenes(scenes []hue_control.Scene) list.Model {
 func updateScenesLayout(scenes *list.Model) {
 	h, v := scenesStyle.GetFrameSize()
 	scenes.SetSize(stores.LayoutStore.Width-h, stores.LayoutStore.Height-v)
+}
+
+func (m Model) findScene(index int) hue_control.Scene {
+	return m.group.GetScenes()[index]
 }

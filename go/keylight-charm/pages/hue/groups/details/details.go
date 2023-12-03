@@ -46,6 +46,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case hue_groups.BackToGroupDetailsAction:
 		m.state = navigate
+	case hue_group_scenes.SceneSelectedAction:
+		m.sendScene(msg.Scene)
+		m.on.Checked = true
 	case tea.KeyMsg:
 		switch m.state {
 		case scenes:
@@ -133,4 +136,8 @@ func (m *Model) updateGroup() {
 func (m *Model) sendGroup() {
 	m.updateGroup()
 	m.group.SendGroup()
+}
+
+func (m *Model) sendScene(scene hue_control.Scene) {
+	m.group.SetScene(scene)
 }

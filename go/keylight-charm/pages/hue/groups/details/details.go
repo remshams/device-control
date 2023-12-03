@@ -17,7 +17,6 @@ type viewState = string
 
 const (
 	navigate viewState = "navigate"
-	insert   viewState = "insert"
 	scenes   viewState = "scenes"
 )
 
@@ -55,26 +54,17 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.scenes, cmd = m.scenes.Update(msg)
 		default:
 			switch msg.String() {
-			case "i":
-				m.processInsert()
 			case "k":
 				m.incrementCursor()
 			case "j":
 				m.decrementCursor()
 			case "enter":
-				if m.state == navigate {
-					m.state = scenes
-				} else {
-					m.state = navigate
-					m.unfocusView()
-					m.sendGroup()
-				}
+				m.processEnterKey()
 			case "esc":
 				if m.state == navigate {
 					cmd = hue_groups.CreateBackToListAction()
 				} else {
 					m.state = navigate
-					m.unfocusView()
 					m.resetView()
 				}
 			default:
@@ -90,22 +80,24 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, cmd
 }
 
+func (m *Model) processEnterKey() {
+	switch m.cursor {
+	case 0:
+		m.on.Checked = !m.on.Checked
+		m.sendGroup()
+	case 1:
+		m.state = scenes
+	}
+
+}
+
 func (m Model) View() string {
 	if m.state == scenes {
 		return m.scenes.View()
 	} else {
-		cursor := kl_cursor.RenderLine(m.on.View(), m.cursor == 0, m.state == insert)
-		scenes := kl_cursor.RenderLine("Scenes", m.cursor == 1, m.state == insert)
+		cursor := kl_cursor.RenderLine(m.on.View(), m.cursor == 0, false)
+		scenes := kl_cursor.RenderLine("Scenes", m.cursor == 1, false)
 		return fmt.Sprintf("%s\n\n%s", cursor, scenes)
-	}
-}
-
-func (m *Model) processInsert() {
-	if m.cursor == 1 {
-		m.state = scenes
-	} else {
-		m.state = insert
-		m.focusView()
 	}
 }
 
@@ -115,14 +107,6 @@ func (m *Model) incrementCursor() {
 
 func (m *Model) decrementCursor() {
 	m.cursor = int(math.Abs(float64((m.cursor - 1) % 2)))
-}
-
-func (m *Model) focusView() {
-	m.on.Focus = true
-}
-
-func (m *Model) unfocusView() {
-	m.on.Focus = false
 }
 
 func (m *Model) resetView() {

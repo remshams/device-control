@@ -6,6 +6,7 @@ import (
 	"keylight-charm/components/checkbox"
 	kl_cursor "keylight-charm/components/cursor"
 	"keylight-charm/lights/hue"
+	pages_hue "keylight-charm/pages/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
 	hue_group_scenes "keylight-charm/pages/hue/groups/scenes"
 	"math"
@@ -45,6 +46,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case hue_groups.BackToGroupDetailsAction:
 		m.state = navigate
+		cmd = pages_hue.CreateReloadBridgesAction()
 	case hue_group_scenes.SceneSelectedAction:
 		m.sendScene(msg.Scene)
 		m.on.Checked = true

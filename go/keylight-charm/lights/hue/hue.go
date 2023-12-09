@@ -16,7 +16,8 @@ func InitHueAdapter() HueAdapter {
 		home = ""
 	}
 	store := hue_control.InitBridgesJsonStore(filepath.Join(home, ".config/bridges/bridges.json"))
+	finder := hue_control.InitZeroconfBridgeFinder()
 	return HueAdapter{
-		Control: hue_control.InitHueControl(store),
+		Control: hue_control.InitHueControl(finder, store),
 	}
 }

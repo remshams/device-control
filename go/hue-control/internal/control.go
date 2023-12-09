@@ -6,15 +6,30 @@ import (
 )
 
 type HueControl struct {
-	store   bridges.BridgesStore
-	bridges []bridges.Bridge
+	store             bridges.BridgesStore
+	finder            bridges.BridgeFinder
+	discoveredBridges []bridges.DisvoveredBridge
+	bridges           []bridges.Bridge
 }
 
-func InitHueControl(store bridges.BridgesStore) HueControl {
+func InitHueControl(finder bridges.BridgeFinder, store bridges.BridgesStore) HueControl {
 	return HueControl{
-		store:   store,
-		bridges: []bridges.Bridge{},
+		store:             store,
+		finder:            finder,
+		discoveredBridges: []bridges.DisvoveredBridge{},
+		bridges:           []bridges.Bridge{},
 	}
+}
+
+func (hueControl *HueControl) FindBridges() error {
+	discoveredBridges, err := hueControl.finder.Discover()
+	if err != nil {
+		log.Error("Failed to discover bridges")
+		return err
+	}
+	log.Debugf("Discovered bridges: %v", discoveredBridges)
+	hueControl.discoveredBridges = discoveredBridges
+	return nil
 }
 
 func (hueControl *HueControl) LoadOrFindBridges() error {

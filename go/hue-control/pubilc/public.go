@@ -12,10 +12,14 @@ type Group = groups.Group
 type Scene = scenes.Scene
 type Control = control.HueControl
 
-func InitHueControl(bridgesStore bridges.BridgesStore) control.HueControl {
-	return control.InitHueControl(bridgesStore)
+func InitHueControl(finder bridges.BridgeFinder, bridgesStore bridges.BridgesStore) control.HueControl {
+	return control.InitHueControl(finder, bridgesStore)
 }
 
 func InitBridgesJsonStore(filePath string) bridges.BridgesJsonStore {
 	return bridges.InitBridgesJsonStore(filePath)
+}
+
+func InitZeroconfBridgeFinder() bridges.ZeroconfBridgeFinder {
+	return bridges.InitZeroconfBridgeFinder()
 }

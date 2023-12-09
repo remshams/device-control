@@ -54,7 +54,6 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 		{Title: "Id", Width: 5},
 		{Title: "Name", Width: 20},
 		{Title: "Number of lights", Width: 20},
-		{Title: "Connected", Width: 10},
 	}
 	rows := []table.Row{}
 
@@ -66,7 +65,6 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 					group.GetId(),
 					group.GetName(),
 					strconv.Itoa(len(group.GetLightIds())),
-					strconv.FormatBool(group.GetConnected()),
 				},
 			)
 		}

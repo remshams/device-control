@@ -11,6 +11,30 @@ type BridgesStore interface {
 	Load() ([]Bridge, error)
 }
 
+type BridgeFinder interface {
+	Discover() ([]DisvoveredBridge, error)
+}
+
+type BridgesAdapter interface {
+	Pair() (*Bridge, error)
+}
+
+type DisvoveredBridge struct {
+	bridgeAdapter BridgesAdapter
+	Ip            net.IP
+}
+
+func InitDiscoverdBridge(bridgeAdapter BridgesAdapter, ip net.IP) DisvoveredBridge {
+	return DisvoveredBridge{
+		bridgeAdapter: bridgeAdapter,
+		Ip:            ip,
+	}
+}
+
+func (bridge DisvoveredBridge) Pair() (*Bridge, error) {
+	return bridge.bridgeAdapter.Pair()
+}
+
 type Bridge struct {
 	groupAdapter groups.GroupAdapter
 	sceneAdapter scenes.SceneAdapter

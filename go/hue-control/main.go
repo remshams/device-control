@@ -24,8 +24,12 @@ func main() {
 	}
 	var store bridges.BridgesStore
 	store = bridges.BridgesJsonStore{FilePath: filepath.Join(home, fmt.Sprintf(".config/bridges/%s", bridgesFileName))}
-	control := control.InitHueControl(store)
-	control.LoadOrFindBridges()
-	group := control.GetBridges()[0].GetGroups()[0]
-	group.SetScene(group.GetScenes()[0])
+	var finder bridges.BridgeFinder
+	finder = bridges.ZeroconfBridgeFinder{}
+	control := control.InitHueControl(finder, store)
+	control.FindBridges()
+	control.PairBridge(control.GetDiscoveredBridges()[0])
+	// control.LoadOrFindBridges()
+	// group := control.GetBridges()[0].GetGroups()[0]
+	// group.SetScene(group.GetScenes()[0])
 }

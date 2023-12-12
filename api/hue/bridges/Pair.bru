@@ -1,0 +1,17 @@
+meta {
+  name: Pair
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://{{ip}}/api
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "devicetype": "bruno user"
+  }
+}

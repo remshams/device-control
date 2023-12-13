@@ -69,6 +69,7 @@ func (adapter BridgeHttpAdapter) Pair(discoveredBridge DisvoveredBridge) (*Bridg
 			if err == nil {
 				log.Debugf("Paired bridge: %v", pairSuccessResponseDto)
 				return &Bridge{
+					id:     discoveredBridge.Id,
 					ip:     adapter.ip,
 					apiKey: pairSuccessResponseDto.Success.Username,
 				}, nil

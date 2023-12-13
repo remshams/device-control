@@ -27,7 +27,7 @@ func main() {
 	var finder bridges.BridgeFinder
 	finder = bridges.ZeroconfBridgeFinder{}
 	control := control.InitHueControl(finder, store)
-	control.LoadOrFindBridges()
+	control.LoadBridges()
 	control.DiscoverBridges()
 	control.Pair(control.GetDiscoveredBridges()[0].Id)
 	// control.LoadOrFindBridges()

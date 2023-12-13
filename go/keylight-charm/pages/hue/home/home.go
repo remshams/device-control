@@ -88,7 +88,7 @@ func (m Model) View() string {
 }
 
 func (m *Model) reloadLights() {
-	m.adapter.Control.LoadOrFindBridges()
+	m.adapter.Control.LoadBridges()
 	m.bridges = m.adapter.Control.GetBridges()
 }
 

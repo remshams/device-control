@@ -56,7 +56,7 @@ func (hueControl *HueControl) Pair(bridgeId string) (*bridges.Bridge, error) {
 	return bridge, nil
 }
 
-func (hueControl *HueControl) LoadOrFindBridges() error {
+func (hueControl *HueControl) LoadBridges() error {
 	bridges, err := hueControl.store.Load()
 	if err == nil {
 		hueControl.bridges = bridges

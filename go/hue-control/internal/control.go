@@ -21,7 +21,7 @@ func InitHueControl(finder bridges.BridgeFinder, store bridges.BridgesStore) Hue
 	}
 }
 
-func (hueControl *HueControl) FindBridges() error {
+func (hueControl *HueControl) DiscoverBridges() error {
 	discoveredBridges, err := hueControl.finder.Discover()
 	if err != nil {
 		log.Error("Failed to discover bridges")

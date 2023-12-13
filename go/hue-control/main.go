@@ -27,8 +27,8 @@ func main() {
 	var finder bridges.BridgeFinder
 	finder = bridges.ZeroconfBridgeFinder{}
 	control := control.InitHueControl(finder, store)
-	control.FindBridges()
-	control.PairBridge(control.GetDiscoveredBridges()[0])
+	control.DiscoverBridges()
+	// control.PairBridge(control.GetDiscoveredBridges()[0])
 	// control.LoadOrFindBridges()
 	// group := control.GetBridges()[0].GetGroups()[0]
 	// group.SetScene(group.GetScenes()[0])

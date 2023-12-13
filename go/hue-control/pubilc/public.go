@@ -1,12 +1,13 @@
 package hue_control
 
 import (
-	"hue-control/internal"
+	control "hue-control/internal"
 	"hue-control/internal/bridges"
 	"hue-control/internal/groups"
 	"hue-control/internal/scenes"
 )
 
+type DiscoveredBridge = bridges.DiscoveredBridgePublic
 type Bridge = bridges.Bridge
 type Group = groups.Group
 type Scene = scenes.Scene

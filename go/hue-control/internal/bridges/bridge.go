@@ -27,6 +27,11 @@ type DisvoveredBridge struct {
 	Ip            net.IP
 }
 
+type DiscoveredBridgePublic struct {
+	Id string
+	Ip net.IP
+}
+
 func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
 	bridge, err := discoveredBridge.bridgeAdapter.Pair(discoveredBridge)
 	if err != nil {

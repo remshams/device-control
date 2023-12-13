@@ -32,17 +32,6 @@ func (hueControl *HueControl) DiscoverBridges() error {
 	return nil
 }
 
-func (hueControl *HueControl) PairBridge(discoveredBridge bridges.DisvoveredBridge) error {
-	bridge, err := discoveredBridge.Pair()
-	if err != nil {
-		log.Error("Failed to pair bridge")
-		return err
-	}
-	log.Debugf("Paired bridge: %v", bridge)
-	// hueControl.bridges = append(hueControl.bridges, *bridge)
-	return nil
-}
-
 func (hueControl *HueControl) LoadOrFindBridges() error {
 	bridges, err := hueControl.store.Load()
 	if err == nil {

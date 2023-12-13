@@ -4,6 +4,8 @@ import (
 	"hue-control/internal/groups"
 	"hue-control/internal/scenes"
 	"net"
+
+	"github.com/charmbracelet/log"
 )
 
 type BridgesStore interface {
@@ -25,16 +27,22 @@ type DisvoveredBridge struct {
 	Ip            net.IP
 }
 
+func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
+	bridge, err := discoveredBridge.bridgeAdapter.Pair(discoveredBridge)
+	if err != nil {
+		log.Error("Failed to pair bridge")
+		return nil, err
+	}
+	log.Debugf("Paired bridge: %v", bridge)
+	return bridge, nil
+}
+
 func InitDiscoverdBridge(bridgeAdapter BridgesAdapter, id string, ip net.IP) DisvoveredBridge {
 	return DisvoveredBridge{
 		bridgeAdapter: bridgeAdapter,
 		Id:            id,
 		Ip:            ip,
 	}
-}
-
-func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
-	return discoveredBridge.bridgeAdapter.Pair(discoveredBridge)
 }
 
 type Bridge struct {

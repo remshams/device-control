@@ -59,13 +59,13 @@ func InitBridgesHttpAdapter(ip net.IP) BridgeHttpAdapter {
 	}
 }
 
-func (adapter BridgeHttpAdapter) Pair() (*Bridge, error) {
+func (adapter BridgeHttpAdapter) Pair(discoveredBridge DisvoveredBridge) (*Bridge, error) {
 	ticker := time.NewTicker(time.Second * 1)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			pairSuccessResponseDto, err := adapter.doPair()
+			pairSuccessResponseDto, err := adapter.doPair(discoveredBridge)
 			if err == nil {
 				log.Debugf("Paired bridge: %v", pairSuccessResponseDto)
 				return &Bridge{
@@ -79,8 +79,8 @@ func (adapter BridgeHttpAdapter) Pair() (*Bridge, error) {
 	}
 }
 
-func (adapter BridgeHttpAdapter) doPair() (*pairSuccessResponseDto, error) {
-	pairingRequestDto, err := fromDiscoveredBridge(InitDiscoverdBridge(adapter, adapter.ip))
+func (adapter BridgeHttpAdapter) doPair(discoveredBridge DisvoveredBridge) (*pairSuccessResponseDto, error) {
+	pairingRequestDto, err := fromDiscoveredBridge(InitDiscoverdBridge(adapter, discoveredBridge.Id, discoveredBridge.Ip))
 	req, client, cancel, err := hue_control_http.RequestWithTimeout(
 		http.MethodPost,
 		fmt.Sprintf(path, adapter.ip),

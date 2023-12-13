@@ -2,9 +2,11 @@ package bridges
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/google/uuid"
 	"github.com/grandcat/zeroconf"
 )
 
@@ -23,9 +25,17 @@ func (finder ZeroconfBridgeFinder) Discover() ([]DisvoveredBridge, error) {
 	entryCh := make(chan *zeroconf.ServiceEntry)
 	go finder.findBridges(resolver, entryCh)
 	bridges := []DisvoveredBridge{}
+	index := 0
 	for entry := range entryCh {
+		uid, err := uuid.NewRandom()
+		id := strconv.Itoa(index)
+		if err == nil {
+			id = uid.String()
+		} else {
+			log.Warn("Failed to generate uuid, falling back to index")
+		}
 		ip := entry.AddrIPv4[0]
-		bridge := InitDiscoverdBridge(InitBridgesHttpAdapter(ip), ip)
+		bridge := InitDiscoverdBridge(InitBridgesHttpAdapter(ip), id, ip)
 		bridges = append(bridges, bridge)
 	}
 	return bridges, nil

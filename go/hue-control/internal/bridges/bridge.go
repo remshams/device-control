@@ -16,23 +16,25 @@ type BridgeFinder interface {
 }
 
 type BridgesAdapter interface {
-	Pair() (*Bridge, error)
+	Pair(discoveredBridge DisvoveredBridge) (*Bridge, error)
 }
 
 type DisvoveredBridge struct {
 	bridgeAdapter BridgesAdapter
+	Id            string
 	Ip            net.IP
 }
 
-func InitDiscoverdBridge(bridgeAdapter BridgesAdapter, ip net.IP) DisvoveredBridge {
+func InitDiscoverdBridge(bridgeAdapter BridgesAdapter, id string, ip net.IP) DisvoveredBridge {
 	return DisvoveredBridge{
 		bridgeAdapter: bridgeAdapter,
+		Id:            id,
 		Ip:            ip,
 	}
 }
 
-func (bridge DisvoveredBridge) Pair() (*Bridge, error) {
-	return bridge.bridgeAdapter.Pair()
+func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
+	return discoveredBridge.bridgeAdapter.Pair(discoveredBridge)
 }
 
 type Bridge struct {

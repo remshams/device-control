@@ -27,7 +27,11 @@ type DisvoveredBridge struct {
 	Ip            net.IP
 }
 
-func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
+func (discoveredBridge DisvoveredBridge) Pair(bridges []Bridge) (*Bridge, error) {
+	bridge := FindBridgeById(bridges, discoveredBridge.Id)
+	if bridge != nil {
+		return bridge, nil
+	}
 	bridge, err := discoveredBridge.bridgeAdapter.Pair(discoveredBridge)
 	if err != nil {
 		log.Error("Failed to pair bridge")

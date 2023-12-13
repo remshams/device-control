@@ -10,17 +10,19 @@ import (
 )
 
 type BridgeDto struct {
-	IP     net.IP
+	Id     string
+	Ip     net.IP
 	ApiKey string
 }
 
 func (bridgeDto BridgeDto) toBridge() Bridge {
-	return InitBridge(bridgeDto.IP, bridgeDto.ApiKey)
+	return InitBridge(bridgeDto.Id, bridgeDto.Ip, bridgeDto.ApiKey)
 }
 
 func dtoFromBridge(bridge Bridge) BridgeDto {
 	return BridgeDto{
-		IP:     bridge.ip,
+		Id:     bridge.id,
+		Ip:     bridge.ip,
 		ApiKey: bridge.apiKey,
 	}
 }

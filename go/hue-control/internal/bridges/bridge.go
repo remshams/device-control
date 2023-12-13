@@ -40,13 +40,15 @@ func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
 type Bridge struct {
 	groupAdapter groups.GroupAdapter
 	sceneAdapter scenes.SceneAdapter
+	id           string
 	ip           net.IP
 	apiKey       string
 	groups       []groups.Group
 }
 
-func InitBridge(ip net.IP, apiKey string) Bridge {
+func InitBridge(id string, ip net.IP, apiKey string) Bridge {
 	return Bridge{
+		id:           id,
 		ip:           ip,
 		apiKey:       apiKey,
 		groupAdapter: groups.InitGroupHttpAdapter(ip, apiKey),

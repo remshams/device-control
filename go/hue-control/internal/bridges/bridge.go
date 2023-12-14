@@ -42,6 +42,13 @@ func (discoveredBridge DisvoveredBridge) Pair() (*Bridge, error) {
 	return bridge, nil
 }
 
+func (discoveredBridge DisvoveredBridge) ToPublic() DiscoveredBridgePublic {
+	return DiscoveredBridgePublic{
+		Id: discoveredBridge.Id,
+		Ip: discoveredBridge.Ip,
+	}
+}
+
 func InitDiscoverdBridge(bridgeAdapter BridgesAdapter, id string, ip net.IP) DisvoveredBridge {
 	return DisvoveredBridge{
 		bridgeAdapter: bridgeAdapter,
@@ -91,6 +98,18 @@ func (bridge *Bridge) loadScenes() error {
 
 func (bridge Bridge) GetGroups() []groups.Group {
 	return bridge.groups
+}
+
+func (bridge Bridge) GetId() string {
+	return bridge.id
+}
+
+func (bridge Bridge) GetIp() net.IP {
+	return bridge.ip
+}
+
+func (bridge Bridge) GetApiKey() string {
+	return bridge.apiKey
 }
 
 func (bridge Bridge) FindGroup(id string) *groups.Group {

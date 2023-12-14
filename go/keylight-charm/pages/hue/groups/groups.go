@@ -17,3 +17,11 @@ func CreateBackToGroupDetailsAction() tea.Cmd {
 		return BackToGroupDetailsAction{}
 	}
 }
+
+type BackToGroupHomeAction struct{}
+
+func CreateBackToGroupHomeAction() tea.Cmd {
+	return func() tea.Msg {
+		return BackToGroupHomeAction{}
+	}
+}

@@ -4,7 +4,7 @@ import (
 	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/lights/hue"
-	"keylight-charm/pages"
+	hue_groups "keylight-charm/pages/hue/groups"
 	hue_group_details "keylight-charm/pages/hue/groups/details"
 	"strconv"
 
@@ -39,7 +39,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case "enter":
 			cmd = m.selectGroup(m.table.SelectedRow()[0])
 		case "esc":
-			cmd = pages.CreateBackToMenuAction()
+			cmd = hue_groups.CreateBackToGroupHomeAction()
 		}
 	}
 	return m, cmd

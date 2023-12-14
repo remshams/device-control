@@ -1,98 +1,136 @@
 package hue_home
 
 import (
-	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
-	pages_hue "keylight-charm/pages/hue"
+	"keylight-charm/pages"
 	hue_groups "keylight-charm/pages/hue/groups"
-	hue_group_details "keylight-charm/pages/hue/groups/details"
-	hue_group_list "keylight-charm/pages/hue/groups/list"
+	hue_groups_home "keylight-charm/pages/hue/groups/home"
+	"keylight-charm/stores"
+
+	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/lipgloss"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type viewState string
+var menuStyles = lipgloss.NewStyle().Margin(1, 2)
 
-const (
-	initial viewState = "init"
-	list    viewState = "list"
-	details viewState = "details"
-)
+type menuItem struct {
+	title, desc string
+}
+
+func (menuItem menuItem) Title() string {
+	return menuItem.title
+}
+
+func (menuItem menuItem) Description() string {
+	return menuItem.desc
+}
+
+func (menuItem menuItem) FilterValue() string { return menuItem.title }
+
+type viewState string
 
 type initMsg struct{}
 
+const (
+	menu   viewState = "menu"
+	groups viewState = "groups"
+)
+
 type Model struct {
 	adapter *hue.HueAdapter
-	bridges []hue_control.Bridge
+	menu    list.Model
+	groups  hue_groups_home.Model
 	state   viewState
-	list    hue_group_list.Model
-	details hue_group_details.Model
 }
 
 func InitModel(adapter *hue.HueAdapter) Model {
 	return Model{
 		adapter: adapter,
-		bridges: []hue_control.Bridge{},
-		state:   initial,
+		menu:    createMenu(),
+		groups:  hue_groups_home.InitModel(adapter),
+		state:   menu,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.init()
+	return m.createInitMsg()
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	switch msg := msg.(type) {
-	case initMsg:
-		m.reloadLights()
-		m.bridges = m.adapter.Control.GetBridges()
-		m.list = hue_group_list.InitModel(m.adapter, m.bridges)
-		m.state = list
-	case pages_hue.ReloadBridgesAction:
-		m.reloadLights()
-	case hue_group_list.GroupSelect:
-		m.reloadLights()
-		m.details = hue_group_details.InitModel(m.adapter, *m.bridges[0].FindGroup(msg.Group.GetId()))
-		m.state = details
-	case hue_groups.BackToListAction:
-		m.state = list
-	default:
+	if m.state == menu {
+		cmd = m.processMenuUpdate(msg)
+	} else {
 		cmd = m.forwardUpdate(msg)
 	}
 	return m, cmd
 }
 
+func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case hue_groups.BackToGroupHomeAction:
+		m.state = menu
+	case initMsg:
+		updateMenuLayout(&m.menu)
+	case pages.WindowResizeAction:
+		updateMenuLayout(&m.menu)
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			cmd = pages.CreateBackToMenuAction()
+		case "enter":
+			if m.menu.Index() == 0 {
+				m.state = groups
+				cmd = m.groups.Init()
+			}
+		default:
+			cmd = m.forwardUpdate(msg)
+		}
+	}
+	return cmd
+}
+
+func updateMenuLayout(menu *list.Model) {
+	h, v := menuStyles.GetFrameSize()
+	menu.SetSize(stores.LayoutStore.Width-h, stores.LayoutStore.Height-v)
+}
+
 func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch m.state {
-	case list:
-		m.list, cmd = m.list.Update(msg)
-	case details:
-		m.details, cmd = m.details.Update(msg)
+	case menu:
+		m.menu, cmd = m.menu.Update(msg)
+	case groups:
+		m.groups, cmd = m.groups.Update(msg)
 	}
 	return cmd
 }
 
 func (m Model) View() string {
 	switch m.state {
-	case initial:
-		return "Loading..."
-	case list:
-		return m.list.View()
-	case details:
-		return m.details.View()
+	case menu:
+		return menuStyles.Render(m.menu.View())
+	case groups:
+		return m.groups.View()
 	default:
 		return ""
 	}
 }
 
-func (m *Model) reloadLights() {
-	m.adapter.Control.LoadBridges()
-	m.bridges = m.adapter.Control.GetBridges()
+func createMenu() list.Model {
+	items := []list.Item{
+		menuItem{title: "HueGroups", desc: "Control hue groups"},
+		menuItem{title: "HueBridges", desc: "Manage hue bridges (pair...)"},
+	}
+	list := list.New(items, list.NewDefaultDelegate(), 0, 0)
+	list.Title = "Hue Home"
+	return list
 }
 
-func (m *Model) init() tea.Cmd {
+func (m Model) createInitMsg() tea.Cmd {
 	return func() tea.Msg {
 		return initMsg{}
 	}

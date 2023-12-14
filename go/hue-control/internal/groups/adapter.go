@@ -19,7 +19,7 @@ const actionPath = "http://%s/api/%s/groups/%s/action"
 
 type GroupActionDto struct {
 	On    *bool   `json:"on"`
-	Scene *string `json:"scene"`
+	Scene *string `json:"scene,omitempty"`
 }
 
 type GroupStateDto struct {
@@ -48,7 +48,8 @@ func (groupDto GroupDto) toGroup(groupAdapter GroupAdapter, sceneAdapter scenes.
 
 func (groupDto GroupDto) toAction() GroupActionDto {
 	return GroupActionDto{
-		On: &groupDto.State.All_on,
+		On:    &groupDto.State.All_on,
+		Scene: nil,
 	}
 }
 

@@ -83,8 +83,12 @@ func (control HueControl) GetBridges() []bridges.Bridge {
 	return control.bridges
 }
 
-func (control HueControl) GetDiscoveredBridges() []bridges.DisvoveredBridge {
-	return control.discoveredBridges
+func (control HueControl) GetDiscoveredBridges() []bridges.DiscoveredBridgePublic {
+	var discoveredBridges []bridges.DiscoveredBridgePublic
+	for _, bridge := range control.discoveredBridges {
+		discoveredBridges = append(discoveredBridges, bridge.ToPublic())
+	}
+	return discoveredBridges
 }
 
 func (control HueControl) findDiscoveredBridgeById(id string) *bridges.DisvoveredBridge {

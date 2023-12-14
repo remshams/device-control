@@ -6,14 +6,12 @@ import (
 	hue_groups "keylight-charm/pages/hue/groups"
 	hue_groups_home "keylight-charm/pages/hue/groups/home"
 	"keylight-charm/stores"
+	"keylight-charm/styles"
 
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/lipgloss"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-var menuStyles = lipgloss.NewStyle().Margin(1, 2)
 
 type menuItem struct {
 	title, desc string
@@ -94,7 +92,7 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 }
 
 func updateMenuLayout(menu *list.Model) {
-	h, v := menuStyles.GetFrameSize()
+	h, v := styles.ListStyles.GetFrameSize()
 	menu.SetSize(stores.LayoutStore.Width-h, stores.LayoutStore.Height-v)
 }
 
@@ -112,7 +110,7 @@ func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
 func (m Model) View() string {
 	switch m.state {
 	case menu:
-		return menuStyles.Render(m.menu.View())
+		return styles.ListStyles.Render(m.menu.View())
 	case groups:
 		return m.groups.View()
 	default:

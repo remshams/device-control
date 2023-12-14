@@ -6,10 +6,10 @@ import (
 	"keylight-charm/pages"
 	hue_groups "keylight-charm/pages/hue/groups"
 	"keylight-charm/stores"
+	"keylight-charm/styles"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type SceneSelectedAction struct {
@@ -23,8 +23,6 @@ func CreateSceneSelectedAction(scene hue_control.Scene) tea.Cmd {
 		}
 	}
 }
-
-var scenesStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type sceneItem struct {
 	title string
@@ -80,7 +78,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	return scenesStyle.Render(m.scenes.View())
+	return styles.ListStyles.Render(m.scenes.View())
 }
 
 func createScenes(scenes []hue_control.Scene) list.Model {
@@ -94,7 +92,7 @@ func createScenes(scenes []hue_control.Scene) list.Model {
 }
 
 func updateScenesLayout(scenes *list.Model) {
-	h, v := scenesStyle.GetFrameSize()
+	h, v := styles.ListStyles.GetFrameSize()
 	scenes.SetSize(stores.LayoutStore.Width-h, stores.LayoutStore.Height-v)
 }
 

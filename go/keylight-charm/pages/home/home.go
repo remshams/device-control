@@ -7,13 +7,11 @@ import (
 	hue_home "keylight-charm/pages/hue/home"
 	keylight_home "keylight-charm/pages/keylight/home"
 	"keylight-charm/stores"
+	"keylight-charm/styles"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
-
-var menuStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type menuItem struct {
 	title, desc string
@@ -89,7 +87,7 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case pages.WindowResizeAction:
-		h, v := menuStyle.GetFrameSize()
+		h, v := styles.ListStyles.GetFrameSize()
 		m.menu.SetSize(msg.Width-h, msg.Height-v)
 	case tea.KeyMsg:
 		switch m.state {
@@ -154,7 +152,7 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 func (m Model) View() string {
 	switch m.state {
 	case menu:
-		return menuStyle.Render(m.menu.View())
+		return styles.ListStyles.Render(m.menu.View())
 	case keylights:
 		return m.keylight.View()
 	case hueLights:

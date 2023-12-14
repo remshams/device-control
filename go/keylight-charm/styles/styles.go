@@ -12,3 +12,4 @@ var TextErrorColor = lipgloss.NewStyle().Foreground(ErrorColor)
 var TextInfoColor = lipgloss.NewStyle().Foreground(InfoColor)
 
 var Padding = 1
+var ListStyles = lipgloss.NewStyle().Margin(1, 2)

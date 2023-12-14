@@ -49,6 +49,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.bridges = m.adapter.Control.GetBridges()
 		m.list = hue_group_list.InitModel(m.adapter, m.bridges)
 		m.state = list
+	case hue_groups.BackToGroupHomeAction:
+		cmd = pages_hue.CreateBackToHueHomeAction()
 	case pages_hue.ReloadBridgesAction:
 		m.reloadLights()
 	case hue_group_list.GroupSelect:

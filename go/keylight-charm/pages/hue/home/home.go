@@ -3,7 +3,8 @@ package hue_home
 import (
 	"keylight-charm/lights/hue"
 	"keylight-charm/pages"
-	hue_groups "keylight-charm/pages/hue/groups"
+	pages_hue "keylight-charm/pages/hue"
+	hue_bridges_home "keylight-charm/pages/hue/bridges/home"
 	hue_groups_home "keylight-charm/pages/hue/groups/home"
 	"keylight-charm/stores"
 	"keylight-charm/styles"
@@ -32,13 +33,15 @@ type viewState string
 type initMsg struct{}
 
 const (
-	menu   viewState = "menu"
-	groups viewState = "groups"
+	menu    viewState = "menu"
+	groups  viewState = "groups"
+	bridges viewState = "bridges"
 )
 
 type Model struct {
 	adapter *hue.HueAdapter
 	menu    list.Model
+	bridges hue_bridges_home.Model
 	groups  hue_groups_home.Model
 	state   viewState
 }
@@ -47,6 +50,7 @@ func InitModel(adapter *hue.HueAdapter) Model {
 	return Model{
 		adapter: adapter,
 		menu:    createMenu(),
+		bridges: hue_bridges_home.InitModel(adapter),
 		groups:  hue_groups_home.InitModel(adapter),
 		state:   menu,
 	}
@@ -58,10 +62,16 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	if m.state == menu {
-		cmd = m.processMenuUpdate(msg)
-	} else {
-		cmd = m.forwardUpdate(msg)
+	switch msg := msg.(type) {
+	case pages_hue.BackToHueHomeAction:
+		m.state = menu
+	default:
+		if m.state == menu {
+			cmd = m.processMenuUpdate(msg)
+		} else {
+			cmd = m.forwardUpdate(msg)
+		}
+
 	}
 	return m, cmd
 }
@@ -69,8 +79,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case hue_groups.BackToGroupHomeAction:
-		m.state = menu
 	case initMsg:
 		updateMenuLayout(&m.menu)
 	case pages.WindowResizeAction:
@@ -80,7 +88,11 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 		case "esc":
 			cmd = pages.CreateBackToMenuAction()
 		case "enter":
-			if m.menu.Index() == 0 {
+			switch m.menu.Index() {
+			case 0:
+				m.state = bridges
+				cmd = m.bridges.Init()
+			case 1:
 				m.state = groups
 				cmd = m.groups.Init()
 			}
@@ -103,6 +115,8 @@ func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
 		m.menu, cmd = m.menu.Update(msg)
 	case groups:
 		m.groups, cmd = m.groups.Update(msg)
+	case bridges:
+		m.bridges, cmd = m.bridges.Update(msg)
 	}
 	return cmd
 }
@@ -113,6 +127,8 @@ func (m Model) View() string {
 		return styles.ListStyles.Render(m.menu.View())
 	case groups:
 		return m.groups.View()
+	case bridges:
+		return m.bridges.View()
 	default:
 		return ""
 	}
@@ -120,8 +136,8 @@ func (m Model) View() string {
 
 func createMenu() list.Model {
 	items := []list.Item{
-		menuItem{title: "HueGroups", desc: "Control hue groups"},
 		menuItem{title: "HueBridges", desc: "Manage hue bridges (pair...)"},
+		menuItem{title: "HueGroups", desc: "Control hue groups"},
 	}
 	list := list.New(items, list.NewDefaultDelegate(), 0, 0)
 	list.Title = "Hue Home"

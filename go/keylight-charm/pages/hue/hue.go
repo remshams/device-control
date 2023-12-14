@@ -9,3 +9,11 @@ func CreateReloadBridgesAction() tea.Cmd {
 		return ReloadBridgesAction{}
 	}
 }
+
+type BackToHueHomeAction struct{}
+
+func CreateBackToHueHomeAction() tea.Cmd {
+	return func() tea.Msg {
+		return BackToHueHomeAction{}
+	}
+}

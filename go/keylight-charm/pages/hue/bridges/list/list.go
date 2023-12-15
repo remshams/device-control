@@ -10,11 +10,21 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type initMsg struct{}
+
+type viewState string
+
+const (
+	initial viewState = "initial"
+	list    viewState = "list"
+)
+
 type Model struct {
 	adapter           *hue.HueAdapter
 	discoveredBridges []hue_control.DiscoveredBridge
 	bridges           []hue_control.Bridge
 	table             table.Model
+	state             viewState
 }
 
 func InitModel(adapter *hue.HueAdapter) Model {
@@ -22,20 +32,23 @@ func InitModel(adapter *hue.HueAdapter) Model {
 		adapter:           adapter,
 		discoveredBridges: adapter.Control.GetDiscoveredBridges(),
 		bridges:           adapter.Control.GetBridges(),
-		table: createTable(
-			adapter.Control.GetBridges(),
-			adapter.Control.GetDiscoveredBridges(),
-		),
+		state:             initial,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return m.init()
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case initMsg:
+		m.table = createTable(
+			m.adapter.Control.GetBridges(),
+			m.adapter.Control.GetDiscoveredBridges(),
+		)
+		m.state = list
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
@@ -46,14 +59,21 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	return "Bridges"
+	switch m.state {
+	case initial:
+		return "Loading..."
+	case list:
+		return m.table.View()
+	default:
+		return ""
+	}
 }
 
 func createTable(bridges []hue_control.Bridge, discoveredBridges []hue_control.DiscoveredBridge) table.Model {
 	columns := []table.Column{
-		{Title: "Id", Width: 5},
+		{Title: "Id", Width: 40},
 		{Title: "Ip", Width: 15},
-		{Title: "ApiKey", Width: 15},
+		{Title: "ApiKey", Width: 45},
 	}
 	rows := []table.Row{}
 
@@ -74,4 +94,15 @@ func createTable(bridges []hue_control.Bridge, discoveredBridges []hue_control.D
 	}
 
 	return kl_table.CreateTable(columns, rows)
+}
+
+func (m Model) reloadBridges() {
+	m.adapter.Control.LoadBridges()
+}
+
+func (m Model) init() tea.Cmd {
+	m.reloadBridges()
+	return func() tea.Msg {
+		return initMsg{}
+	}
 }

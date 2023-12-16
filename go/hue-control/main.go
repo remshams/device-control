@@ -29,7 +29,7 @@ func main() {
 	control := control.InitHueControl(finder, store)
 	control.LoadBridges()
 	control.DiscoverBridges()
-	control.Pair(control.GetDiscoveredBridges()[0].Id)
+	// control.Pair(control.GetDiscoveredBridges()[0].Id)
 	// control.LoadOrFindBridges()
 	// group := control.GetBridges()[0].GetGroups()[0]
 	// group.SetScene(group.GetScenes()[0])

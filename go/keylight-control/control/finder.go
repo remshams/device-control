@@ -5,24 +5,19 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"github.com/grandcat/zeroconf"
+	"github.com/libp2p/zeroconf/v2"
 )
 
 type ZeroConfKeylightFinder struct{}
 
 func (finder *ZeroConfKeylightFinder) Discover(adapter KeylightAdapter, store KeylightStore) []Keylight {
-	resolver, err := zeroconf.NewResolver(nil)
-	if err != nil {
-		log.Debug("Failed to initialize resolver: %+v", err.Error())
-	}
-
 	serviceEntryCh := make(chan *zeroconf.ServiceEntry)
 	keylightCh := make(chan Keylight)
 	go finder.searchKeylights(serviceEntryCh, keylightCh, adapter, store)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	err = resolver.Browse(ctx, "_elg._tcp", "local", serviceEntryCh)
+	err := zeroconf.Browse(ctx, "_elg._tcp", "local", serviceEntryCh)
 	if err != nil {
 		log.Debug("Failed to browse: %+v", err.Error())
 	}

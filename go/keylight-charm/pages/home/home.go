@@ -1,6 +1,8 @@
 package home
 
 import (
+	"fmt"
+	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
 	"keylight-charm/lights/keylight"
 	"keylight-charm/pages"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type menuItem struct {
@@ -40,6 +43,7 @@ type Model struct {
 	hue      hue_home.Model
 	menu     list.Model
 	state    viewState
+	toast    toast.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter) Model {
@@ -48,6 +52,7 @@ func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAda
 		hue:      hue_home.InitModel(hueAdapter),
 		menu:     createMenu(),
 		state:    menu,
+		toast:    toast.InitModel(),
 	}
 }
 
@@ -57,6 +62,7 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+	m.toast, _ = m.toast.Update(msg)
 	if pages.IsSystemMsg(msg) {
 		cmd = m.processSystemUpdate(msg)
 	} else {
@@ -150,16 +156,20 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
+	component := ""
 	switch m.state {
 	case menu:
-		return styles.ListStyles.Render(m.menu.View())
+		component = styles.ListStyles.Render(m.menu.View())
 	case keylights:
-		return m.keylight.View()
+		component = m.keylight.View()
 	case hueLights:
-		return m.hue.View()
+		component = m.hue.View()
 	default:
-		return ""
+		component = ""
 	}
+
+	styles := lipgloss.NewStyle().PaddingTop(styles.Padding)
+	return fmt.Sprintf("%s\n%s", component, styles.Render(m.toast.View()))
 }
 
 func createMenu() list.Model {

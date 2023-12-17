@@ -1,19 +1,16 @@
 package keylight_home
 
 import (
-	"fmt"
 	hue_control "hue-control/pubilc"
 	"keylight-charm/components/toast"
 	"keylight-charm/lights/keylight"
-	"keylight-charm/pages/keylight"
-	"keylight-charm/pages/keylight/details"
-	"keylight-charm/pages/keylight/edit"
-	"keylight-charm/pages/keylight/list"
-	"keylight-charm/styles"
+	pages_keylight "keylight-charm/pages/keylight"
+	keylight_details "keylight-charm/pages/keylight/details"
+	keylight_edit "keylight-charm/pages/keylight/edit"
+	keylight_list "keylight-charm/pages/keylight/list"
 	"keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type viewState string
@@ -36,7 +33,6 @@ type Model struct {
 	list            keylight_list.Model
 	details         *keylight_details.Model
 	edit            *keylight_edit.Model
-	toast           toast.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
@@ -45,7 +41,6 @@ func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
 		state:           initial,
 		details:         nil,
 		edit:            nil,
-		toast:           toast.InitModel(),
 	}
 }
 
@@ -55,7 +50,6 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	m.toast, _ = m.toast.Update(msg)
 	switch msg := msg.(type) {
 	case initMsg:
 		m.keylights = m.keylightAdapter.Control.Keylights()
@@ -118,24 +112,21 @@ func (m *Model) updateChilds(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
-	component := ""
 	switch m.state {
 	case initial:
 		return "Loading..."
 	case list:
-		component = m.list.View()
+		return m.list.View()
 	case details:
-		component = m.details.View()
+		return m.details.View()
 	case add:
-		component = m.edit.View()
+		return m.edit.View()
 	case edit:
-		component = m.edit.View()
+		return m.edit.View()
 	default:
 		return "Error"
 	}
 
-	styles := lipgloss.NewStyle().PaddingTop(styles.Padding)
-	return fmt.Sprintf("%s\n%s", component, styles.Render(m.toast.View()))
 }
 
 func (m *Model) init() tea.Cmd {

@@ -55,6 +55,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = tea.Batch(toast.CreateInfoToastAction("Discovering bridges..."), m.createBridgesDiscoveredMsg())
 		case "esc":
 			cmd = hue_bridges.CreateBackToBridgesHomeAction()
+		default:
+			m.table, cmd = m.table.Update(msg)
 		}
 	}
 	return m, cmd

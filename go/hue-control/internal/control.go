@@ -91,6 +91,17 @@ func (control HueControl) GetDiscoveredBridges() []bridges.DiscoveredBridgePubli
 	return discoveredBridges
 }
 
+func (control HueControl) GetNewlyDiscoveredBridges() []bridges.DiscoveredBridgePublic {
+	var discoveredBridges []bridges.DiscoveredBridgePublic
+	for _, discoveredBridge := range control.discoveredBridges {
+		bridge := bridges.FindBridgeById(control.bridges, discoveredBridge.Id)
+		if bridge == nil {
+			discoveredBridges = append(discoveredBridges, discoveredBridge.ToPublic())
+		}
+	}
+	return discoveredBridges
+}
+
 func (control HueControl) findDiscoveredBridgeById(id string) *bridges.DisvoveredBridge {
 	for _, bridge := range control.discoveredBridges {
 		if bridge.Id == id {

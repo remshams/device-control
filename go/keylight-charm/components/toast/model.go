@@ -51,3 +51,17 @@ func CreateInfoToastAction(message string) tea.Cmd {
 		return InfoToast{message}
 	}
 }
+
+type SuccessToast struct {
+	message string
+}
+
+func (successToast SuccessToast) Message() string {
+	return styles.TextSuccessColor.Render(successToast.message)
+}
+
+func CreateSuccessToastAction(message string) tea.Cmd {
+	return func() tea.Msg {
+		return SuccessToast{message}
+	}
+}

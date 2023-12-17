@@ -3,6 +3,7 @@ package hue_bridges_list
 import (
 	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
+	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
 	hue_bridges "keylight-charm/pages/hue/bridges"
 
@@ -11,6 +12,8 @@ import (
 )
 
 type initMsg struct{}
+type bridgesDiscovered struct{}
+type bridgesReloaded struct{}
 
 type viewState string
 
@@ -29,28 +32,30 @@ type Model struct {
 
 func InitModel(adapter *hue.HueAdapter) Model {
 	return Model{
-		adapter:           adapter,
-		discoveredBridges: adapter.Control.GetDiscoveredBridges(),
-		bridges:           adapter.Control.GetBridges(),
-		state:             initial,
+		adapter: adapter,
+		state:   initial,
+		table:   createInitialTable(),
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.init()
+	return m.createInitMsg()
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
-		m.table = createTable(
-			m.adapter.Control.GetBridges(),
-			m.adapter.Control.GetDiscoveredBridges(),
-		)
+		cmd = m.reloadBridges()
 		m.state = list
+	case bridgesReloaded:
+		m.table.SetRows(m.createTableRows())
+	case bridgesDiscovered:
+		cmd = tea.Batch(toast.CreateInfoToastAction("Bridges discovered"), m.reloadBridges())
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "d":
+			cmd = tea.Batch(toast.CreateInfoToastAction("Discovering bridges..."), m.createBridgesDiscoveredMsg())
 		case "esc":
 			cmd = hue_bridges.CreateBackToBridgesHomeAction()
 		}
@@ -69,15 +74,26 @@ func (m Model) View() string {
 	}
 }
 
-func createTable(bridges []hue_control.Bridge, discoveredBridges []hue_control.DiscoveredBridge) table.Model {
-	columns := []table.Column{
+func (m Model) createTable(columns []table.Column, rows []table.Row) table.Model {
+	return kl_table.CreateTable(columns, rows)
+}
+
+func createInitialTable() table.Model {
+	return kl_table.CreateTable(createTableColumns(), []table.Row{})
+}
+
+func createTableColumns() []table.Column {
+	return []table.Column{
 		{Title: "Id", Width: 40},
 		{Title: "Ip", Width: 15},
 		{Title: "ApiKey", Width: 45},
 	}
+}
+
+func (m Model) createTableRows() []table.Row {
 	rows := []table.Row{}
 
-	for _, bridge := range bridges {
+	for _, bridge := range m.adapter.Control.GetBridges() {
 		rows = append(rows, table.Row{
 			bridge.GetId(),
 			bridge.GetIp().String(),
@@ -85,7 +101,7 @@ func createTable(bridges []hue_control.Bridge, discoveredBridges []hue_control.D
 		})
 	}
 
-	for _, bridge := range discoveredBridges {
+	for _, bridge := range m.adapter.Control.GetDiscoveredBridges() {
 		rows = append(rows, table.Row{
 			bridge.Id,
 			bridge.Ip.String(),
@@ -93,15 +109,26 @@ func createTable(bridges []hue_control.Bridge, discoveredBridges []hue_control.D
 		})
 	}
 
-	return kl_table.CreateTable(columns, rows)
+	return rows
 }
 
-func (m Model) reloadBridges() {
+func (m *Model) reloadBridges() tea.Cmd {
 	m.adapter.Control.LoadBridges()
+	m.bridges = m.adapter.Control.GetBridges()
+	m.discoveredBridges = m.adapter.Control.GetDiscoveredBridges()
+	return func() tea.Msg {
+		return bridgesReloaded{}
+	}
 }
 
-func (m Model) init() tea.Cmd {
-	m.reloadBridges()
+func (m Model) createBridgesDiscoveredMsg() tea.Cmd {
+	return func() tea.Msg {
+		m.adapter.Control.DiscoverBridges()
+		return bridgesDiscovered{}
+	}
+}
+
+func (m Model) createInitMsg() tea.Cmd {
 	return func() tea.Msg {
 		return initMsg{}
 	}

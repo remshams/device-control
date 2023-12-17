@@ -1,7 +1,6 @@
 package hue_bridges_list
 
 import (
-	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
@@ -23,11 +22,9 @@ const (
 )
 
 type Model struct {
-	adapter           *hue.HueAdapter
-	discoveredBridges []hue_control.DiscoveredBridge
-	bridges           []hue_control.Bridge
-	table             table.Model
-	state             viewState
+	adapter *hue.HueAdapter
+	table   table.Model
+	state   viewState
 }
 
 func InitModel(adapter *hue.HueAdapter) Model {
@@ -101,7 +98,7 @@ func (m Model) createTableRows() []table.Row {
 		})
 	}
 
-	for _, bridge := range m.adapter.Control.GetDiscoveredBridges() {
+	for _, bridge := range m.adapter.Control.GetNewlyDiscoveredBridges() {
 		rows = append(rows, table.Row{
 			bridge.Id,
 			bridge.Ip.String(),
@@ -114,8 +111,6 @@ func (m Model) createTableRows() []table.Row {
 
 func (m *Model) reloadBridges() tea.Cmd {
 	m.adapter.Control.LoadBridges()
-	m.bridges = m.adapter.Control.GetBridges()
-	m.discoveredBridges = m.adapter.Control.GetDiscoveredBridges()
 	return func() tea.Msg {
 		return bridgesReloaded{}
 	}

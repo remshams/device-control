@@ -1,8 +1,10 @@
 package control
 
 import (
-	"github.com/charmbracelet/log"
+	"errors"
 	"hue-control/internal/bridges"
+
+	"github.com/charmbracelet/log"
 )
 
 type HueControl struct {
@@ -33,15 +35,15 @@ func (hueControl *HueControl) DiscoverBridges() error {
 }
 
 func (hueControl *HueControl) Pair(bridgeId string) (*bridges.Bridge, error) {
-	discoveredBridge := hueControl.findDiscoveredBridgeById(bridgeId)
-	if discoveredBridge == nil {
-		log.Debugf("Could not find bridge with id: %s", bridgeId)
-		return nil, nil
-	}
-	bridge := bridges.FindBridgeById(hueControl.bridges, discoveredBridge.Id)
+	bridge := bridges.FindBridgeById(hueControl.bridges, bridgeId)
 	if bridge != nil {
 		log.Debugf("Bridge with id: %s already paired", bridgeId)
 		return bridge, nil
+	}
+	discoveredBridge := hueControl.findDiscoveredBridgeById(bridgeId)
+	if discoveredBridge == nil {
+		log.Errorf("Could not find bridge with id: %s", bridgeId)
+		return nil, errors.New("Could not find bridge")
 	}
 	bridge, err := discoveredBridge.Pair()
 	if err != nil {

@@ -13,6 +13,10 @@ import (
 type initMsg struct{}
 type bridgesDiscovered struct{}
 type bridgesReloaded struct{}
+type bridgePaired struct {
+	success bool
+	message string
+}
 
 type viewState string
 
@@ -49,10 +53,20 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.table.SetRows(m.createTableRows())
 	case bridgesDiscovered:
 		cmd = tea.Batch(toast.CreateInfoToastAction("Bridges discovered"), m.reloadBridges())
+	case bridgePaired:
+		var toastCmd tea.Cmd
+		if msg.success {
+			toastCmd = toast.CreateSuccessToastAction(msg.message)
+		} else {
+			toastCmd = toast.CreateErrorToastAction(msg.message)
+		}
+		cmd = tea.Batch(toastCmd, m.reloadBridges())
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "d":
 			cmd = tea.Batch(toast.CreateInfoToastAction("Discovering bridges..."), m.createBridgesDiscoveredMsg())
+		case "p":
+			cmd = tea.Batch(toast.CreateInfoToastAction("Pairing bridge, please press the button..."), m.createBridgePairedMsg())
 		case "esc":
 			cmd = hue_bridges.CreateBackToBridgesHomeAction()
 		default:
@@ -128,5 +142,17 @@ func (m Model) createBridgesDiscoveredMsg() tea.Cmd {
 func (m Model) createInitMsg() tea.Cmd {
 	return func() tea.Msg {
 		return initMsg{}
+	}
+}
+
+func (m Model) createBridgePairedMsg() tea.Cmd {
+	return func() tea.Msg {
+		bridgeId := m.table.SelectedRow()[0]
+		_, err := m.adapter.Control.Pair(bridgeId)
+		if err != nil {
+			return bridgePaired{success: false, message: err.Error()}
+		} else {
+			return bridgePaired{success: true, message: "Bridge paired"}
+		}
 	}
 }

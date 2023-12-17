@@ -102,8 +102,10 @@ func (store BridgesJsonStore) createOrUpdateFile(bridgeJson []byte) error {
 func (store BridgesJsonStore) Load() ([]Bridge, error) {
 	data, err := os.ReadFile(store.FilePath)
 	if err != nil {
-		log.Error("Could not read bridge file")
-		return nil, err
+		log.Warn("Bridge file does not exist")
+		return []Bridge{}, nil
 	}
-	return bridgesFromJson(data)
+	bridges, err := bridgesFromJson(data)
+	log.Debugf("Loaded bridges: %v", bridges)
+	return bridges, err
 }

@@ -6,11 +6,14 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/charmbracelet/log"
 )
 
 func HasError(res *http.Response, body *[]byte) bool {
 	defer res.Body.Close()
 	if res.StatusCode >= 300 || (body != nil && strings.Contains(string(*body), "error")) {
+		log.Errorf("Error response: %v", string(*body))
 		return true
 	} else {
 		return false

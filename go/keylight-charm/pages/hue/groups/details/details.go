@@ -5,6 +5,7 @@ import (
 	hue_control "hue-control/pubilc"
 	"keylight-charm/components/checkbox"
 	kl_cursor "keylight-charm/components/cursor"
+	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
 	pages_hue "keylight-charm/pages/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
@@ -15,6 +16,7 @@ import (
 )
 
 type viewState = string
+type selectedSceneSent struct{}
 
 const (
 	navigate viewState = "navigate"
@@ -48,8 +50,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.state = navigate
 		cmd = pages_hue.CreateReloadBridgesAction()
 	case hue_group_scenes.SceneSelectedAction:
-		m.sendScene(msg.Scene)
-		m.on.Checked = true
+		cmd = tea.Batch(toast.CreateInfoToastAction("Setting scene"), m.sendScene(msg.Scene))
+	case selectedSceneSent:
+		cmd = tea.Batch(toast.CreateSuccessToastAction("Scene set"), pages_hue.CreateReloadBridgesAction())
 	case tea.KeyMsg:
 		switch m.state {
 		case scenes:
@@ -124,6 +127,10 @@ func (m *Model) sendGroup() {
 	m.group.SendGroup()
 }
 
-func (m *Model) sendScene(scene hue_control.Scene) {
+func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {
 	m.group.SetScene(scene)
+	m.on.Checked = true
+	return func() tea.Msg {
+		return selectedSceneSent{}
+	}
 }

@@ -112,7 +112,7 @@ func (bridge Bridge) GetApiKey() string {
 	return bridge.apiKey
 }
 
-func (bridge Bridge) FindGroup(id string) *groups.Group {
+func (bridge Bridge) GetGroupById(id string) *groups.Group {
 	for _, group := range bridge.groups {
 		if id == group.GetId() {
 			return &group

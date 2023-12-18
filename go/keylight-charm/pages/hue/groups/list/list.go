@@ -76,7 +76,7 @@ func (m *Model) selectGroup(id string) tea.Cmd {
 	return func() tea.Msg {
 		var selectedGroup *hue_control.Group
 		for _, bridge := range m.bridges {
-			selectedGroup = bridge.FindGroup(id)
+			selectedGroup = bridge.GetGroupById(id)
 			if selectedGroup != nil {
 				break
 			}

@@ -13,6 +13,7 @@ type GroupAdapter interface {
 type Group struct {
 	groupAdapter GroupAdapter
 	sceneAdapter scenes.SceneAdapter
+	bridgeId     string
 	id           string
 	name         string
 	lights       []string
@@ -20,10 +21,11 @@ type Group struct {
 	scenes       []scenes.Scene
 }
 
-func InitGroup(groupAdapter GroupAdapter, sceneAdapter scenes.SceneAdapter, id string, name string, lights []string, on bool) Group {
+func InitGroup(groupAdapter GroupAdapter, sceneAdapter scenes.SceneAdapter, bridgeId string, id string, name string, lights []string, on bool) Group {
 	return Group{
 		groupAdapter: groupAdapter,
 		sceneAdapter: sceneAdapter,
+		bridgeId:     bridgeId,
 		id:           id,
 		name:         name,
 		lights:       lights,
@@ -58,6 +60,10 @@ func (group Group) SetScene(scene scenes.Scene) error {
 
 func (group *Group) SetOn(on bool) {
 	group.on = on
+}
+
+func (group *Group) GetBridgeId() string {
+	return group.bridgeId
 }
 
 func (group *Group) LoadScenes() error {

@@ -71,7 +71,7 @@ func InitBridge(id string, ip net.IP, apiKey string) Bridge {
 		id:           id,
 		ip:           ip,
 		apiKey:       apiKey,
-		groupAdapter: groups.InitGroupHttpAdapter(ip, apiKey),
+		groupAdapter: groups.InitGroupHttpAdapter(ip, apiKey, id),
 		sceneAdapter: scenes.InitSceneHttpAdapter(ip, apiKey),
 	}
 }

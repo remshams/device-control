@@ -35,10 +35,11 @@ type GroupDto struct {
 	State  GroupStateDto
 }
 
-func (groupDto GroupDto) toGroup(groupAdapter GroupAdapter, sceneAdapter scenes.SceneAdapter, id string) Group {
+func (groupDto GroupDto) toGroup(groupAdapter GroupAdapter, sceneAdapter scenes.SceneAdapter, bridgeId string, id string) Group {
 	return InitGroup(
 		groupAdapter,
 		sceneAdapter,
+		bridgeId,
 		id,
 		groupDto.Name,
 		groupDto.Lights,
@@ -80,12 +81,13 @@ func fromScene(scene scenes.Scene) GroupActionDto {
 }
 
 type GroupHttpAdapter struct {
-	ip     net.IP
-	apiKey string
+	ip       net.IP
+	apiKey   string
+	bridgeId string
 }
 
-func InitGroupHttpAdapter(ip net.IP, apiKey string) GroupHttpAdapter {
-	return GroupHttpAdapter{ip, apiKey}
+func InitGroupHttpAdapter(ip net.IP, apiKey string, bridgeId string) GroupHttpAdapter {
+	return GroupHttpAdapter{ip, apiKey, bridgeId}
 }
 
 func (adapter GroupHttpAdapter) All(sceneAdapter scenes.SceneAdapter) ([]Group, error) {
@@ -119,7 +121,7 @@ func (adapter GroupHttpAdapter) All(sceneAdapter scenes.SceneAdapter) ([]Group, 
 	groups := []Group{}
 	if len(groupResponseDto) > 0 {
 		for id, groupDto := range groupResponseDto {
-			groups = append(groups, groupDto.toGroup(adapter, sceneAdapter, id))
+			groups = append(groups, groupDto.toGroup(adapter, sceneAdapter, adapter.bridgeId, id))
 		}
 	}
 	return groups, nil

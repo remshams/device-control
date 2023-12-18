@@ -53,6 +53,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmd = tea.Batch(toast.CreateInfoToastAction("Setting scene"), m.sendScene(msg.Scene))
 	case selectedSceneSent:
 		cmd = tea.Batch(toast.CreateSuccessToastAction("Scene set"), pages_hue.CreateReloadBridgesAction())
+	case hue_groups.GroupReloadedAction:
+		m.group = msg.Group
+		m.resetView()
 	case tea.KeyMsg:
 		switch m.state {
 		case scenes:
@@ -129,7 +132,6 @@ func (m *Model) sendGroup() {
 
 func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {
 	m.group.SetScene(scene)
-	m.on.Checked = true
 	return func() tea.Msg {
 		return selectedSceneSent{}
 	}

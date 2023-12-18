@@ -35,7 +35,7 @@ func (hueControl *HueControl) DiscoverBridges() error {
 }
 
 func (hueControl *HueControl) Pair(bridgeId string) (*bridges.Bridge, error) {
-	bridge := bridges.FindBridgeById(hueControl.bridges, bridgeId)
+	bridge := hueControl.GetBridgeById(bridgeId)
 	if bridge != nil {
 		log.Debugf("Bridge with id: %s already paired", bridgeId)
 		return bridge, nil
@@ -96,7 +96,7 @@ func (control HueControl) GetDiscoveredBridges() []bridges.DiscoveredBridgePubli
 func (control HueControl) GetNewlyDiscoveredBridges() []bridges.DiscoveredBridgePublic {
 	var discoveredBridges []bridges.DiscoveredBridgePublic
 	for _, discoveredBridge := range control.discoveredBridges {
-		bridge := bridges.FindBridgeById(control.bridges, discoveredBridge.Id)
+		bridge := control.GetBridgeById(discoveredBridge.Id)
 		if bridge == nil {
 			discoveredBridges = append(discoveredBridges, discoveredBridge.ToPublic())
 		}
@@ -107,6 +107,15 @@ func (control HueControl) GetNewlyDiscoveredBridges() []bridges.DiscoveredBridge
 func (control HueControl) findDiscoveredBridgeById(id string) *bridges.DisvoveredBridge {
 	for _, bridge := range control.discoveredBridges {
 		if bridge.Id == id {
+			return &bridge
+		}
+	}
+	return nil
+}
+
+func (control HueControl) GetBridgeById(id string) *bridges.Bridge {
+	for _, bridge := range control.bridges {
+		if bridge.GetId() == id {
 			return &bridge
 		}
 	}

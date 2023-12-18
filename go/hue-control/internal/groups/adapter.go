@@ -18,7 +18,7 @@ const path = "http://%s/api/%s/groups"
 const actionPath = "http://%s/api/%s/groups/%s/action"
 
 type GroupActionDto struct {
-	On    *bool   `json:"on"`
+	On    *bool   `json:"on,omitempty"`
 	Scene *string `json:"scene,omitempty"`
 }
 
@@ -149,6 +149,7 @@ func (adapter GroupHttpAdapter) Set(group Group) error {
 
 func (adapter GroupHttpAdapter) SetScene(group Group, scene scenes.Scene) error {
 	actionDto, err := fromScene(scene).toJson()
+	log.Debugf("Setting scene: %v", string(actionDto))
 	if err != nil {
 		return err
 	}

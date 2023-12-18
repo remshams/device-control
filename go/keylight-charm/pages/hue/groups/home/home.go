@@ -59,6 +59,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.state = details
 	case hue_groups.BackToListAction:
 		m.selectedGroup = nil
+		m.list = hue_group_list.InitModel(m.adapter, m.adapter.Control.GetBridges())
 		m.state = list
 	default:
 		cmd = m.forwardUpdate(msg)

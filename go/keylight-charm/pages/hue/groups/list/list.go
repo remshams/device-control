@@ -23,11 +23,11 @@ type Model struct {
 	details hue_group_details.Model
 }
 
-func InitModel(adapter *hue.HueAdapter, bridges []hue_control.Bridge) Model {
+func InitModel(adapter *hue.HueAdapter) Model {
 	return Model{
 		adapter: adapter,
-		bridges: bridges,
-		table:   createTable(bridges),
+		bridges: adapter.Control.GetBridges(),
+		table:   createTable(adapter.Control.GetBridges()),
 	}
 }
 

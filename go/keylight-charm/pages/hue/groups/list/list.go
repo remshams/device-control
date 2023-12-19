@@ -24,6 +24,7 @@ type Model struct {
 }
 
 func InitModel(adapter *hue.HueAdapter) Model {
+	adapter.Control.LoadBridges()
 	return Model{
 		adapter: adapter,
 		bridges: adapter.Control.GetBridges(),

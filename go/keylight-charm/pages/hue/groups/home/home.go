@@ -44,20 +44,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
-		m.reloadLights()
 		m.list = hue_group_list.InitModel(m.adapter)
 		m.state = list
 	case hue_groups.BackToGroupHomeAction:
 		cmd = pages_hue.CreateBackToHueHomeAction()
-	case pages_hue.ReloadBridgesAction:
-		m.reloadLights()
-		bridgesReloadedCmd := pages_hue.CreateBridgesReloadedAction()
-		if m.selectedGroup != nil {
-			m.selectedGroup = m.adapter.Control.GetBridgeById(m.selectedGroup.GetBridgeId()).GetGroupById(m.selectedGroup.GetId())
-			cmd = tea.Batch(bridgesReloadedCmd, hue_groups.CreateGroupReloadedAction(*m.selectedGroup))
-		} else {
-			cmd = bridgesReloadedCmd
-		}
 	case hue_group_list.GroupSelect:
 		m.selectedGroup = &msg.Group
 		m.details = hue_group_details.InitModel(m.adapter, msg.Group)
@@ -94,10 +84,6 @@ func (m Model) View() string {
 	default:
 		return ""
 	}
-}
-
-func (m *Model) reloadLights() {
-	m.adapter.Control.LoadBridges()
 }
 
 func (m *Model) init() tea.Cmd {

@@ -7,7 +7,6 @@ import (
 	kl_cursor "keylight-charm/components/cursor"
 	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
-	pages_hue "keylight-charm/pages/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
 	hue_group_scenes "keylight-charm/pages/hue/groups/scenes"
 	"math"
@@ -48,14 +47,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case hue_groups.BackToGroupDetailsAction:
 		m.state = navigate
-		cmd = pages_hue.CreateReloadBridgesAction()
+		m.reloadLights()
 	case hue_group_scenes.SceneSelectedAction:
 		cmd = tea.Batch(toast.CreateInfoToastAction("Setting scene"), m.sendScene(msg.Scene))
 	case selectedSceneSent:
-		cmd = tea.Batch(toast.CreateSuccessToastAction("Scene set"), pages_hue.CreateReloadBridgesAction())
-	case hue_groups.GroupReloadedAction:
-		m.group = msg.Group
-		m.resetView()
+		m.reloadLights()
+		cmd = toast.CreateSuccessToastAction("Scene set")
 	case tea.KeyMsg:
 		switch m.state {
 		case scenes:
@@ -94,11 +91,12 @@ func (m *Model) processEnterKey() tea.Cmd {
 	case 0:
 		m.group.SetOn(!m.group.GetOn())
 		err := m.group.SendGroup()
+		m.reloadLights()
 		toastCmd := toast.CreateSuccessToastAction("Group updated")
 		if err != nil {
 			toastCmd = toast.CreateErrorToastAction("Error updating group")
 		}
-		cmd = tea.Batch(toastCmd, pages_hue.CreateReloadBridgesAction())
+		cmd = toastCmd
 	case 1:
 		m.state = scenes
 	}
@@ -123,13 +121,19 @@ func (m *Model) decrementCursor() {
 	m.cursor = int(math.Abs(float64((m.cursor - 1) % 2)))
 }
 
-func (m *Model) resetView() {
-	m.on.Checked = m.group.GetOn()
-}
-
 func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {
 	m.group.SetScene(scene)
 	return func() tea.Msg {
 		return selectedSceneSent{}
 	}
+}
+
+func (m *Model) reloadLights() {
+	m.adapter.Control.LoadBridges()
+	m.group = *m.adapter.Control.GetBridgeById(m.group.GetBridgeId()).GetGroupById(m.group.GetId())
+	m.resetView()
+}
+
+func (m *Model) resetView() {
+	m.on.Checked = m.group.GetOn()
 }

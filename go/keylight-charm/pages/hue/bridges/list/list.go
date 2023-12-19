@@ -48,6 +48,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case initMsg:
 		cmd = m.reloadBridges()
+		m.table.SetRows(m.createTableRows())
 		m.state = list
 	case pages_hue.BridgesReloadedAction:
 		m.table.SetRows(m.createTableRows())

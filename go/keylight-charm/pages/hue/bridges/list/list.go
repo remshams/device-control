@@ -128,9 +128,7 @@ func (m Model) createTableRows() []table.Row {
 func (m *Model) reloadBridges() tea.Cmd {
 	m.adapter.Control.LoadBridges()
 	return func() tea.Msg {
-		return pages_hue.BridgesReloadedAction{
-			Bridges: m.adapter.Control.GetBridges(),
-		}
+		return pages_hue.CreateBridgesReloadedAction()
 	}
 }
 

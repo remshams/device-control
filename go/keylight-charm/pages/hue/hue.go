@@ -1,8 +1,6 @@
 package pages_hue
 
 import (
-	hue_control "hue-control/pubilc"
-
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -14,15 +12,11 @@ func CreateReloadBridgesAction() tea.Cmd {
 	}
 }
 
-type BridgesReloadedAction struct {
-	Bridges []hue_control.Bridge
-}
+type BridgesReloadedAction struct{}
 
-func CreateBridgesReloadedAction(bridges []hue_control.Bridge) tea.Cmd {
+func CreateBridgesReloadedAction() tea.Cmd {
 	return func() tea.Msg {
-		return BridgesReloadedAction{
-			Bridges: bridges,
-		}
+		return BridgesReloadedAction{}
 	}
 }
 

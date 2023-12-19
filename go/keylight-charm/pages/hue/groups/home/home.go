@@ -51,7 +51,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmd = pages_hue.CreateBackToHueHomeAction()
 	case pages_hue.ReloadBridgesAction:
 		m.reloadLights()
-		bridgesReloadedCmd := pages_hue.CreateBridgesReloadedAction(m.adapter.Control.GetBridges())
+		bridgesReloadedCmd := pages_hue.CreateBridgesReloadedAction()
 		if m.selectedGroup != nil {
 			m.selectedGroup = m.adapter.Control.GetBridgeById(m.selectedGroup.GetBridgeId()).GetGroupById(m.selectedGroup.GetId())
 			cmd = tea.Batch(bridgesReloadedCmd, hue_groups.CreateGroupReloadedAction(*m.selectedGroup))

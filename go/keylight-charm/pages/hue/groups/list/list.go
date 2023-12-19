@@ -40,6 +40,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = m.selectGroup(m.table.SelectedRow()[0])
 		case "esc":
 			cmd = hue_groups.CreateBackToGroupHomeAction()
+		default:
+			m.table, cmd = m.table.Update(msg)
 		}
 	}
 	return m, cmd
@@ -54,6 +56,7 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 		{Title: "Id", Width: 5},
 		{Title: "Name", Width: 20},
 		{Title: "Number of lights", Width: 20},
+		{Title: "Bridge Id", Width: 20},
 	}
 	rows := []table.Row{}
 
@@ -65,6 +68,7 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 					group.GetId(),
 					group.GetName(),
 					strconv.Itoa(len(group.GetLightIds())),
+					group.GetBridgeId(),
 				},
 			)
 		}

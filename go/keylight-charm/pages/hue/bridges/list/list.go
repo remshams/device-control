@@ -4,6 +4,7 @@ import (
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
+	pages_hue "keylight-charm/pages/hue"
 	hue_bridges "keylight-charm/pages/hue/bridges"
 
 	"github.com/charmbracelet/bubbles/table"
@@ -12,7 +13,6 @@ import (
 
 type initMsg struct{}
 type bridgesDiscovered struct{}
-type bridgesReloaded struct{}
 type bridgePaired struct {
 	success bool
 	message string
@@ -49,7 +49,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case initMsg:
 		cmd = m.reloadBridges()
 		m.state = list
-	case bridgesReloaded:
+	case pages_hue.BridgesReloadedAction:
 		m.table.SetRows(m.createTableRows())
 	case bridgesDiscovered:
 		cmd = tea.Batch(toast.CreateInfoToastAction("Bridges discovered"), m.reloadBridges())
@@ -128,7 +128,9 @@ func (m Model) createTableRows() []table.Row {
 func (m *Model) reloadBridges() tea.Cmd {
 	m.adapter.Control.LoadBridges()
 	return func() tea.Msg {
-		return bridgesReloaded{}
+		return pages_hue.BridgesReloadedAction{
+			Bridges: m.adapter.Control.GetBridges(),
+		}
 	}
 }
 

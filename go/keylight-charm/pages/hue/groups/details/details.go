@@ -92,8 +92,8 @@ func (m *Model) processEnterKey() tea.Cmd {
 	var cmd tea.Cmd
 	switch m.cursor {
 	case 0:
-		m.on.Checked = !m.on.Checked
-		m.sendGroup()
+		m.group.SetOn(!m.group.GetOn())
+		m.group.SendGroup()
 		cmd = pages_hue.CreateReloadBridgesAction()
 	case 1:
 		m.state = scenes
@@ -121,15 +121,6 @@ func (m *Model) decrementCursor() {
 
 func (m *Model) resetView() {
 	m.on.Checked = m.group.GetOn()
-}
-
-func (m *Model) updateGroup() {
-	m.group.SetOn(m.on.Checked)
-}
-
-func (m *Model) sendGroup() {
-	m.updateGroup()
-	m.group.SendGroup()
 }
 
 func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {

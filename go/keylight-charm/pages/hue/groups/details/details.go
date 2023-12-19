@@ -67,7 +67,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			case "j":
 				m.decrementCursor()
 			case "enter":
-				m.processEnterKey()
+				cmd = m.processEnterKey()
 			case "esc":
 				if m.state == navigate {
 					cmd = hue_groups.CreateBackToListAction()
@@ -88,15 +88,17 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *Model) processEnterKey() {
+func (m *Model) processEnterKey() tea.Cmd {
+	var cmd tea.Cmd
 	switch m.cursor {
 	case 0:
 		m.on.Checked = !m.on.Checked
 		m.sendGroup()
+		cmd = pages_hue.CreateReloadBridgesAction()
 	case 1:
 		m.state = scenes
 	}
-
+	return cmd
 }
 
 func (m Model) View() string {

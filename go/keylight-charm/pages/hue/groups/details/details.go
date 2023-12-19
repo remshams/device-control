@@ -15,7 +15,10 @@ import (
 )
 
 type viewState = string
-type selectedSceneSent struct{}
+type selectedSceneSent struct {
+	success bool
+	message string
+}
 
 const (
 	navigate viewState = "navigate"
@@ -51,8 +54,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case hue_group_scenes.SceneSelectedAction:
 		cmd = tea.Batch(toast.CreateInfoToastAction("Setting scene"), m.sendScene(msg.Scene))
 	case selectedSceneSent:
-		m.reloadLights()
-		cmd = toast.CreateSuccessToastAction("Scene set")
+		if msg.success {
+			m.reloadLights()
+			cmd = toast.CreateSuccessToastAction(msg.message)
+		} else {
+			cmd = toast.CreateErrorToastAction(msg.message)
+		}
 	case tea.KeyMsg:
 		switch m.state {
 		case scenes:
@@ -122,9 +129,19 @@ func (m *Model) decrementCursor() {
 }
 
 func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {
-	m.group.SetScene(scene)
+	err := m.group.SetScene(scene)
 	return func() tea.Msg {
-		return selectedSceneSent{}
+		if err == nil {
+			return selectedSceneSent{
+				success: true,
+				message: "Scene set",
+			}
+		} else {
+			return selectedSceneSent{
+				success: false,
+				message: "Error setting scene",
+			}
+		}
 	}
 }
 

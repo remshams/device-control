@@ -1,8 +1,6 @@
 package hue_groups
 
 import (
-	hue_control "hue-control/pubilc"
-
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -27,17 +25,5 @@ type BackToGroupHomeAction struct{}
 func CreateBackToGroupHomeAction() tea.Cmd {
 	return func() tea.Msg {
 		return BackToGroupHomeAction{}
-	}
-}
-
-type GroupReloadedAction struct {
-	Group hue_control.Group
-}
-
-func CreateGroupReloadedAction(group hue_control.Group) tea.Cmd {
-	return func() tea.Msg {
-		return GroupReloadedAction{
-			Group: group,
-		}
 	}
 }

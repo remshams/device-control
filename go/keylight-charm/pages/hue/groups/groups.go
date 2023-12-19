@@ -41,15 +41,3 @@ func CreateGroupReloadedAction(group hue_control.Group) tea.Cmd {
 		}
 	}
 }
-
-type GroupsReloadedAction struct {
-	Groups []hue_control.Group
-}
-
-func CreateGroupsReloadedAction(groups []hue_control.Group) tea.Cmd {
-	return func() tea.Msg {
-		return GroupsReloadedAction{
-			Groups: groups,
-		}
-	}
-}

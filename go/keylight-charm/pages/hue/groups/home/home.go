@@ -51,8 +51,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmd = pages_hue.CreateBackToHueHomeAction()
 	case pages_hue.ReloadBridgesAction:
 		m.reloadLights()
-		// TODO Add case to update list view
-		cmd = hue_groups.CreateGroupReloadedAction(*m.adapter.Control.GetBridges()[0].GetGroupById(m.selectedGroup.GetId()))
+		bridgesReloadedCmd := pages_hue.CreateBridgesReloadedAction(m.adapter.Control.GetBridges())
+		if m.selectedGroup != nil {
+			m.selectedGroup = m.adapter.Control.GetBridgeById(m.selectedGroup.GetBridgeId()).GetGroupById(m.selectedGroup.GetId())
+			cmd = tea.Batch(bridgesReloadedCmd, hue_groups.CreateGroupReloadedAction(*m.selectedGroup))
+		} else {
+			cmd = bridgesReloadedCmd
+		}
 	case hue_group_list.GroupSelect:
 		m.selectedGroup = &msg.Group
 		m.details = hue_group_details.InitModel(m.adapter, msg.Group)

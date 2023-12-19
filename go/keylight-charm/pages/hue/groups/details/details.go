@@ -93,8 +93,12 @@ func (m *Model) processEnterKey() tea.Cmd {
 	switch m.cursor {
 	case 0:
 		m.group.SetOn(!m.group.GetOn())
-		m.group.SendGroup()
-		cmd = pages_hue.CreateReloadBridgesAction()
+		err := m.group.SendGroup()
+		toastCmd := toast.CreateSuccessToastAction("Group updated")
+		if err != nil {
+			toastCmd = toast.CreateErrorToastAction("Error updating group")
+		}
+		cmd = tea.Batch(toastCmd, pages_hue.CreateReloadBridgesAction())
 	case 1:
 		m.state = scenes
 	}

@@ -64,10 +64,22 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			cmd = hue_groups.CreateBackToGroupDetailsAction()
+			// This avoids conflicts between the keybindings of the main page
+			// and the keybindings of the bubbletea list.
+			// It ignores the enter and esc keybindings when the list is filtering or
+			// in a filtered state.
+			if m.scenes.FilterState() == list.Unfiltered {
+				cmd = hue_groups.CreateBackToGroupDetailsAction()
+			} else {
+				m.scenes, cmd = m.scenes.Update(msg)
+			}
 		case "enter":
-			scene := m.findScene(m.scenes.Index())
-			cmd = CreateSceneSelectedAction(scene)
+			if m.scenes.FilterState() == list.Filtering {
+				m.scenes, cmd = m.scenes.Update(msg)
+			} else {
+				scene := m.group.GetSceneByName(m.scenes.SelectedItem().FilterValue())
+				cmd = CreateSceneSelectedAction(*scene)
+			}
 		default:
 			m.scenes, cmd = m.scenes.Update(msg)
 		}

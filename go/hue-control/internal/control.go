@@ -121,3 +121,29 @@ func (control HueControl) GetBridgeById(id string) *bridges.Bridge {
 	}
 	return nil
 }
+
+func (control *HueControl) RemoveBridge(bridgeId string) error {
+	bridge := control.GetBridgeById(bridgeId)
+	if bridge == nil {
+		log.Warnf("Bridge to delete does not exist: %s", bridgeId)
+		return nil
+	}
+	newBridges := control.removeBridgeFromList(bridgeId)
+	err := control.store.Save(newBridges)
+	if err != nil {
+		log.Error("Fail to save bridges list with removed bridge: %s", bridgeId)
+		return err
+	}
+	control.bridges = newBridges
+	return nil
+}
+
+func (control HueControl) removeBridgeFromList(bridgeId string) []bridges.Bridge {
+	newBridges := []bridges.Bridge{}
+	for _, bridge := range control.bridges {
+		if bridge.GetId() != bridgeId {
+			newBridges = append(newBridges, bridge)
+		}
+	}
+	return newBridges
+}

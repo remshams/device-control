@@ -1,6 +1,7 @@
 package hue_bridges_list
 
 import (
+	"fmt"
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
@@ -21,8 +22,9 @@ type bridgePaired struct {
 type viewState string
 
 const (
-	initial viewState = "initial"
-	list    viewState = "list"
+	initial      viewState = "initial"
+	list         viewState = "list"
+	deleteBridge viewState = "deleteBridge"
 )
 
 type Model struct {
@@ -70,6 +72,21 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = tea.Batch(toast.CreateInfoToastAction("Pairing bridge, please press the button..."), m.createBridgePairedMsg())
 		case "esc":
 			cmd = hue_bridges.CreateBackToBridgesHomeAction()
+		case "d":
+			m.state = deleteBridge
+			cmd = toast.CreateWarningToastAction(fmt.Sprintf("Are you sure you want to delete bridge %s? (y/n)", m.table.SelectedRow()[0]))
+		case "y":
+			if m.state == deleteBridge {
+				err := m.adapter.Control.RemoveBridge(m.table.SelectedRow()[0])
+				if err != nil {
+					cmd = toast.CreateErrorToastAction("Could not delete bridge")
+				} else {
+					cmd = tea.Batch(toast.CreateSuccessToastAction("Bridge deleted"), m.reloadBridges())
+				}
+				m.state = list
+			}
+		case "n":
+			m.state = list
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}
@@ -128,9 +145,7 @@ func (m Model) createTableRows() []table.Row {
 
 func (m *Model) reloadBridges() tea.Cmd {
 	m.adapter.Control.LoadBridges()
-	return func() tea.Msg {
-		return pages_hue.CreateBridgesReloadedAction()
-	}
+	return pages_hue.CreateBridgesReloadedAction()
 }
 
 func (m Model) createBridgesDiscoveredMsg() tea.Cmd {

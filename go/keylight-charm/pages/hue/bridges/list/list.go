@@ -64,7 +64,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmd = tea.Batch(toastCmd, m.reloadBridges())
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "d":
+		case "f":
 			cmd = tea.Batch(toast.CreateInfoToastAction("Discovering bridges..."), m.createBridgesDiscoveredMsg())
 		case "p":
 			cmd = tea.Batch(toast.CreateInfoToastAction("Pairing bridge, please press the button..."), m.createBridgePairedMsg())

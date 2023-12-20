@@ -77,12 +77,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = toast.CreateWarningToastAction(fmt.Sprintf("Are you sure you want to delete bridge %s? (y/n)", m.table.SelectedRow()[0]))
 		case "y":
 			if m.state == deleteBridge {
-				err := m.adapter.Control.RemoveBridge(m.table.SelectedRow()[0])
-				if err != nil {
-					cmd = toast.CreateErrorToastAction("Could not delete bridge")
-				} else {
-					cmd = tea.Batch(toast.CreateSuccessToastAction("Bridge deleted"), m.reloadBridges())
-				}
+				cmd = m.deleteBridge()
 				m.state = list
 			}
 		case "n":
@@ -92,6 +87,17 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	}
 	return m, cmd
+}
+
+func (m *Model) deleteBridge() tea.Cmd {
+	bridgeId := m.table.SelectedRow()[0]
+	err := m.adapter.Control.RemoveBridge(bridgeId)
+	if err != nil {
+		return toast.CreateErrorToastAction("Could not delete bridge")
+	} else {
+		m.table.MoveUp(1)
+		return tea.Batch(toast.CreateSuccessToastAction(fmt.Sprintf("Bridge %s deleted", bridgeId)), m.reloadBridges())
+	}
 }
 
 func (m Model) View() string {

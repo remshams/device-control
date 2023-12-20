@@ -54,6 +54,24 @@ func (group Group) GetScenes() []scenes.Scene {
 	return group.scenes
 }
 
+func (group Group) GetSceneById(id string) *scenes.Scene {
+	for _, scene := range group.scenes {
+		if scene.Id() == id {
+			return &scene
+		}
+	}
+	return nil
+}
+
+func (group Group) GetSceneByName(name string) *scenes.Scene {
+	for _, scene := range group.scenes {
+		if scene.Name() == name {
+			return &scene
+		}
+	}
+	return nil
+}
+
 func (group Group) SetScene(scene scenes.Scene) error {
 	return group.groupAdapter.SetScene(group, scene)
 }

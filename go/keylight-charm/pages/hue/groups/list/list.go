@@ -4,6 +4,7 @@ import (
 	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/lights/hue"
+	pages_hue "keylight-charm/pages/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
 	hue_group_details "keylight-charm/pages/hue/groups/details"
 	"strconv"
@@ -18,7 +19,6 @@ type GroupSelect struct {
 
 type Model struct {
 	adapter *hue.HueAdapter
-	bridges []hue_control.Bridge
 	table   table.Model
 	details hue_group_details.Model
 }
@@ -27,7 +27,6 @@ func InitModel(adapter *hue.HueAdapter) Model {
 	adapter.Control.LoadBridges()
 	return Model{
 		adapter: adapter,
-		bridges: adapter.Control.GetBridges(),
 		table:   createTable(adapter.Control.GetBridges()),
 	}
 }
@@ -37,6 +36,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "t":
+			cmd = m.toggleAllGroupLights()
 		case "enter":
 			cmd = m.selectGroup(m.table.SelectedRow()[0])
 		case "esc":
@@ -79,15 +80,26 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 
 func (m *Model) selectGroup(id string) tea.Cmd {
 	return func() tea.Msg {
-		var selectedGroup *hue_control.Group
-		for _, bridge := range m.bridges {
-			selectedGroup = bridge.GetGroupById(id)
-			if selectedGroup != nil {
-				break
-			}
-		}
 		return GroupSelect{
-			Group: *selectedGroup,
+			Group: *m.findSelectedGroup(id),
 		}
 	}
+}
+
+func (m Model) toggleAllGroupLights() tea.Cmd {
+	group := m.findSelectedGroup(m.table.SelectedRow()[0])
+	group.SetOn(!group.GetOn())
+	group.SendGroup()
+	m.adapter.Control.LoadBridges()
+	return pages_hue.CreateBridgesReloadedAction()
+}
+
+func (m Model) findSelectedGroup(id string) *hue_control.Group {
+	for _, bridge := range m.adapter.Control.GetBridges() {
+		group := bridge.GetGroupById(id)
+		if group != nil {
+			return group
+		}
+	}
+	return nil
 }

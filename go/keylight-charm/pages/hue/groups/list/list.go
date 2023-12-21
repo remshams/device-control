@@ -27,13 +27,15 @@ func InitModel(adapter *hue.HueAdapter) Model {
 	adapter.Control.LoadBridges()
 	return Model{
 		adapter: adapter,
-		table:   createTable(adapter.Control.GetBridges()),
+		table:   kl_table.CreateTable(createTableColumns(), createTableRows(adapter.Control.GetBridges())),
 	}
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case pages_hue.BridgesReloadedAction:
+		m.table.SetRows(createTableRows(m.adapter.Control.GetBridges()))
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "t":
@@ -53,13 +55,17 @@ func (m Model) View() string {
 	return m.table.View()
 }
 
-func createTable(bridges []hue_control.Bridge) table.Model {
-	columns := []table.Column{
+func createTableColumns() []table.Column {
+	return []table.Column{
 		{Title: "Id", Width: 5},
 		{Title: "Name", Width: 20},
 		{Title: "Number of lights", Width: 20},
 		{Title: "Bridge Id", Width: 20},
+		{Title: "Lights On", Width: 10},
 	}
+}
+
+func createTableRows(bridges []hue_control.Bridge) []table.Row {
 	rows := []table.Row{}
 
 	for _, bridge := range bridges {
@@ -71,11 +77,13 @@ func createTable(bridges []hue_control.Bridge) table.Model {
 					group.GetName(),
 					strconv.Itoa(len(group.GetLightIds())),
 					group.GetBridgeId(),
+					strconv.FormatBool(group.GetOn()),
 				},
 			)
 		}
 	}
-	return kl_table.CreateTable(columns, rows)
+
+	return rows
 }
 
 func (m *Model) selectGroup(id string) tea.Cmd {

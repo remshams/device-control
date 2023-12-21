@@ -33,6 +33,7 @@ func InitModel(adapter *hue.HueAdapter) Model {
 	return Model{
 		adapter: adapter,
 		state:   initial,
+		list:    hue_group_list.InitModel(adapter),
 	}
 }
 
@@ -54,7 +55,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.state = details
 	case hue_groups.BackToListAction:
 		m.selectedGroup = nil
-		m.list = hue_group_list.InitModel(m.adapter)
 		m.state = list
 	default:
 		cmd = m.forwardUpdate(msg)

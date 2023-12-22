@@ -63,17 +63,34 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case pages_hue.ReloadBridgesAction:
+		m.adapter.Control.LoadBridges()
+		cmd = pages_hue.CreateBridgesReloadedAction()
 	case pages_hue.BackToHueHomeAction:
 		m.state = menu
-	default:
-		if m.state == menu {
-			cmd = m.processMenuUpdate(msg)
-		} else {
-			cmd = m.forwardUpdate(msg)
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "r":
+			cmd = pages_hue.CreateReloadBridgesAction()
+		default:
+			cmd = m.defaultUpdate(msg)
 		}
+
+	default:
+		cmd = m.defaultUpdate(msg)
 
 	}
 	return m, cmd
+}
+
+func (m *Model) defaultUpdate(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	if m.state == menu {
+		cmd = m.processMenuUpdate(msg)
+	} else {
+		cmd = m.forwardUpdate(msg)
+	}
+	return cmd
 }
 
 func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {

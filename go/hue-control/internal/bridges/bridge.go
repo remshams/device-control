@@ -2,6 +2,7 @@ package bridges
 
 import (
 	"hue-control/internal/groups"
+	"hue-control/internal/lights"
 	"hue-control/internal/scenes"
 	"net"
 
@@ -60,10 +61,12 @@ func InitDiscoverdBridge(bridgeAdapter BridgesAdapter, id string, ip net.IP) Dis
 type Bridge struct {
 	groupAdapter groups.GroupAdapter
 	sceneAdapter scenes.SceneAdapter
+	lightAdapter lights.LightAdapter
 	id           string
 	ip           net.IP
 	apiKey       string
 	groups       []groups.Group
+	lights       []lights.Light
 }
 
 func InitBridge(id string, ip net.IP, apiKey string) Bridge {
@@ -73,6 +76,7 @@ func InitBridge(id string, ip net.IP, apiKey string) Bridge {
 		apiKey:       apiKey,
 		groupAdapter: groups.InitGroupHttpAdapter(ip, apiKey, id),
 		sceneAdapter: scenes.InitSceneHttpAdapter(ip, apiKey),
+		lightAdapter: lights.InitLightHttpAdapter(ip, apiKey),
 	}
 }
 
@@ -93,6 +97,15 @@ func (bridge *Bridge) loadScenes() error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (bridge *Bridge) LoadLights() error {
+	lights, err := bridge.lightAdapter.All()
+	if err != nil {
+		return err
+	}
+	bridge.lights = lights
 	return nil
 }
 
@@ -120,4 +133,8 @@ func (bridge Bridge) GetGroupById(id string) *groups.Group {
 		}
 	}
 	return nil
+}
+
+func (bridge Bridge) GetLights() []lights.Light {
+	return bridge.lights
 }

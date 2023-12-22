@@ -28,9 +28,7 @@ func main() {
 	finder = bridges.ZeroconfBridgeFinder{}
 	control := control.InitHueControl(finder, store)
 	control.LoadBridges()
-	control.DiscoverBridges()
-	// control.Pair(control.GetDiscoveredBridges()[0].Id)
-	// control.LoadOrFindBridges()
-	// group := control.GetBridges()[0].GetGroups()[0]
-	// group.SetScene(group.GetScenes()[0])
+	bridge := control.GetBridges()[0]
+	bridge.LoadLights()
+	log.Debugf("Lights: %v", bridge.GetLights())
 }

@@ -98,7 +98,6 @@ func (m Model) toggleAllGroupLights() tea.Cmd {
 	group := m.findSelectedGroup(m.table.SelectedRow()[0])
 	group.SetOn(!group.GetOn())
 	group.SendGroup()
-	m.adapter.Control.LoadBridges()
 	return pages_hue.CreateBridgesReloadedAction()
 }
 

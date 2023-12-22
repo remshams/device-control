@@ -50,7 +50,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case hue_groups.BackToGroupHomeAction:
 		cmd = pages_hue.CreateBackToHueHomeAction()
 	case hue_group_list.GroupSelect:
-		m.selectedGroup = &msg.Group
+		m.selectedGroup = msg.Group
 		m.details = hue_group_details.InitModel(m.adapter, msg.Group)
 		m.state = details
 	case hue_groups.BackToListAction:

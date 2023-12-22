@@ -14,7 +14,7 @@ import (
 )
 
 type GroupSelect struct {
-	Group hue_control.Group
+	Group *hue_control.Group
 }
 
 type Model struct {
@@ -89,7 +89,7 @@ func createTableRows(bridges []hue_control.Bridge) []table.Row {
 func (m *Model) selectGroup(id string) tea.Cmd {
 	return func() tea.Msg {
 		return GroupSelect{
-			Group: *m.findSelectedGroup(id),
+			Group: m.findSelectedGroup(id),
 		}
 	}
 }

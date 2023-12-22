@@ -28,8 +28,9 @@ type lightStateDto struct {
 	Sat int  `json:"sat"`
 }
 
-func (lightDto lightDto) toLight(id string) Light {
+func (lightDto lightDto) toLight(bridgeId string, id string) Light {
 	return InitLight(
+		bridgeId,
 		id,
 		lightDto.Name,
 		lightDto.State.On,
@@ -39,7 +40,7 @@ func (lightDto lightDto) toLight(id string) Light {
 	)
 }
 
-func parseResponse(body []byte) ([]Light, error) {
+func parseResponse(bridgeId string, body []byte) ([]Light, error) {
 	var lightResponseDto lightDtoById
 	err := json.Unmarshal(body, &lightResponseDto)
 	if err != nil {
@@ -51,20 +52,22 @@ func parseResponse(body []byte) ([]Light, error) {
 	}
 	lights := []Light{}
 	for id, lightDto := range lightResponseDto {
-		lights = append(lights, lightDto.toLight(id))
+		lights = append(lights, lightDto.toLight(bridgeId, id))
 	}
 	return lights, nil
 }
 
 type LightHttpAdapter struct {
-	ip     net.IP
-	apiKey string
+	bridgeId string
+	ip       net.IP
+	apiKey   string
 }
 
-func InitLightHttpAdapter(ip net.IP, apiKey string) LightHttpAdapter {
+func InitLightHttpAdapter(bridgeId string, ip net.IP, apiKey string) LightHttpAdapter {
 	return LightHttpAdapter{
-		ip:     ip,
-		apiKey: apiKey,
+		bridgeId: bridgeId,
+		ip:       ip,
+		apiKey:   apiKey,
 	}
 }
 
@@ -86,6 +89,6 @@ func (adapter LightHttpAdapter) All() ([]Light, error) {
 	if err != nil || hue_control_http.HasError(res, &body) {
 		return nil, errors.New("Failed to get lights")
 	}
-	return parseResponse(body)
+	return parseResponse(adapter.bridgeId, body)
 
 }

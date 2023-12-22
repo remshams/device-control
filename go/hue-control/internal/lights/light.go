@@ -5,23 +5,29 @@ type LightAdapter interface {
 }
 
 type Light struct {
-	id   string
-	name string
-	on   bool
-	bri  int
-	hue  int
-	sat  int
+	bridgeId string
+	id       string
+	name     string
+	on       bool
+	bri      int
+	hue      int
+	sat      int
 }
 
-func InitLight(id string, name string, on bool, bri int, hue int, sat int) Light {
+func InitLight(bridgeId string, id string, name string, on bool, bri int, hue int, sat int) Light {
 	return Light{
-		id:   id,
-		name: name,
-		on:   on,
-		bri:  bri,
-		hue:  hue,
-		sat:  sat,
+		bridgeId: bridgeId,
+		id:       id,
+		name:     name,
+		on:       on,
+		bri:      bri,
+		hue:      hue,
+		sat:      sat,
 	}
+}
+
+func (light Light) GetBridgeId() string {
+	return light.bridgeId
 }
 
 func (light Light) GetId() string {

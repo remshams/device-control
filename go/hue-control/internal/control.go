@@ -74,9 +74,10 @@ func (hueControl HueControl) loadBridgeGroups() error {
 	for i := range hueControl.bridges {
 		bridge := &hueControl.bridges[i]
 		err = bridge.LoadGroups()
+		err = bridge.LoadLights()
 	}
 	if err != nil {
-		log.Error("Failed to load bridge groups")
+		log.Error("Failed to load bridge groups and/or lights")
 	}
 	return err
 }

@@ -6,6 +6,7 @@ import (
 	pages_hue "keylight-charm/pages/hue"
 	hue_bridges_home "keylight-charm/pages/hue/bridges/home"
 	hue_groups_home "keylight-charm/pages/hue/groups/home"
+	hue_lights_home "keylight-charm/pages/hue/lights/home"
 	"keylight-charm/stores"
 	"keylight-charm/styles"
 
@@ -36,6 +37,7 @@ const (
 	menu    viewState = "menu"
 	groups  viewState = "groups"
 	bridges viewState = "bridges"
+	lights  viewState = "lights"
 )
 
 type Model struct {
@@ -43,6 +45,7 @@ type Model struct {
 	menu    list.Model
 	bridges hue_bridges_home.Model
 	groups  hue_groups_home.Model
+	lights  hue_lights_home.Model
 	state   viewState
 }
 
@@ -52,6 +55,7 @@ func InitModel(adapter *hue.HueAdapter) Model {
 		menu:    createMenu(),
 		bridges: hue_bridges_home.InitModel(adapter),
 		groups:  hue_groups_home.InitModel(adapter),
+		lights:  hue_lights_home.InitModel(adapter),
 		state:   menu,
 	}
 }
@@ -112,6 +116,9 @@ func (m *Model) processMenuUpdate(msg tea.Msg) tea.Cmd {
 			case 1:
 				m.state = groups
 				cmd = m.groups.Init()
+			case 2:
+				m.state = lights
+				cmd = m.lights.Init()
 			}
 		default:
 			cmd = m.forwardUpdate(msg)
@@ -134,6 +141,8 @@ func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
 		m.groups, cmd = m.groups.Update(msg)
 	case bridges:
 		m.bridges, cmd = m.bridges.Update(msg)
+	case lights:
+		m.lights, cmd = m.lights.Update(msg)
 	}
 	return cmd
 }
@@ -146,6 +155,8 @@ func (m Model) View() string {
 		return m.groups.View()
 	case bridges:
 		return m.bridges.View()
+	case lights:
+		return m.lights.View()
 	default:
 		return ""
 	}
@@ -153,8 +164,9 @@ func (m Model) View() string {
 
 func createMenu() list.Model {
 	items := []list.Item{
-		menuItem{title: "HueBridges", desc: "Manage hue bridges (pair...)"},
-		menuItem{title: "HueGroups", desc: "Control hue groups"},
+		menuItem{title: "Bridges", desc: "Manage hue bridges (pair...)"},
+		menuItem{title: "Groups", desc: "Control hue groups"},
+		menuItem{title: "Lights", desc: "Control hue lights"},
 	}
 	list := list.New(items, list.NewDefaultDelegate(), 0, 0)
 	list.Title = "Hue Home"

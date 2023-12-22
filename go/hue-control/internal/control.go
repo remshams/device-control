@@ -114,9 +114,10 @@ func (control HueControl) findDiscoveredBridgeById(id string) *bridges.Disvovere
 }
 
 func (control HueControl) GetBridgeById(id string) *bridges.Bridge {
-	for _, bridge := range control.bridges {
+	for i := range control.bridges {
+		bridge := &control.bridges[i]
 		if bridge.GetId() == id {
-			return &bridge
+			return bridge
 		}
 	}
 	return nil

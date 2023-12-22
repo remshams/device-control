@@ -146,7 +146,6 @@ func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {
 }
 
 func (m *Model) reloadLights() {
-	m.adapter.Control.LoadBridges()
 	m.group = m.adapter.Control.GetBridgeById(m.group.GetBridgeId()).GetGroupById(m.group.GetId())
 	m.resetView()
 }

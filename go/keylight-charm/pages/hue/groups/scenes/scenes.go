@@ -42,11 +42,11 @@ func (sceneItem sceneItem) FilterValue() string {
 
 type Model struct {
 	adapter *hue.HueAdapter
-	group   hue_control.Group
+	group   *hue_control.Group
 	scenes  list.Model
 }
 
-func InitModel(adapter *hue.HueAdapter, group hue_control.Group) Model {
+func InitModel(adapter *hue.HueAdapter, group *hue_control.Group) Model {
 	model := Model{
 		adapter: adapter,
 		group:   group,

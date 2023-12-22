@@ -150,7 +150,6 @@ func (m Model) createTableRows() []table.Row {
 }
 
 func (m *Model) reloadBridges() tea.Cmd {
-	m.adapter.Control.LoadBridges()
 	return pages_hue.CreateBridgesReloadedAction()
 }
 

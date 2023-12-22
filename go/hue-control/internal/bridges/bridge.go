@@ -113,9 +113,10 @@ func (bridge Bridge) GetApiKey() string {
 }
 
 func (bridge Bridge) GetGroupById(id string) *groups.Group {
-	for _, group := range bridge.groups {
+	for i := range bridge.groups {
+		group := &bridge.groups[i]
 		if id == group.GetId() {
-			return &group
+			return group
 		}
 	}
 	return nil

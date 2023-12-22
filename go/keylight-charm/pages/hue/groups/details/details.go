@@ -27,14 +27,14 @@ const (
 
 type Model struct {
 	adapter *hue.HueAdapter
-	group   hue_control.Group
+	group   *hue_control.Group
 	on      checkbox.Model
 	state   viewState
 	cursor  int
 	scenes  hue_group_scenes.Model
 }
 
-func InitModel(adapter *hue.HueAdapter, group hue_control.Group) Model {
+func InitModel(adapter *hue.HueAdapter, group *hue_control.Group) Model {
 	return Model{
 		adapter: adapter,
 		group:   group,
@@ -147,7 +147,7 @@ func (m *Model) sendScene(scene hue_control.Scene) tea.Cmd {
 
 func (m *Model) reloadLights() {
 	m.adapter.Control.LoadBridges()
-	m.group = *m.adapter.Control.GetBridgeById(m.group.GetBridgeId()).GetGroupById(m.group.GetId())
+	m.group = m.adapter.Control.GetBridgeById(m.group.GetBridgeId()).GetGroupById(m.group.GetId())
 	m.resetView()
 }
 

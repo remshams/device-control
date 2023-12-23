@@ -10,6 +10,7 @@ func CreateTable(columns []table.Column, rows []table.Row) table.Model {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
+		table.WithHeight(10),
 	)
 
 	s := table.DefaultStyles()

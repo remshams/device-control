@@ -1,8 +1,10 @@
 package hue_group_list
 
 import (
+	"fmt"
 	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
+	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
 	pages_hue "keylight-charm/pages/hue"
 	hue_groups "keylight-charm/pages/hue/groups"
@@ -96,9 +98,20 @@ func (m *Model) selectGroup(id string) tea.Cmd {
 
 func (m Model) toggleAllGroupLights() tea.Cmd {
 	group := m.findSelectedGroup(m.table.SelectedRow()[0])
-	group.SetOn(!group.GetOn())
-	group.SendGroup()
-	return pages_hue.CreateBridgesReloadedAction()
+	on := !group.GetOn()
+	group.SetOn(on)
+	err := group.SendGroup()
+	if err != nil {
+		return toast.CreateErrorToastAction("Failed to toggle group")
+	}
+	onText := "on"
+	if on {
+		onText = "off"
+	}
+	return tea.Batch(
+		toast.CreateSuccessToastAction(fmt.Sprintf("All groups set to %s", onText)),
+		pages_hue.CreateBridgesReloadedAction(),
+	)
 }
 
 func (m Model) findSelectedGroup(id string) *hue_control.Group {

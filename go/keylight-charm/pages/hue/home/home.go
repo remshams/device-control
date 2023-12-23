@@ -1,6 +1,7 @@
 package hue_home
 
 import (
+	"keylight-charm/components/toast"
 	"keylight-charm/lights/hue"
 	"keylight-charm/pages"
 	pages_hue "keylight-charm/pages/hue"
@@ -68,8 +69,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case pages_hue.ReloadBridgesAction:
-		m.adapter.Control.LoadBridges()
-		cmd = pages_hue.CreateBridgesReloadedAction()
+		err := m.adapter.Control.LoadBridges()
+		if err != nil {
+			cmd = toast.CreateErrorToastAction("Failed to reload bridges")
+		}
+		cmd = tea.Batch(
+			toast.CreateSuccessToastAction("Bridges/Groups/Lights reloaded"),
+			pages_hue.CreateBridgesReloadedAction(),
+		)
 	case pages_hue.BackToHueHomeAction:
 		m.state = menu
 	case tea.KeyMsg:

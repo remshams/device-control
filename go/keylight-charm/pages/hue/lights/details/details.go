@@ -3,6 +3,7 @@ package hue_lights_details
 import (
 	hue_control "hue-control/pubilc"
 	"keylight-charm/lights/hue"
+	hue_lights "keylight-charm/pages/hue/lights"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -24,7 +25,15 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
-	return m, nil
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			cmd = hue_lights.CreateBackToLightHomeAction()
+		}
+	}
+	return m, cmd
 }
 
 func (m Model) View() string {

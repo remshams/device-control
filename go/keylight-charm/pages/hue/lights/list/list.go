@@ -4,11 +4,16 @@ import (
 	hue_control "hue-control/pubilc"
 	kl_table "keylight-charm/components/table"
 	"keylight-charm/lights/hue"
+	hue_lights "keylight-charm/pages/hue/lights"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+type LightSelected struct {
+	Light *hue_control.Light
+}
 
 type Model struct {
 	adapter *hue.HueAdapter
@@ -28,6 +33,16 @@ func InitModel(adapter *hue.HueAdapter) Model {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.lights, cmd = m.lights.Update(msg)
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			cmd = hue_lights.CreateBackToLightHomeAction()
+		case "enter":
+			cmd = m.createLightSelectedAction(m.findLight())
+		}
+
+	}
 	return m, cmd
 }
 
@@ -59,4 +74,15 @@ func createLightsRows(bridges []hue_control.Bridge) []table.Row {
 		}
 	}
 	return rows
+}
+
+func (m Model) findLight() *hue_control.Light {
+	selectedItem := m.lights.SelectedRow()
+	return m.adapter.Control.GetBridgeById(selectedItem[3]).GetLightById(selectedItem[0])
+}
+
+func (m Model) createLightSelectedAction(light *hue_control.Light) tea.Cmd {
+	return func() tea.Msg {
+		return LightSelected{light}
+	}
 }

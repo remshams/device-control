@@ -138,3 +138,13 @@ func (bridge Bridge) GetGroupById(id string) *groups.Group {
 func (bridge Bridge) GetLights() []lights.Light {
 	return bridge.lights
 }
+
+func (bridge Bridge) GetLightById(id string) *lights.Light {
+	for i := range bridge.lights {
+		light := &bridge.lights[i]
+		if id == light.GetId() {
+			return light
+		}
+	}
+	return nil
+}

@@ -39,7 +39,6 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
 	switch msg := msg.(type) {
 	case hue_lights.BackToLightHomeAction:
 		m.details = nil
@@ -53,6 +52,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case "esc":
 			if m.state == list {
 				cmd = pages_hue.CreateBackToHueHomeAction()
+			} else {
+				cmd = m.forwardAction(msg)
 			}
 		default:
 			cmd = m.forwardAction(msg)

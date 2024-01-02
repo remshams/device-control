@@ -2,10 +2,10 @@ package hue_lights_list
 
 import (
 	hue_control "hue-control/pubilc"
+	"strconv"
 	kl_table "ui/components/table"
 	"ui/lights/hue"
 	hue_lights "ui/pages/hue/lights"
-	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -32,7 +32,6 @@ func InitModel(adapter *hue.HueAdapter) Model {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	m.lights, cmd = m.lights.Update(msg)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -40,7 +39,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			cmd = hue_lights.CreateBackToLightHomeAction()
 		case "enter":
 			cmd = m.createLightSelectedAction(m.findLight())
+		default:
+			m.lights, cmd = m.lights.Update(msg)
 		}
+	default:
+		m.lights, cmd = m.lights.Update(msg)
 
 	}
 	return m, cmd

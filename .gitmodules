@@ -1,3 +1,0 @@
-[submodule "avahi-sys"]
-	path = rust/avahi-sys
-	url = git@github.com:remshams/avahi-sys.git

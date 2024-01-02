@@ -1,3 +1,3 @@
-# Light control
+# Device Control
 
-Tui app to control elgato keylights from the command line.
+Tui app to control network devices

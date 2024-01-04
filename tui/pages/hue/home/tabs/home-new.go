@@ -65,6 +65,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			toast.CreateSuccessToastAction("Bridges/Groups/Lights reloaded"),
 			pages_hue.CreateBridgesReloadedAction(),
 		)
+	case pages_hue.BackToHueHomeAction:
+		cmd = pages.CreateBackToMenuAction()
 	case dc_tabs.TabSelectedMsg:
 		switch msg {
 		case 0:
@@ -80,7 +82,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			cmd = pages.CreateBackToMenuAction()
+			cmd = m.forwardUpdate(msg)
 		case "r":
 			cmd = pages_hue.CreateReloadBridgesAction()
 		default:

@@ -1,4 +1,4 @@
-module hue-control
+module github.com/remshams/device-control/hue-control
 
 go 1.21.3
 

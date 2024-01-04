@@ -2,7 +2,7 @@ package hue_group_details
 
 import (
 	"fmt"
-	hue_control "hue-control/pubilc"
+	hue_control "github.com/remshams/device-control/hue-control/pubilc"
 	"github.com/remshams/device-control/tui/components/checkbox"
 	kl_cursor "github.com/remshams/device-control/tui/components/cursor"
 	"github.com/remshams/device-control/tui/components/toast"

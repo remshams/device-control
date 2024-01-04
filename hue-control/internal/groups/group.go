@@ -1,7 +1,7 @@
 package groups
 
 import (
-	"hue-control/internal/scenes"
+	"github.com/remshams/device-control/hue-control/internal/scenes"
 )
 
 type GroupAdapter interface {

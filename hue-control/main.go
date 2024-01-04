@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	control "hue-control/internal"
-	"hue-control/internal/bridges"
+	control "github.com/remshams/device-control/hue-control/internal"
+	"github.com/remshams/device-control/hue-control/internal/bridges"
 	"os"
 	"path/filepath"
 

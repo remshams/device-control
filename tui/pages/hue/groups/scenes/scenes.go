@@ -1,7 +1,7 @@
 package hue_group_scenes
 
 import (
-	hue_control "hue-control/pubilc"
+	hue_control "github.com/remshams/device-control/hue-control/pubilc"
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/pages"
 	hue_groups "github.com/remshams/device-control/tui/pages/hue/groups"

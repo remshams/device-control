@@ -1,7 +1,7 @@
 package keylight_home
 
 import (
-	hue_control "hue-control/pubilc"
+	hue_control "github.com/remshams/device-control/hue-control/pubilc"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	pages_keylight "github.com/remshams/device-control/tui/pages/keylight"

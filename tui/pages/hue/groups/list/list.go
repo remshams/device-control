@@ -2,7 +2,7 @@ package hue_group_list
 
 import (
 	"fmt"
-	hue_control "hue-control/pubilc"
+	hue_control "github.com/remshams/device-control/hue-control/pubilc"
 	kl_table "github.com/remshams/device-control/tui/components/table"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"

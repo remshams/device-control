@@ -1,11 +1,11 @@
 package hue_control
 
 import (
-	control "hue-control/internal"
-	"hue-control/internal/bridges"
-	"hue-control/internal/groups"
-	"hue-control/internal/lights"
-	"hue-control/internal/scenes"
+	control "github.com/remshams/device-control/hue-control/internal"
+	"github.com/remshams/device-control/hue-control/internal/bridges"
+	"github.com/remshams/device-control/hue-control/internal/groups"
+	"github.com/remshams/device-control/hue-control/internal/lights"
+	"github.com/remshams/device-control/hue-control/internal/scenes"
 )
 
 type DiscoveredBridge = bridges.DiscoveredBridgePublic

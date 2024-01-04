@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	hue_control_http "hue-control/internal/http"
+	hue_control_http "github.com/remshams/device-control/hue-control/internal/http"
 	"io"
 	"net"
 	"net/http"

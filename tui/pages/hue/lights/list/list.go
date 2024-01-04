@@ -1,7 +1,7 @@
 package hue_lights_list
 
 import (
-	hue_control "hue-control/pubilc"
+	hue_control "github.com/remshams/device-control/hue-control/pubilc"
 	"strconv"
 	kl_table "github.com/remshams/device-control/tui/components/table"
 	"github.com/remshams/device-control/tui/lights/hue"

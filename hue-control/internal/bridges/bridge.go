@@ -1,9 +1,9 @@
 package bridges
 
 import (
-	"hue-control/internal/groups"
-	"hue-control/internal/lights"
-	"hue-control/internal/scenes"
+	"github.com/remshams/device-control/hue-control/internal/groups"
+	"github.com/remshams/device-control/hue-control/internal/lights"
+	"github.com/remshams/device-control/hue-control/internal/scenes"
 	"net"
 
 	"github.com/charmbracelet/log"

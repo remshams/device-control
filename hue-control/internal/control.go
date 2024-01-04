@@ -2,7 +2,7 @@ package control
 
 import (
 	"errors"
-	"hue-control/internal/bridges"
+	"github.com/remshams/device-control/hue-control/internal/bridges"
 
 	"github.com/charmbracelet/log"
 )

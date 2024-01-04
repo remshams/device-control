@@ -1,7 +1,7 @@
 package hue_lights_details
 
 import (
-	hue_control "hue-control/pubilc"
+	hue_control "github.com/remshams/device-control/hue-control/pubilc"
 	"github.com/remshams/device-control/tui/lights/hue"
 	hue_lights "github.com/remshams/device-control/tui/pages/hue/lights"
 

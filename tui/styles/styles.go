@@ -12,6 +12,8 @@ var TextWarningColor = lipgloss.NewStyle().Foreground(WarningColor)
 var TextErrorColor = lipgloss.NewStyle().Foreground(ErrorColor)
 var TextInfoColor = lipgloss.NewStyle().Foreground(InfoColor)
 var TextSuccessColor = lipgloss.NewStyle().Foreground(SuccessColor)
+var SelectedColor = lipgloss.Color("212")
+var DisabledColor = lipgloss.Color("238")
 
 var Padding = 1
 var ListStyles = lipgloss.NewStyle().Margin(1, 2)

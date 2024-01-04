@@ -1,7 +1,7 @@
 package main
 
 import (
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 	"os"
 	"path/filepath"
 )

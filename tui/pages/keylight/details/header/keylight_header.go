@@ -2,7 +2,7 @@ package keylight_header
 
 import (
 	"fmt"
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

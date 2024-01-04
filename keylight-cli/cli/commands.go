@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"keylight-cli/cli"
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 	"os"
 	"path/filepath"
 

@@ -6,7 +6,7 @@ import (
 	"github.com/remshams/device-control/tui/lights/keylight"
 	pages_keylight "github.com/remshams/device-control/tui/pages/keylight"
 	"github.com/remshams/device-control/tui/styles"
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 	"net"
 	"strconv"
 

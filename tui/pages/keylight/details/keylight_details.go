@@ -10,7 +10,7 @@ import (
 	keylight_model "github.com/remshams/device-control/tui/pages/keylight/details/model"
 	"github.com/remshams/device-control/tui/styles"
 
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 
 	"github.com/charmbracelet/lipgloss"
 

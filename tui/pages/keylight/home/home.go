@@ -8,7 +8,7 @@ import (
 	keylight_details "github.com/remshams/device-control/tui/pages/keylight/details"
 	keylight_edit "github.com/remshams/device-control/tui/pages/keylight/edit"
 	keylight_list "github.com/remshams/device-control/tui/pages/keylight/list"
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

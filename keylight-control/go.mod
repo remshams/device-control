@@ -1,4 +1,4 @@
-module keylight-control
+module github.com/remshams/device-control/keylight-control
 
 go 1.20
 

@@ -6,7 +6,7 @@ import (
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages"
 	"github.com/remshams/device-control/tui/utils"
-	"keylight-control/control"
+	"github.com/remshams/device-control/keylight-control/control"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"

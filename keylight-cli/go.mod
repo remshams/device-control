@@ -1,4 +1,4 @@
-module keylight-cli
+module github.com/remshams/device-control/keylight-cli
 
 go 1.20
 

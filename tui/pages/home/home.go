@@ -2,11 +2,12 @@ package home
 
 import (
 	"fmt"
+
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages"
-	hue_home "github.com/remshams/device-control/tui/pages/hue/home"
+	hue_home_tabs "github.com/remshams/device-control/tui/pages/hue/home/tabs"
 	keylight_home "github.com/remshams/device-control/tui/pages/keylight/home"
 	"github.com/remshams/device-control/tui/stores"
 	"github.com/remshams/device-control/tui/styles"
@@ -40,7 +41,7 @@ const (
 
 type Model struct {
 	keylight keylight_home.Model
-	hue      hue_home.Model
+	hue      hue_home_tabs.Model
 	menu     list.Model
 	state    viewState
 	toast    toast.Model
@@ -49,7 +50,7 @@ type Model struct {
 func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter) Model {
 	return Model{
 		keylight: keylight_home.InitModel(keylightAdapter),
-		hue:      hue_home.InitModel(hueAdapter),
+		hue:      hue_home_tabs.InitModel(hueAdapter),
 		menu:     createMenu(),
 		state:    menu,
 		toast:    toast.InitModel(),

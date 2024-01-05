@@ -112,6 +112,12 @@ func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
+	header := lipgloss.NewStyle().
+		Bold(true).
+		Background(styles.HeadlineBackgroundColor).
+		MarginLeft(styles.Padding).
+		MarginBottom(styles.Padding).
+		Render("Hue Home")
 	body := ""
 	switch m.state {
 	case groups:
@@ -122,7 +128,8 @@ func (m Model) View() string {
 		body = m.lights.View()
 	}
 	return fmt.Sprintf(
-		"%s\n%s",
+		"%s\n%s\n%s",
+		header,
 		lipgloss.NewStyle().PaddingBottom(styles.Padding).Render(m.tabs.View()),
 		body,
 	)

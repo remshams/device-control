@@ -123,7 +123,7 @@ func (m Model) View() string {
 		body = m.lights.View()
 	}
 	return fmt.Sprintf(
-		"\n%s\n%s",
+		"%s\n%s",
 		lipgloss.NewStyle().PaddingBottom(styles.Padding).Render(m.tabs.View()),
 		body,
 	)

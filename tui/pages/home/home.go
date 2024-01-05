@@ -8,7 +8,7 @@ import (
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages"
-	hue_home_tabs "github.com/remshams/device-control/tui/pages/hue/home/tabs"
+	"github.com/remshams/device-control/tui/pages/hue/home"
 	keylight_home "github.com/remshams/device-control/tui/pages/keylight/home"
 	"github.com/remshams/device-control/tui/stores"
 	"github.com/remshams/device-control/tui/styles"

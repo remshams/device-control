@@ -3,7 +3,7 @@ package home
 import (
 	"fmt"
 
-	"github.com/remshams/device-control/tui/components/header"
+	"github.com/remshams/device-control/tui/components/page_title"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
@@ -41,22 +41,22 @@ const (
 )
 
 type Model struct {
-	keylight keylight_home.Model
-	hue      hue_home_tabs.Model
-	menu     list.Model
-	state    viewState
-	toast    toast.Model
-	header   header.Model
+	keylight  keylight_home.Model
+	hue       hue_home_tabs.Model
+	menu      list.Model
+	state     viewState
+	toast     toast.Model
+	pageTitle page_title.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter) Model {
 	return Model{
-		keylight: keylight_home.InitModel(keylightAdapter),
-		hue:      hue_home_tabs.InitModel(hueAdapter),
-		menu:     createMenu(),
-		state:    menu,
-		toast:    toast.InitModel(),
-		header:   header.New(),
+		keylight:  keylight_home.InitModel(keylightAdapter),
+		hue:       hue_home_tabs.InitModel(hueAdapter),
+		menu:      createMenu(),
+		state:     menu,
+		toast:     toast.InitModel(),
+		pageTitle: page_title.New(),
 	}
 }
 
@@ -67,7 +67,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.toast, _ = m.toast.Update(msg)
-	m.header, _ = m.header.Update(msg)
+	m.pageTitle, _ = m.pageTitle.Update(msg)
 	if pages.IsSystemMsg(msg) {
 		cmd = m.processSystemUpdate(msg)
 	} else {
@@ -161,14 +161,14 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
-	return fmt.Sprintf("%s\n%s\n%s", m.renderHeader(), m.renderPageContent(), m.renderToast())
+	return fmt.Sprintf("%s\n%s\n%s", m.renderPageTitle(), m.renderPageContent(), m.renderToast())
 }
 
-func (m Model) renderHeader() string {
-	headerStyle := lipgloss.NewStyle().
+func (m Model) renderPageTitle() string {
+	pageTitle := lipgloss.NewStyle().
 		PaddingTop(styles.Padding).
 		PaddingLeft(styles.Padding)
-	return headerStyle.Render(m.header.View())
+	return pageTitle.Render(m.pageTitle.View())
 }
 
 func (m Model) renderPageContent() string {

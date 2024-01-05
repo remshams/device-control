@@ -1,4 +1,4 @@
-package header
+package page_title
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
@@ -17,7 +17,7 @@ func New() Model {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case SetHeaderMsg:
+	case SetPageTitleMsg:
 		m.header = msg
 	}
 	return m, cmd

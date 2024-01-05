@@ -2,13 +2,14 @@ package keylight_home
 
 import (
 	hue_control "github.com/remshams/device-control/hue-control/pubilc"
+	"github.com/remshams/device-control/keylight-control/control"
+	"github.com/remshams/device-control/tui/components/page_title"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	pages_keylight "github.com/remshams/device-control/tui/pages/keylight"
 	keylight_details "github.com/remshams/device-control/tui/pages/keylight/details"
 	keylight_edit "github.com/remshams/device-control/tui/pages/keylight/edit"
 	keylight_list "github.com/remshams/device-control/tui/pages/keylight/list"
-	"github.com/remshams/device-control/keylight-control/control"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -45,7 +46,9 @@ func InitModel(keylightAdapter *keylight.KeylightAdapter) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.init()
+	// The title is set here because init loads the keylights which can take some time.
+	// If set in the initMsg case, the title is not set before the keylights are rendered.
+	return tea.Batch(page_title.CreateSetPageTitleMsg("Keylights"), m.init())
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {

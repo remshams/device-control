@@ -169,6 +169,7 @@ func (m Model) View() string {
 func (m Model) renderPageTitle() string {
 	pageTitle := lipgloss.NewStyle().
 		PaddingTop(styles.Padding).
+		PaddingBottom(styles.Padding).
 		PaddingLeft(styles.Padding)
 	return pageTitle.Render(m.pageTitle.View())
 }

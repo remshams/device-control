@@ -8,6 +8,8 @@ import (
 	"github.com/remshams/device-control/tui/styles"
 )
 
+type TabSelectedMsg = int
+
 type Model struct {
 	names        []string
 	active       int
@@ -36,17 +38,18 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
-			m.navigate()
+			cmd = m.navigate()
 		}
 	}
 	return m, cmd
 }
 
-func (m *Model) navigate() {
+func (m *Model) navigate() tea.Cmd {
 	m.active++
 	if m.active >= len(m.names) {
 		m.active = 0
 	}
+	return m.createTabSelectedMsg()
 }
 
 func (m Model) View() string {
@@ -72,4 +75,10 @@ func (m Model) renderTab(
 	}
 	return fmt.Sprintf("%s%s%s", startSeparator, styledName, endSeparator)
 
+}
+
+func (m Model) createTabSelectedMsg() tea.Cmd {
+	return func() tea.Msg {
+		return TabSelectedMsg(m.active)
+	}
 }

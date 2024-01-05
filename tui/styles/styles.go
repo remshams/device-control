@@ -14,6 +14,7 @@ var TextInfoColor = lipgloss.NewStyle().Foreground(InfoColor)
 var TextSuccessColor = lipgloss.NewStyle().Foreground(SuccessColor)
 var SelectedColor = lipgloss.Color("212")
 var DisabledColor = lipgloss.Color("238")
+var HeadlineBackgroundColor = lipgloss.Color("#5f00ff")
 
 var Padding = 1
 var ListStyles = lipgloss.NewStyle().Margin(1, 2)

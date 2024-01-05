@@ -2,11 +2,13 @@ package home
 
 import (
 	"fmt"
+
+	"github.com/remshams/device-control/tui/components/page_title"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages"
-	hue_home "github.com/remshams/device-control/tui/pages/hue/home"
+	"github.com/remshams/device-control/tui/pages/hue/home"
 	keylight_home "github.com/remshams/device-control/tui/pages/keylight/home"
 	"github.com/remshams/device-control/tui/stores"
 	"github.com/remshams/device-control/tui/styles"
@@ -39,20 +41,22 @@ const (
 )
 
 type Model struct {
-	keylight keylight_home.Model
-	hue      hue_home.Model
-	menu     list.Model
-	state    viewState
-	toast    toast.Model
+	keylight  keylight_home.Model
+	hue       hue_home_tabs.Model
+	menu      list.Model
+	state     viewState
+	toast     toast.Model
+	pageTitle page_title.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter) Model {
 	return Model{
-		keylight: keylight_home.InitModel(keylightAdapter),
-		hue:      hue_home.InitModel(hueAdapter),
-		menu:     createMenu(),
-		state:    menu,
-		toast:    toast.InitModel(),
+		keylight:  keylight_home.InitModel(keylightAdapter),
+		hue:       hue_home_tabs.InitModel(hueAdapter),
+		menu:      createMenu(),
+		state:     menu,
+		toast:     toast.InitModel(),
+		pageTitle: page_title.New(),
 	}
 }
 
@@ -63,6 +67,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.toast, _ = m.toast.Update(msg)
+	m.pageTitle, _ = m.pageTitle.Update(msg)
 	if pages.IsSystemMsg(msg) {
 		cmd = m.processSystemUpdate(msg)
 	} else {
@@ -124,6 +129,7 @@ func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case pages.BackToMenuAction:
 		m.state = menu
+		cmd = page_title.CreateSetPageTitleMsg("")
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -142,6 +148,7 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case pages.BackToMenuAction:
 		m.state = menu
+		cmd = page_title.CreateSetPageTitleMsg("")
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -156,20 +163,33 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
-	component := ""
+	return fmt.Sprintf("%s\n%s\n%s", m.renderPageTitle(), m.renderPageContent(), m.renderToast())
+}
+
+func (m Model) renderPageTitle() string {
+	pageTitle := lipgloss.NewStyle().
+		PaddingTop(styles.Padding).
+		PaddingBottom(styles.Padding).
+		PaddingLeft(styles.Padding)
+	return pageTitle.Render(m.pageTitle.View())
+}
+
+func (m Model) renderPageContent() string {
 	switch m.state {
 	case menu:
-		component = styles.ListStyles.Render(m.menu.View())
+		return styles.ListStyles.Render(m.menu.View())
 	case keylights:
-		component = m.keylight.View()
+		return m.keylight.View()
 	case hueLights:
-		component = m.hue.View()
+		return m.hue.View()
 	default:
-		component = ""
+		return ""
 	}
+}
 
-	styles := lipgloss.NewStyle().PaddingTop(styles.Padding)
-	return fmt.Sprintf("%s\n%s", component, styles.Render(m.toast.View()))
+func (m Model) renderToast() string {
+	toastStyle := lipgloss.NewStyle().PaddingTop(styles.Padding)
+	return toastStyle.Render(m.toast.View())
 }
 
 func createMenu() list.Model {

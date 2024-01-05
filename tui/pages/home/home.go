@@ -3,6 +3,7 @@ package home
 import (
 	"fmt"
 
+	"github.com/remshams/device-control/tui/components/header"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
@@ -45,6 +46,7 @@ type Model struct {
 	menu     list.Model
 	state    viewState
 	toast    toast.Model
+	header   header.Model
 }
 
 func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter) Model {
@@ -54,6 +56,7 @@ func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAda
 		menu:     createMenu(),
 		state:    menu,
 		toast:    toast.InitModel(),
+		header:   header.New(),
 	}
 }
 
@@ -64,6 +67,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.toast, _ = m.toast.Update(msg)
+	m.header, _ = m.header.Update(msg)
 	if pages.IsSystemMsg(msg) {
 		cmd = m.processSystemUpdate(msg)
 	} else {
@@ -157,20 +161,32 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
-	component := ""
+	return fmt.Sprintf("%s\n%s\n%s", m.renderHeader(), m.renderPageContent(), m.renderToast())
+}
+
+func (m Model) renderHeader() string {
+	headerStyle := lipgloss.NewStyle().
+		PaddingTop(styles.Padding).
+		PaddingLeft(styles.Padding)
+	return headerStyle.Render(m.header.View())
+}
+
+func (m Model) renderPageContent() string {
 	switch m.state {
 	case menu:
-		component = styles.ListStyles.Render(m.menu.View())
+		return styles.ListStyles.Render(m.menu.View())
 	case keylights:
-		component = m.keylight.View()
+		return m.keylight.View()
 	case hueLights:
-		component = m.hue.View()
+		return m.hue.View()
 	default:
-		component = ""
+		return ""
 	}
+}
 
-	styles := lipgloss.NewStyle().PaddingTop(styles.Padding)
-	return fmt.Sprintf("%s\n%s", component, styles.Render(m.toast.View()))
+func (m Model) renderToast() string {
+	toastStyle := lipgloss.NewStyle().PaddingTop(styles.Padding)
+	return toastStyle.Render(m.toast.View())
 }
 
 func createMenu() list.Model {

@@ -3,6 +3,7 @@ package hue_home_tabs
 import (
 	"fmt"
 
+	"github.com/remshams/device-control/tui/components/header"
 	dc_tabs "github.com/remshams/device-control/tui/components/tabs"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
@@ -55,7 +56,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
-		cmd = tea.Batch(m.tabs.Init(), m.groups.Init())
+		cmd = tea.Batch(m.tabs.Init(), m.groups.Init(), header.CreateSetHeaderMsg("Hue Home"))
 	case pages_hue.ReloadBridgesAction:
 		err := m.adapter.Control.LoadBridges()
 		if err != nil {
@@ -112,12 +113,6 @@ func (m *Model) forwardUpdate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
-	header := lipgloss.NewStyle().
-		Bold(true).
-		Background(styles.HeadlineBackgroundColor).
-		MarginLeft(styles.Padding).
-		MarginBottom(styles.Padding).
-		Render("Hue Home")
 	body := ""
 	switch m.state {
 	case groups:
@@ -128,8 +123,7 @@ func (m Model) View() string {
 		body = m.lights.View()
 	}
 	return fmt.Sprintf(
-		"%s\n%s\n%s",
-		header,
+		"\n%s\n%s",
 		lipgloss.NewStyle().PaddingBottom(styles.Padding).Render(m.tabs.View()),
 		body,
 	)

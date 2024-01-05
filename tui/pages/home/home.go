@@ -129,6 +129,7 @@ func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case pages.BackToMenuAction:
 		m.state = menu
+		cmd = page_title.CreateSetPageTitleMsg("")
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -147,6 +148,7 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case pages.BackToMenuAction:
 		m.state = menu
+		cmd = page_title.CreateSetPageTitleMsg("")
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":

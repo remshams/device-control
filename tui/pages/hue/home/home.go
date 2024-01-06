@@ -3,6 +3,7 @@ package hue_home_tabs
 import (
 	"fmt"
 
+	"github.com/remshams/device-control/tui/components/page_help"
 	"github.com/remshams/device-control/tui/components/page_title"
 	dc_tabs "github.com/remshams/device-control/tui/components/tabs"
 	"github.com/remshams/device-control/tui/components/toast"
@@ -14,6 +15,7 @@ import (
 	hue_lights_home "github.com/remshams/device-control/tui/pages/hue/lights/home"
 	"github.com/remshams/device-control/tui/styles"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -21,6 +23,30 @@ import (
 type viewState string
 
 type initMsg struct{}
+
+type keyMap struct {
+	Quit          key.Binding
+	ReloadBridges key.Binding
+}
+
+func (k keyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Quit, k.ReloadBridges}
+}
+
+func (k keyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{}
+}
+
+var defaultKeyMap = keyMap{
+	Quit: key.NewBinding(
+		key.WithKeys("esc", "esc"),
+		key.WithHelp("esc", "Go back"),
+	),
+	ReloadBridges: key.NewBinding(
+		key.WithKeys("r", "r"),
+		key.WithHelp("r", "Reload bridges"),
+	),
+}
 
 const (
 	groups  viewState = "groups"
@@ -56,7 +82,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case initMsg:
-		cmd = tea.Batch(m.tabs.Init(), m.groups.Init(), page_title.CreateSetPageTitleMsg("Hue Home"))
+		cmd = tea.Batch(
+			m.tabs.Init(),
+			m.groups.Init(),
+			page_title.CreateSetPageTitleMsg("Hue Home"),
+			page_help.CreateSetKeyMapMsg(&defaultKeyMap),
+		)
 	case pages_hue.ReloadBridgesAction:
 		err := m.adapter.Control.LoadBridges()
 		if err != nil {

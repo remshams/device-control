@@ -3,6 +3,7 @@ package home
 import (
 	"fmt"
 
+	"github.com/remshams/device-control/tui/components/page_help"
 	"github.com/remshams/device-control/tui/components/page_title"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
@@ -46,6 +47,7 @@ type Model struct {
 	menu      list.Model
 	state     viewState
 	toast     toast.Model
+	keyMap    page_help.Model
 	pageTitle page_title.Model
 }
 
@@ -56,6 +58,7 @@ func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAda
 		menu:      createMenu(),
 		state:     menu,
 		toast:     toast.InitModel(),
+		keyMap:    page_help.New(),
 		pageTitle: page_title.New(),
 	}
 }
@@ -68,6 +71,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.toast, _ = m.toast.Update(msg)
 	m.pageTitle, _ = m.pageTitle.Update(msg)
+	m.keyMap, _ = m.keyMap.Update(msg)
 	if pages.IsSystemMsg(msg) {
 		cmd = m.processSystemUpdate(msg)
 	} else {
@@ -129,7 +133,7 @@ func (m *Model) processKeylightsUpdate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case pages.BackToMenuAction:
 		m.state = menu
-		cmd = page_title.CreateSetPageTitleMsg("")
+		cmd = m.resetLayout()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -148,7 +152,7 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case pages.BackToMenuAction:
 		m.state = menu
-		cmd = page_title.CreateSetPageTitleMsg("")
+		cmd = m.resetLayout()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -163,7 +167,13 @@ func (m *Model) processHueUpate(msg tea.Msg) tea.Cmd {
 }
 
 func (m Model) View() string {
-	return fmt.Sprintf("%s\n%s\n%s", m.renderPageTitle(), m.renderPageContent(), m.renderToast())
+	return fmt.Sprintf(
+		"%s\n%s\n%s\n%s",
+		m.renderPageTitle(),
+		m.renderPageContent(),
+		m.renderToast(),
+		m.keyMap.View(),
+	)
 }
 
 func (m Model) renderPageTitle() string {
@@ -200,4 +210,8 @@ func createMenu() list.Model {
 	list := list.New(items, list.NewDefaultDelegate(), 0, 0)
 	list.Title = "Lights"
 	return list
+}
+
+func (m Model) resetLayout() tea.Cmd {
+	return tea.Batch(page_title.CreateSetPageTitleMsg(""), page_help.CreateResetKeyMapMsg())
 }

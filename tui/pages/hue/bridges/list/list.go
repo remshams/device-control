@@ -2,12 +2,15 @@ package hue_bridges_list
 
 import (
 	"fmt"
+
+	"github.com/remshams/device-control/tui/components/page_help"
 	kl_table "github.com/remshams/device-control/tui/components/table"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
 	pages_hue "github.com/remshams/device-control/tui/pages/hue"
 	hue_bridges "github.com/remshams/device-control/tui/pages/hue/bridges"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -27,6 +30,45 @@ const (
 	deleteBridge viewState = "deleteBridge"
 )
 
+type keyMap struct {
+	Quit            key.Binding
+	DiscoverBridges key.Binding
+	PairBridge      key.Binding
+	DeleteBridge    key.Binding
+	ReloadBridges   key.Binding
+}
+
+func (k keyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Quit, k.DiscoverBridges, k.PairBridge, k.DeleteBridge, k.ReloadBridges}
+}
+
+func (k keyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{}
+}
+
+var defaultKeyMap = keyMap{
+	Quit: key.NewBinding(
+		key.WithKeys("esc", "esc"),
+		key.WithHelp("esc", "Go back"),
+	),
+	DiscoverBridges: key.NewBinding(
+		key.WithKeys("f", "f"),
+		key.WithHelp("f", "Discover bridges"),
+	),
+	PairBridge: key.NewBinding(
+		key.WithKeys("p", "p"),
+		key.WithHelp("p", "Pair bridge"),
+	),
+	DeleteBridge: key.NewBinding(
+		key.WithKeys("d", "d"),
+		key.WithHelp("d", "Delete bridge"),
+	),
+	ReloadBridges: key.NewBinding(
+		key.WithKeys("r", "r"),
+		key.WithHelp("r", "Reload bridges"),
+	),
+}
+
 type Model struct {
 	adapter *hue.HueAdapter
 	table   table.Model
@@ -42,7 +84,7 @@ func InitModel(adapter *hue.HueAdapter) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.createInitMsg()
+	return tea.Batch(page_help.CreateSetKeyMapMsg(defaultKeyMap), m.createInitMsg())
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -65,23 +107,23 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 		cmd = tea.Batch(toastCmd, m.reloadBridges())
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "f":
+		switch {
+		case key.Matches(msg, defaultKeyMap.DiscoverBridges):
 			cmd = tea.Batch(toast.CreateInfoToastAction("Discovering bridges..."), m.createBridgesDiscoveredMsg())
-		case "p":
+		case key.Matches(msg, defaultKeyMap.PairBridge):
 			cmd = tea.Batch(toast.CreateInfoToastAction("Pairing bridge, please press the button..."), m.createBridgePairedMsg())
-		case "esc":
+		case key.Matches(msg, defaultKeyMap.Quit):
 			cmd = hue_bridges.CreateBackToBridgesHomeAction()
-		case "d":
+		case key.Matches(msg, defaultKeyMap.DeleteBridge):
 			m.state = deleteBridge
 			cmd = toast.CreateWarningToastAction(fmt.Sprintf("Are you sure you want to delete bridge %s? (y/n)", m.table.SelectedRow()[0]))
-		case "y":
+		case msg.String() == "y":
 			if m.state == deleteBridge {
 				cmd = m.deleteBridge()
 				m.state = list
 			}
-		case "n":
-			m.state = list
+		case key.Matches(msg, defaultKeyMap.ReloadBridges):
+			cmd = pages_hue.CreateReloadBridgesAction()
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}

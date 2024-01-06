@@ -46,6 +46,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case initMsg:
 		m.list = hue_group_list.InitModel(m.adapter)
+		cmd = m.list.Init()
 		m.state = list
 	case hue_groups.BackToGroupHomeAction:
 		cmd = pages_hue.CreateBackToHueHomeAction()

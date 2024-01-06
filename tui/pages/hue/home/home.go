@@ -111,16 +111,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.state = lights
 			cmd = m.lights.Init()
 		}
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "esc":
-			cmd = m.forwardUpdate(msg)
-		case "r":
-			cmd = pages_hue.CreateReloadBridgesAction()
-		default:
-			cmd = m.forwardUpdate(msg)
-		}
-
 	default:
 		cmd = m.forwardUpdate(msg)
 

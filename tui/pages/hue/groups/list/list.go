@@ -2,18 +2,55 @@ package hue_group_list
 
 import (
 	"fmt"
+	"strconv"
+
 	hue_control "github.com/remshams/device-control/hue-control/pubilc"
+	"github.com/remshams/device-control/tui/components/page_help"
 	kl_table "github.com/remshams/device-control/tui/components/table"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/hue"
 	pages_hue "github.com/remshams/device-control/tui/pages/hue"
 	hue_groups "github.com/remshams/device-control/tui/pages/hue/groups"
 	hue_group_details "github.com/remshams/device-control/tui/pages/hue/groups/details"
-	"strconv"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+type keyMap struct {
+	Quit                 key.Binding
+	ToggleAllGroupLights key.Binding
+	SelectGroup          key.Binding
+	ReloadBridges        key.Binding
+}
+
+func (k keyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Quit, k.ToggleAllGroupLights, k.SelectGroup, k.ReloadBridges}
+}
+
+func (k keyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{}
+}
+
+var defaultKeyMap = keyMap{
+	Quit: key.NewBinding(
+		key.WithKeys("esc", "esc"),
+		key.WithHelp("esc", "Go back"),
+	),
+	ToggleAllGroupLights: key.NewBinding(
+		key.WithKeys("t", "t"),
+		key.WithHelp("t", "Toggle all group lights"),
+	),
+	SelectGroup: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "Select group"),
+	),
+	ReloadBridges: key.NewBinding(
+		key.WithKeys("r", "r"),
+		key.WithHelp("r", "Reload groups"),
+	),
+}
 
 type GroupSelect struct {
 	Group *hue_control.Group
@@ -33,19 +70,25 @@ func InitModel(adapter *hue.HueAdapter) Model {
 	}
 }
 
+func (m Model) Init() tea.Cmd {
+	return page_help.CreateSetKeyMapMsg(defaultKeyMap)
+}
+
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case pages_hue.BridgesReloadedAction:
 		m.table.SetRows(createTableRows(m.adapter.Control.GetBridges()))
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "t":
+		switch {
+		case key.Matches(msg, defaultKeyMap.ToggleAllGroupLights):
 			cmd = m.toggleAllGroupLights()
-		case "enter":
+		case key.Matches(msg, defaultKeyMap.SelectGroup):
 			cmd = m.selectGroup(m.table.SelectedRow()[0])
-		case "esc":
+		case key.Matches(msg, defaultKeyMap.Quit):
 			cmd = hue_groups.CreateBackToGroupHomeAction()
+		case key.Matches(msg, defaultKeyMap.ReloadBridges):
+			cmd = pages_hue.CreateReloadBridgesAction()
 		default:
 			m.table, cmd = m.table.Update(msg)
 		}

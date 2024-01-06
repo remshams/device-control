@@ -2,10 +2,10 @@ package hue_lights_list
 
 import (
 	hue_control "github.com/remshams/device-control/hue-control/pubilc"
-	"strconv"
 	kl_table "github.com/remshams/device-control/tui/components/table"
 	"github.com/remshams/device-control/tui/lights/hue"
 	hue_lights "github.com/remshams/device-control/tui/pages/hue/lights"
+	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"

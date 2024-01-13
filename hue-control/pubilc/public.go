@@ -15,6 +15,8 @@ type Scene = scenes.Scene
 type Light = lights.Light
 type Control = control.HueControl
 
+var StorePath = ".config/device-control/bridges.json"
+
 func InitHueControl(finder bridges.BridgeFinder, bridgesStore bridges.BridgesStore) control.HueControl {
 	return control.InitHueControl(finder, bridgesStore)
 }

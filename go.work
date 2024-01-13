@@ -5,4 +5,5 @@ use (
 	./tui
 	./keylight-cli
 	./keylight-control
+  ./settings
 )

@@ -1,5 +1,10 @@
 package settings
 
+type SettingsStore interface {
+	Save(settings Settings) error
+	Load() (Settings, error)
+}
+
 type Settings struct {
 	longtitude float64
 	latitude   float64

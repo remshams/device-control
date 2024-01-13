@@ -1,10 +1,10 @@
 go 1.21.3
 
 use (
-  ./_common/
+	./_common
 	./hue-control
-	./tui
 	./keylight-cli
 	./keylight-control
-  ./settings
+	./settings
+	./tui
 )

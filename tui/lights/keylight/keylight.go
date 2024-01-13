@@ -1,10 +1,12 @@
 package keylight
 
 import (
-	"github.com/remshams/device-control/keylight-control/control"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/remshams/device-control/keylight-control/control"
+	keylight_control "github.com/remshams/device-control/keylight-control/public"
 )
 
 type KeylightAdapter struct {
@@ -19,7 +21,7 @@ func InitKeylightAdapter() KeylightAdapter {
 	keylightAdapter := control.New(
 		&control.ZeroConfKeylightFinder{},
 		&control.KeylightRestAdapter{},
-		&control.JsonKeylightStore{FilePath: filepath.Join(home, ".config/keylight/keylight.json")},
+		&control.JsonKeylightStore{FilePath: filepath.Join(home, keylight_control.StorePath)},
 	)
 	return KeylightAdapter{
 		Control: keylightAdapter,

@@ -72,8 +72,12 @@ func (settings Settings) GetLatitude() float64 {
 	return settings.location.latitude
 }
 
-func (settings Settings) GetSunriseSunset() SunriseAndSunset {
-	return settings.sunriseAndSunset
+func (settings Settings) GetSunrise() time.Time {
+	return settings.sunriseAndSunset.sunrise
+}
+
+func (settings Settings) GetSunset() time.Time {
+	return settings.sunriseAndSunset.sunset
 }
 
 func (settings *Settings) UpdateSunriseAndSunset() error {

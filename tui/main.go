@@ -18,7 +18,7 @@ func main() {
 		logLevel = log.ErrorLevel
 	}
 	log.SetLevel(logLevel)
-	f, err := tea.LogToFileWith("debug.log", "keylight-charm", log.Default())
+	f, err := tea.LogToFileWith("debug.log", "device-control", log.Default())
 	if err != nil {
 		fmt.Println("fatal:", err)
 		os.Exit(1)

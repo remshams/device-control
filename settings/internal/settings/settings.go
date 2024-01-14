@@ -7,6 +7,10 @@ type SettingsStore interface {
 	Load() (*Settings, error)
 }
 
+type SunriseAndSunsetAdapter interface {
+	GetSunriseAndSunset(location Location) (SunriseAndSunset, time.Time, time.Time, error)
+}
+
 type Location struct {
 	longtitude float64
 	latitude   float64
@@ -15,6 +19,13 @@ type Location struct {
 type SunriseAndSunset struct {
 	sunrise time.Time
 	sunset  time.Time
+}
+
+func InitSunriseAndSunset(sunrise time.Time, sunset time.Time) SunriseAndSunset {
+	return SunriseAndSunset{
+		sunrise: sunrise,
+		sunset:  sunset,
+	}
 }
 
 type Settings struct {

@@ -6,22 +6,25 @@ import (
 	"path/filepath"
 )
 
-func CreateOrUpdateFile(path string, bridgeJson []byte) error {
+func CreateOrUpdateFile(path string, data []byte) error {
 	dir := filepath.Dir(path)
 	err := os.MkdirAll(dir, os.ModePerm)
+	log.Debugf("Creating directory: %v", dir)
 	if err != nil {
-		log.Error("Could not create bridge file directory")
+		log.Error("Could not create directory: %v", dir)
 		return err
 	}
+	log.Debugf("Creating file: %v", path)
 	file, err := os.Create(path)
 	if err != nil {
-		log.Error("Could not create bridge file")
+		log.Error("Could not create file: %v", path)
 		return err
 	}
 	defer file.Close()
-	_, err = file.Write(bridgeJson)
+	_, err = file.Write(data)
 	if err != nil {
-		log.Error("Could not write bridge file")
+		log.Error("Could not write data")
 	}
+	log.Debug("Successfully wrote data")
 	return err
 }

@@ -2,6 +2,7 @@ package settings
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/charmbracelet/log"
 	"github.com/remshams/device-control/common/file-store"
@@ -49,6 +50,7 @@ func InitSettingsJsonStore(filePath string) SettingsJsonStore {
 }
 
 func (store SettingsJsonStore) Save(settings Settings) error {
+	log.Debugf("Saving settings: %v", settings)
 	settingsJson, err := jsonFromSettings(settings)
 	if err != nil {
 		return err
@@ -57,6 +59,15 @@ func (store SettingsJsonStore) Save(settings Settings) error {
 
 }
 
-func (store SettingsJsonStore) Load() (Settings, error) {
-	return Settings{}, nil
+func (store SettingsJsonStore) Load() (*Settings, error) {
+	data, err := os.ReadFile(store.FilePath)
+	if err != nil {
+		log.Warn("Settings file does not exist")
+		return nil, nil
+	}
+	settings, err := fromSettingsJson(data)
+	if err != nil {
+		log.Debugf("Loaded settings: %v", settings)
+	}
+	return settings, err
 }

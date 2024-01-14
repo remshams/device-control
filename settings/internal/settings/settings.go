@@ -8,7 +8,7 @@ type SettingsStore interface {
 }
 
 type SunriseAndSunsetAdapter interface {
-	GetSunriseAndSunset(location Location) (SunriseAndSunset, time.Time, time.Time, error)
+	GetSunriseAndSunset(location Location) (*SunriseAndSunset, error)
 }
 
 type Location struct {
@@ -29,18 +29,20 @@ func InitSunriseAndSunset(sunrise time.Time, sunset time.Time) SunriseAndSunset 
 }
 
 type Settings struct {
-	store            SettingsStore
-	location         Location
-	sunriseAndSunset SunriseAndSunset
+	store                   SettingsStore
+	sunriseAndSunsetAdapter SunriseAndSunsetAdapter
+	location                Location
+	sunriseAndSunset        SunriseAndSunset
 }
 
-func InitSettings(store SettingsStore, longtitude float64, latitude float64) Settings {
+func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, latitude float64, longtitude float64) Settings {
 	return Settings{
+		store:                   store,
+		sunriseAndSunsetAdapter: sunriseSetAdapter,
 		location: Location{
-			longtitude: longtitude,
 			latitude:   latitude,
+			longtitude: longtitude,
 		},
-		store: store,
 	}
 }
 
@@ -52,7 +54,17 @@ func (settings Settings) GetLatitude() float64 {
 	return settings.location.latitude
 }
 
-func (settings *Settings) UpdateSunriseAndSunset() {
+func (settings Settings) GetSunriseSunset() SunriseAndSunset {
+	return settings.sunriseAndSunset
+}
+
+func (settings *Settings) UpdateSunriseAndSunset() error {
+	sunriseAndsSunset, err := settings.sunriseAndSunsetAdapter.GetSunriseAndSunset(settings.location)
+	if err != nil {
+		return err
+	}
+	settings.sunriseAndSunset = *sunriseAndsSunset
+	return nil
 }
 
 func (settings Settings) Save() error {

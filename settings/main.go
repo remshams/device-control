@@ -12,7 +12,12 @@ func main() {
 	logger.PrepareLogger()
 	path := file_store.CreateHomePath(device_control_settings.StorePath)
 	settingsStore := settings.InitSettingsJsonStore(path)
-	settings := settings.InitSettings(settingsStore, 48.1, 9.2)
-	err := settings.Save()
+	sunriseSetAdapter := settings.SunriseAndSunsetOrgAdapter{}
+	settings := settings.InitSettings(settingsStore, sunriseSetAdapter, 48.684927234902425, 9.637580098113036)
+	err := settings.UpdateSunriseAndSunset()
+	if err == nil {
+		log.Debugf("Sunrise: %v", settings.GetSunriseSunset())
+	}
+	err = settings.Save()
 	log.Debugf("Error: %v", err)
 }

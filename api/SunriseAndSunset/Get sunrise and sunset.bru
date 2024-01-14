@@ -1,0 +1,16 @@
+meta {
+  name: Get sunrise and sunset
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.sunrise-sunset.org/json?lat={{lat}}&lng={{lng}}
+  body: none
+  auth: none
+}
+
+query {
+  lat: {{lat}}
+  lng: {{lng}}
+}

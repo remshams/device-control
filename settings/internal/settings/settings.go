@@ -39,14 +39,11 @@ type Settings struct {
 	sunriseAndSunset        SunriseAndSunset
 }
 
-func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, latitude float64, longtitude float64) (*Settings, error) {
+func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, location Location) (*Settings, error) {
 	settings := Settings{
 		store:                   store,
 		sunriseAndSunsetAdapter: sunriseSetAdapter,
-		location: Location{
-			latitude:   latitude,
-			longtitude: longtitude,
-		},
+		location:                location,
 	}
 	err := settings.UpdateSunriseAndSunset()
 	if err != nil {

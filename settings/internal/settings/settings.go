@@ -56,6 +56,17 @@ func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter
 	return &settings, nil
 }
 
+func InitFromStore(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter) (*Settings, error) {
+	settings, err := store.Load()
+	if err != nil {
+		log.Errorf("Could not load settings: %v", err)
+		return nil, err
+	}
+	settings.store = store
+	settings.sunriseAndSunsetAdapter = sunriseSetAdapter
+	return settings, nil
+}
+
 func (settings Settings) GetLongtitude() float64 {
 	return settings.location.longtitude
 }

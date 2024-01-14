@@ -63,6 +63,10 @@ func fromSettingsJson(settingsJson []byte) (*Settings, error) {
 			longtitude: settingsDto.Location.Longtitute,
 			latitude:   settingsDto.Location.Latitude,
 		},
+		sunriseAndSunset: InitSunriseAndSunset(
+			settingsDto.SunriseAndSunset.Sunrise,
+			settingsDto.SunriseAndSunset.Sunset,
+		),
 	}, nil
 }
 
@@ -87,6 +91,7 @@ func (store SettingsJsonStore) Save(settings Settings) error {
 }
 
 func (store SettingsJsonStore) Load() (*Settings, error) {
+	log.Debugf("Load settings")
 	data, err := os.ReadFile(store.FilePath)
 	if err != nil {
 		log.Warn("Settings file does not exist")
@@ -96,5 +101,6 @@ func (store SettingsJsonStore) Load() (*Settings, error) {
 	if err != nil {
 		log.Debugf("Loaded settings: %v", settings)
 	}
+	log.Debugf("Loaded settings: %v", settings)
 	return settings, err
 }

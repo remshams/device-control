@@ -46,19 +46,10 @@ func InitSunriseAndSunsetOrgAdapter() SunriseAndSunsetOrgAdapter {
 
 func (adapter SunriseAndSunsetOrgAdapter) GetSunriseAndSunset(location Location) (*SunriseAndSunset, error) {
 	pathWithParams := fmt.Sprintf(path, location.latitude, location.longtitude)
-	req, client, cancel, err := dc_http.RequestWithTimeout(
-		http.MethodGet,
-		pathWithParams,
-		nil,
-		nil,
-	)
-	defer cancel()
-	res, err := client.Do(req)
+	res, err := dc_http.PerformRequest("SunriseAndSunset", http.MethodGet, pathWithParams, nil, nil)
 	if err != nil {
-		log.Error("Could not get sunrise and sunset")
-	}
-	if res.StatusCode != 200 {
-		log.Error("Could not get sunrise and sunset")
+		log.Error("Could not perform sunrise and sunset request")
+		return nil, err
 	}
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)

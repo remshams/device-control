@@ -3,20 +3,45 @@ package settings
 import (
 	"encoding/json"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/remshams/device-control/common/file-store"
 )
 
-type SettingsDto struct {
+type LocationDto struct {
 	Longtitute float64 `json:"longtitute"`
 	Latitude   float64 `json:"latitude"`
 }
 
+func fromLocation(location Location) LocationDto {
+	return LocationDto{
+		Longtitute: location.longtitude,
+		Latitude:   location.latitude,
+	}
+}
+
+type SunriseAndSunsetDto struct {
+	Sunrise time.Time `json:"sunrise"`
+	Sunset  time.Time `json:"sunset"`
+}
+
+func fromSunriseAndSunset(sunriseAndSunset SunriseAndSunset) SunriseAndSunsetDto {
+	return SunriseAndSunsetDto{
+		Sunrise: sunriseAndSunset.sunrise,
+		Sunset:  sunriseAndSunset.sunset,
+	}
+}
+
+type SettingsDto struct {
+	Location         LocationDto         `json:"location"`
+	SunriseAndSunset SunriseAndSunsetDto `json:"sunriseAndSunset"`
+}
+
 func jsonFromSettings(settings Settings) ([]byte, error) {
 	settingsDto := SettingsDto{
-		Longtitute: settings.longtitude,
-		Latitude:   settings.latitude,
+		Location:         fromLocation(settings.location),
+		SunriseAndSunset: fromSunriseAndSunset(settings.sunriseAndSunset),
 	}
 	settingsJson, err := json.Marshal(settingsDto)
 	if err != nil {
@@ -34,8 +59,10 @@ func fromSettingsJson(settingsJson []byte) (*Settings, error) {
 		return nil, err
 	}
 	return &Settings{
-		longtitude: settingsDto.Longtitute,
-		latitude:   settingsDto.Latitude,
+		location: Location{
+			longtitude: settingsDto.Location.Longtitute,
+			latitude:   settingsDto.Location.Latitude,
+		},
 	}, nil
 }
 

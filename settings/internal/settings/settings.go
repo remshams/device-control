@@ -1,6 +1,10 @@
 package settings
 
-import "time"
+import (
+	"time"
+
+	"github.com/charmbracelet/log"
+)
 
 type SettingsStore interface {
 	Save(settings Settings) error
@@ -35,8 +39,8 @@ type Settings struct {
 	sunriseAndSunset        SunriseAndSunset
 }
 
-func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, latitude float64, longtitude float64) Settings {
-	return Settings{
+func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, latitude float64, longtitude float64) (*Settings, error) {
+	settings := Settings{
 		store:                   store,
 		sunriseAndSunsetAdapter: sunriseSetAdapter,
 		location: Location{
@@ -44,6 +48,12 @@ func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter
 			longtitude: longtitude,
 		},
 	}
+	err := settings.UpdateSunriseAndSunset()
+	if err != nil {
+		log.Errorf("Could not initialize settings: %v", err)
+		return nil, err
+	}
+	return &settings, nil
 }
 
 func (settings Settings) GetLongtitude() float64 {

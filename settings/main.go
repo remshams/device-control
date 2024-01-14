@@ -13,8 +13,7 @@ func main() {
 	path := file_store.CreateHomePath(device_control_settings.StorePath)
 	settingsStore := settings.InitSettingsJsonStore(path)
 	sunriseSetAdapter := settings.SunriseAndSunsetOrgAdapter{}
-	settings := settings.InitSettings(settingsStore, sunriseSetAdapter, 48.684927234902425, 9.637580098113036)
-	err := settings.UpdateSunriseAndSunset()
+	settings, err := settings.InitSettings(settingsStore, sunriseSetAdapter, 48.684927234902425, 9.637580098113036)
 	if err == nil {
 		log.Debugf("Sunrise: %v", settings.GetSunriseSunset())
 	}

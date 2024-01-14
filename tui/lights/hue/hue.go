@@ -1,9 +1,8 @@
 package hue
 
 import (
+	file_store "github.com/remshams/device-control/common/file-store"
 	hue_control "github.com/remshams/device-control/hue-control/pubilc"
-	"os"
-	"path/filepath"
 )
 
 type HueAdapter struct {
@@ -11,11 +10,8 @@ type HueAdapter struct {
 }
 
 func InitHueAdapter() HueAdapter {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		home = ""
-	}
-	store := hue_control.InitBridgesJsonStore(filepath.Join(home, hue_control.StorePath))
+	hueStorePath := file_store.CreateHomePath(hue_control.StorePath)
+	store := hue_control.InitBridgesJsonStore(hueStorePath)
 	finder := hue_control.InitZeroconfBridgeFinder()
 	return HueAdapter{
 		Control: hue_control.InitHueControl(finder, store),

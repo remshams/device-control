@@ -28,3 +28,12 @@ func CreateOrUpdateFile(path string, data []byte) error {
 	log.Debug("Successfully wrote data")
 	return err
 }
+
+func CreateHomePath(path string) string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Warn("Could not get home directory, writing to current directory")
+		home = "./"
+	}
+	return filepath.Join(home, path)
+}

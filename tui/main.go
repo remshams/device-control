@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/remshams/device-control/common/logger"
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages/home"
@@ -13,11 +15,7 @@ import (
 )
 
 func main() {
-	logLevel, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
-	if err != nil {
-		logLevel = log.ErrorLevel
-	}
-	log.SetLevel(logLevel)
+	logger.PrepareLogger()
 	f, err := tea.LogToFileWith("debug.log", "device-control", log.Default())
 	if err != nil {
 		fmt.Println("fatal:", err)

@@ -16,6 +16,7 @@ import (
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages/home"
+	"github.com/remshams/device-control/tui/settings"
 
 	"os"
 
@@ -73,6 +74,10 @@ func main() {
 func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	keylightAdapter := keylight.InitKeylightAdapter()
 	hueAdapter := hue.InitHueAdapter()
-	m := home.InitModel(&keylightAdapter, &hueAdapter)
+	settings, err := settings.LoadSettings()
+	if err != nil {
+		log.Warn("Could not load settings, starting with empty one")
+	}
+	m := home.InitModel(&keylightAdapter, &hueAdapter, settings)
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }

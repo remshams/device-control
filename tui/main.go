@@ -7,6 +7,7 @@ import (
 	"github.com/remshams/device-control/tui/lights/hue"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages/home"
+	"github.com/remshams/device-control/tui/settings"
 
 	"os"
 
@@ -24,7 +25,11 @@ func main() {
 	defer f.Close()
 	keylightAdapter := keylight.InitKeylightAdapter()
 	hueAdapter := hue.InitHueAdapter()
-	p := tea.NewProgram(home.InitModel(&keylightAdapter, &hueAdapter))
+	settings, err := settings.LoadSettings()
+	if err != nil {
+		log.Warn("Could not load settings, starting with empty one")
+	}
+	p := tea.NewProgram(home.InitModel(&keylightAdapter, &hueAdapter, settings))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

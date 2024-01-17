@@ -8,6 +8,8 @@ import (
 	device_control_settings "github.com/remshams/device-control/settings/public"
 	"github.com/remshams/device-control/tui/components/page_title"
 	dc_tabs "github.com/remshams/device-control/tui/components/tabs"
+	"github.com/remshams/device-control/tui/pages"
+	page_settings "github.com/remshams/device-control/tui/pages/settings"
 	settings_location "github.com/remshams/device-control/tui/pages/settings/location"
 	"github.com/remshams/device-control/tui/styles"
 )
@@ -27,12 +29,17 @@ func InitModel(settings *device_control_settings.Settings) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return page_title.CreateSetPageTitleMsg("Settings")
+	return tea.Batch(m.location.Init(), page_title.CreateSetPageTitleMsg("Settings"))
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	m.location, cmd = m.location.Update(msg)
+	switch msg := msg.(type) {
+	case page_settings.BackToSettingsHomeMsg:
+		cmd = pages.CreateBackToMenuAction()
+	default:
+		m.location, cmd = m.location.Update(msg)
+	}
 	return m, cmd
 }
 

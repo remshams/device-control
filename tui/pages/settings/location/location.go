@@ -9,6 +9,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	device_control_settings "github.com/remshams/device-control/settings/public"
 	kl_cursor "github.com/remshams/device-control/tui/components/cursor"
+	"github.com/remshams/device-control/tui/components/page_help"
+	page_settings "github.com/remshams/device-control/tui/pages/settings"
 )
 
 type keyMap struct {
@@ -16,10 +18,22 @@ type keyMap struct {
 	Quit key.Binding
 }
 
+func (k keyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Save, k.Quit}
+}
+
+func (k keyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{}
+}
+
 var settingsLocationMap = keyMap{
 	Save: key.NewBinding(
 		key.WithKeys("s"),
 		key.WithHelp("s", "save"),
+	),
+	Quit: key.NewBinding(
+		key.WithKeys("esc"),
+		key.WithHelp("esc", "Go back"),
 	),
 }
 
@@ -43,11 +57,18 @@ func InitModel(settings *device_control_settings.Settings) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return page_help.CreateSetKeyMapMsg(settingsLocationMap)
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, settingsLocationMap.Quit):
+			cmd = page_settings.CreateBackToSettingsHomeAction()
+		}
+	}
 	return m, cmd
 }
 

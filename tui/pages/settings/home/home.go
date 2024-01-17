@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	device_control_settings "github.com/remshams/device-control/settings/public"
+	"github.com/remshams/device-control/tui/components/page_title"
 	dc_tabs "github.com/remshams/device-control/tui/components/tabs"
 	settings_location "github.com/remshams/device-control/tui/pages/settings/location"
 	"github.com/remshams/device-control/tui/styles"
@@ -26,7 +27,7 @@ func InitModel(settings *device_control_settings.Settings) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return page_title.CreateSetPageTitleMsg("Settings")
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {

@@ -1,4 +1,4 @@
-package kl_textinput
+package dc_textinput
 
 import (
 	"fmt"

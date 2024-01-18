@@ -9,8 +9,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	device_control_settings "github.com/remshams/device-control/settings/public"
 	kl_cursor "github.com/remshams/device-control/tui/components/cursor"
+	kl_textinput "github.com/remshams/device-control/tui/components/dc_textinput"
 	"github.com/remshams/device-control/tui/components/page_help"
-	kl_textinput "github.com/remshams/device-control/tui/components/textinput"
 	page_settings "github.com/remshams/device-control/tui/pages/settings"
 )
 

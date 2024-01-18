@@ -2,13 +2,13 @@ package keylight_content
 
 import (
 	"fmt"
+	"github.com/remshams/device-control/keylight-control/control"
 	"github.com/remshams/device-control/tui/components/checkbox"
-	"github.com/remshams/device-control/tui/components/textinput"
+	"github.com/remshams/device-control/tui/components/dc_textinput"
 	"github.com/remshams/device-control/tui/components/toast"
 	"github.com/remshams/device-control/tui/lights/keylight"
 	"github.com/remshams/device-control/tui/pages/keylight/details/model"
 	"github.com/remshams/device-control/tui/styles"
-	"github.com/remshams/device-control/keylight-control/control"
 	"os"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -30,8 +30,8 @@ func InitModel(keylight *control.Keylight, keylightAdapter *keylight.KeylightAda
 	model := Model{
 		keylight:    keylight,
 		on:          checkbox.New("On: ", false),
-		brightness:  kl_textinput.CreateTextInputModel(),
-		temperature: kl_textinput.CreateTextInputModel(),
+		brightness:  dc_textinput.CreateTextInputModel(),
+		temperature: dc_textinput.CreateTextInputModel(),
 		cursor:      0, keylightAdapter: keylightAdapter,
 	}
 	model.updateKeylight()
@@ -129,8 +129,8 @@ func (m *Model) decreaseCursor() {
 
 func (m Model) View(state keylight_model.ViewState) string {
 	on := fmt.Sprintf("%s", m.on.View())
-	brightness := kl_textinput.CreateTextInputView(m.brightness, "Brightness", "%")
-	temperature := kl_textinput.CreateTextInputView(m.temperature, "Temperature", "")
+	brightness := dc_textinput.CreateTextInputView(m.brightness, "Brightness", "%")
+	temperature := dc_textinput.CreateTextInputView(m.temperature, "Temperature", "")
 	on = m.renderLine(on, m.cursor == 0, state == keylight_model.Insert)
 	brightness = m.renderLine(brightness, m.cursor == 1, state == keylight_model.Insert)
 	temperature = m.renderLine(temperature, m.cursor == 2, state == keylight_model.Insert)

@@ -26,12 +26,12 @@ func RenderLine(line string, isActive, isEdit bool) string {
 	return style.Render(fmt.Sprintf("%s %s %s", cursor, line, edit))
 }
 
-type keyMap struct {
+type KeyMap struct {
 	Up   key.Binding
 	Down key.Binding
 }
 
-var CursorKeyMap = keyMap{
+var CursorKeyMap = KeyMap{
 	Up: key.NewBinding(
 		key.WithKeys("k"),
 		key.WithHelp("k", "up"),

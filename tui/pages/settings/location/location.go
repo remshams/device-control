@@ -154,8 +154,8 @@ func (m *Model) saveSettings() tea.Cmd {
 	if err_ != nil {
 		log.Errorf("Could not parse longtitude: %v", err_)
 	}
-	m.settings.SetLatitude(lat)
-	m.settings.SetLongtitude(lng)
+	err = m.settings.SetLatitude(lat)
+	err = m.settings.SetLongtitude(lng)
 	err = m.settings.Save()
 	if err != nil {
 		return toast.CreateErrorToastAction("Could not save settings")

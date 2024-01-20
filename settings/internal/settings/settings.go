@@ -59,6 +59,10 @@ func InitFromStore(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapte
 		log.Errorf("Could not load settings: %v", err)
 		return nil, err
 	}
+	if settings == nil {
+		log.Debug("No settings found in store")
+		return nil, nil
+	}
 	settings.store = store
 	settings.sunriseAndSunsetAdapter = sunriseSetAdapter
 	return settings, nil

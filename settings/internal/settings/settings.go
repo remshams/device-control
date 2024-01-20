@@ -32,6 +32,11 @@ func InitSunriseAndSunset(sunrise time.Time, sunset time.Time) SunriseAndSunset 
 	}
 }
 
+var DefaultLocation = Location{
+	latitude:   48.775845,
+	longtitude: 9.182932,
+}
+
 type Settings struct {
 	store                   SettingsStore
 	sunriseAndSunsetAdapter SunriseAndSunsetAdapter
@@ -39,7 +44,7 @@ type Settings struct {
 	sunriseAndSunset        SunriseAndSunset
 }
 
-func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, location Location) (*Settings, error) {
+func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter, location Location) (Settings, error) {
 	settings := Settings{
 		store:                   store,
 		sunriseAndSunsetAdapter: sunriseSetAdapter,
@@ -47,10 +52,10 @@ func InitSettings(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter
 	}
 	err := settings.UpdateSunriseAndSunset()
 	if err != nil {
-		log.Errorf("Could not initialize settings: %v", err)
-		return nil, err
+		log.Errorf("Could not load sunrise and sunset values: %v", err)
+		log.Error("Using default values")
 	}
-	return &settings, nil
+	return settings, err
 }
 
 func InitFromStore(store SettingsStore, sunriseSetAdapter SunriseAndSunsetAdapter) (*Settings, error) {

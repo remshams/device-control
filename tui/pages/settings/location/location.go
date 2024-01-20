@@ -55,14 +55,14 @@ const (
 )
 
 type Model struct {
-	settings *device_control_settings.Settings
+	settings device_control_settings.Settings
 	lat      kl_textinput.Model
 	lng      kl_textinput.Model
 	cursor   kl_cursor.CursorState
 	state    viewState
 }
 
-func InitModel(settings *device_control_settings.Settings) Model {
+func InitModel(settings device_control_settings.Settings) Model {
 	m := Model{
 		settings: settings,
 		lat:      kl_textinput.New("Latitude", ""),
@@ -70,10 +70,8 @@ func InitModel(settings *device_control_settings.Settings) Model {
 		cursor:   kl_cursor.InitCursorState(2),
 		state:    navigate,
 	}
-	if settings != nil {
-		m.lat.Input.SetValue(strconv.FormatFloat(settings.GetLatitude(), 'f', -1, 64))
-		m.lng.Input.SetValue(strconv.FormatFloat(settings.GetLongtitude(), 'f', -1, 64))
-	}
+	m.lat.Input.SetValue(strconv.FormatFloat(settings.GetLatitude(), 'f', -1, 64))
+	m.lng.Input.SetValue(strconv.FormatFloat(settings.GetLongtitude(), 'f', -1, 64))
 	return m
 }
 

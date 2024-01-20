@@ -25,7 +25,7 @@ func main() {
 	defer f.Close()
 	keylightAdapter := keylight.InitKeylightAdapter()
 	hueAdapter := hue.InitHueAdapter()
-	settings, err := settings.LoadSettings()
+	settings := settings.LoadOrInitSettings()
 	if err != nil {
 		log.Warn("Could not load settings, starting with empty one")
 	}

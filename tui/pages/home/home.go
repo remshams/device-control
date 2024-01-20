@@ -55,7 +55,7 @@ type Model struct {
 	pageTitle    page_title.Model
 }
 
-func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter, settings *device_control_settings.Settings) Model {
+func InitModel(keylightAdapter *keylight.KeylightAdapter, hueAdapter *hue.HueAdapter, settings device_control_settings.Settings) Model {
 	return Model{
 		keylight:     keylight_home.InitModel(keylightAdapter),
 		hue:          hue_home_tabs.InitModel(hueAdapter),

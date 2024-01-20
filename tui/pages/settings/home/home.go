@@ -15,12 +15,12 @@ import (
 )
 
 type Model struct {
-	settings *device_control_settings.Settings
+	settings device_control_settings.Settings
 	location settings_location.Model
 	tabs     dc_tabs.Model
 }
 
-func InitModel(settings *device_control_settings.Settings) Model {
+func InitModel(settings device_control_settings.Settings) Model {
 	return Model{
 		settings: settings,
 		location: settings_location.InitModel(settings),

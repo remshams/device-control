@@ -74,10 +74,7 @@ func main() {
 func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	keylightAdapter := keylight.InitKeylightAdapter()
 	hueAdapter := hue.InitHueAdapter()
-	settings, err := settings.LoadSettings()
-	if err != nil {
-		log.Warn("Could not load settings, starting with empty one")
-	}
+	settings := settings.LoadOrInitSettings()
 	m := home.InitModel(&keylightAdapter, &hueAdapter, settings)
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }

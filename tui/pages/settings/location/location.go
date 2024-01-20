@@ -6,10 +6,12 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/log"
 	device_control_settings "github.com/remshams/device-control/settings/public"
 	kl_cursor "github.com/remshams/device-control/tui/components/cursor"
 	kl_textinput "github.com/remshams/device-control/tui/components/dc_textinput"
 	"github.com/remshams/device-control/tui/components/page_help"
+	"github.com/remshams/device-control/tui/components/toast"
 	page_settings "github.com/remshams/device-control/tui/pages/settings"
 )
 
@@ -106,10 +108,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case key.Matches(msg, settingsLocationMap.Save):
 			if m.state == navigate {
 				m.state = navigate
+				cmd = m.saveSettings()
 			} else {
 				cmd = m.updateSelectedInput(msg)
 			}
-			// TODO: save settings
 		default:
 			if m.state == navigate {
 				m.cursor.Update(msg)
@@ -141,6 +143,24 @@ func (m *Model) resetSettings(msg tea.Msg) tea.Cmd {
 		m.lng.Input.SetValue(strconv.FormatFloat(m.settings.GetLongtitude(), 'f', -1, 64))
 	}
 	return cmd
+}
+
+func (m *Model) saveSettings() tea.Cmd {
+	lat, err := strconv.ParseFloat(m.lat.Input.Value(), 64)
+	if err != nil {
+		log.Errorf("Could not parse latitude: %v", err)
+	}
+	lng, err_ := strconv.ParseFloat(m.lng.Input.Value(), 64)
+	if err_ != nil {
+		log.Errorf("Could not parse longtitude: %v", err_)
+	}
+	m.settings.SetLatitude(lat)
+	m.settings.SetLongtitude(lng)
+	err = m.settings.Save()
+	if err != nil {
+		return toast.CreateErrorToastAction("Could not save settings")
+	}
+	return toast.CreateSuccessToastAction("Settings saved")
 }
 
 func (m Model) View() string {

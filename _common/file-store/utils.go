@@ -9,12 +9,12 @@ import (
 func CreateOrUpdateFile(path string, data []byte) error {
 	dir := filepath.Dir(path)
 	err := os.MkdirAll(dir, os.ModePerm)
-	log.Debugf("Creating directory: %v", dir)
+	log.Debugf("Creating directory (if necessary): %v", dir)
 	if err != nil {
 		log.Error("Could not create directory: %v", dir)
 		return err
 	}
-	log.Debugf("Creating file: %v", path)
+	log.Debugf("Creating file (if necessary): %v", path)
 	file, err := os.Create(path)
 	if err != nil {
 		log.Error("Could not create file: %v", path)

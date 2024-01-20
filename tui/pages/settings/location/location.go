@@ -70,8 +70,10 @@ func InitModel(settings *device_control_settings.Settings) Model {
 		cursor:   kl_cursor.InitCursorState(2),
 		state:    navigate,
 	}
-	m.lat.Input.SetValue(strconv.FormatFloat(settings.GetLatitude(), 'f', -1, 64))
-	m.lng.Input.SetValue(strconv.FormatFloat(settings.GetLongtitude(), 'f', -1, 64))
+	if settings != nil {
+		m.lat.Input.SetValue(strconv.FormatFloat(settings.GetLatitude(), 'f', -1, 64))
+		m.lng.Input.SetValue(strconv.FormatFloat(settings.GetLongtitude(), 'f', -1, 64))
+	}
 	return m
 }
 

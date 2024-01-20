@@ -47,11 +47,19 @@ var settingsLocationMap = keyMapNavMode{
 	),
 }
 
+type viewState string
+
+const (
+	navigate viewState = "navigate"
+	edit     viewState = "edit"
+)
+
 type Model struct {
 	settings *device_control_settings.Settings
 	lat      kl_textinput.Model
 	lng      kl_textinput.Model
 	cursor   kl_cursor.CursorState
+	state    viewState
 }
 
 func InitModel(settings *device_control_settings.Settings) Model {
@@ -60,6 +68,7 @@ func InitModel(settings *device_control_settings.Settings) Model {
 		lat:      kl_textinput.New("Latitude", ""),
 		lng:      kl_textinput.New("Longtitude", ""),
 		cursor:   kl_cursor.InitCursorState(2),
+		state:    navigate,
 	}
 	m.lat.Input.SetValue(strconv.FormatFloat(settings.GetLatitude(), 'f', -1, 64))
 	m.lng.Input.SetValue(strconv.FormatFloat(settings.GetLongtitude(), 'f', -1, 64))
@@ -76,17 +85,62 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, settingsLocationMap.Quit):
-			cmd = page_settings.CreateBackToSettingsHomeAction()
-		default:
-			if m.cursor.Index() == 0 {
-				m.lat, cmd = m.lat.Update(msg)
+			if m.state == navigate {
+				cmd = page_settings.CreateBackToSettingsHomeAction()
 			} else {
-				m.lng, cmd = m.lng.Update(msg)
+				m.state = navigate
+				cmd = m.resetSettings(msg)
 			}
-			m.cursor.Update(msg)
+		case key.Matches(msg, settingsLocationMap.textinput.Apply):
+			if m.state == edit {
+				cmd = m.updateSelectedInput(msg)
+				m.state = navigate
+			}
+		case key.Matches(msg, settingsLocationMap.textinput.Edit):
+			if m.state == navigate {
+				m.state = edit
+				cmd = m.updateSelectedInput(msg)
+			} else {
+				cmd = m.updateSelectedInput(msg)
+			}
+		case key.Matches(msg, settingsLocationMap.Save):
+			if m.state == navigate {
+				m.state = navigate
+			} else {
+				cmd = m.updateSelectedInput(msg)
+			}
+			// TODO: save settings
+		default:
+			if m.state == navigate {
+				m.cursor.Update(msg)
+			} else {
+				cmd = m.updateSelectedInput(msg)
+			}
 		}
 	}
 	return m, cmd
+}
+
+func (m *Model) updateSelectedInput(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	if m.cursor.Index() == 0 {
+		m.lat, cmd = m.lat.Update(msg)
+	} else {
+		m.lng, cmd = m.lng.Update(msg)
+	}
+	return cmd
+}
+
+func (m *Model) resetSettings(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+	if m.cursor.Index() == 0 {
+		m.lat, cmd = m.lat.Update(msg)
+		m.lat.Input.SetValue(strconv.FormatFloat(m.settings.GetLatitude(), 'f', -1, 64))
+	} else {
+		m.lng, cmd = m.lng.Update(msg)
+		m.lng.Input.SetValue(strconv.FormatFloat(m.settings.GetLongtitude(), 'f', -1, 64))
+	}
+	return cmd
 }
 
 func (m Model) View() string {

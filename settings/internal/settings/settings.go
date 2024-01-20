@@ -77,16 +77,18 @@ func (settings Settings) GetLongtitude() float64 {
 	return settings.location.longtitude
 }
 
-func (settings *Settings) SetLongtitude(longtitude float64) {
+func (settings *Settings) SetLongtitude(longtitude float64) error {
 	settings.location.longtitude = longtitude
+	return settings.UpdateSunriseAndSunset()
 }
 
 func (settings Settings) GetLatitude() float64 {
 	return settings.location.latitude
 }
 
-func (settings *Settings) SetLatitude(latitude float64) {
+func (settings *Settings) SetLatitude(latitude float64) error {
 	settings.location.latitude = latitude
+	return settings.UpdateSunriseAndSunset()
 }
 
 func (settings Settings) GetSunrise() time.Time {
